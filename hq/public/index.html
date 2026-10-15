@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DecodeHer Studio</title>
   <meta name="theme-color" content="#0f0608">
+  <meta name="build" content="20261015T141802Z">
   <meta name="description" content="DecodeHer HQ: the live studio board">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -884,8 +885,11 @@ const packets = [];
 window.__tokens = tokens; window.__packets = packets;
 function addPacket(p){ packets.push(p); Snd.blip(); }
 const LINE = ['voice','scout','judge','edit','post','posted'];
-const LINE_ST = [0,1,2,3,6,6];
-const WORK_LINE = [0,1,2,3,3,3,4];
+// tk.kept is the reel's rank in the REAL factory order: voice → scout (plan/clips) → mix → judge (sheets/judge) → edit/render → post → posted.
+// Waiting reels sit in a tray: mix-stage reels at Mix; render-stage reels wait for the single render lane in EDIT's tray (Edit cuts
+// first, then Render renders frames). A reel is on a desk only while that station really runs it.
+const LINE_ST = [0,1,4,2,3,6,6];        // rank -> station whose tray holds a waiting reel (6 = posted: on the wall)
+const WORK_LINE = [0,1,3,4,2,4,5];      // station -> rank of a reel worked at that desk
 const deskHold = [null,null,null,null,null,null,null];
 const shelf = [[],[],[],[],[],[],[]];
 const deskTk = [null,null,null,null,null,null,null];
@@ -909,6 +913,8 @@ function parseRunning(list){
   });
   return out;
 }
+const FAC_ST = { voice:0, plan:1, clips:1, research:1, sheets:2, judge:2, mix:4, render:5, queue:6 };
+function facStation(stg, d){ const k = FAC_ST[stg]; if (k === 5 && d.stations && d.stations.edit && d.stations.edit.busy && !(d.stations.render && d.stations.render.busy)) return 3; return k === undefined ? -1 : k; }
 const isSlug = x => /^(w\d+-\d+-|\d+-[A-Za-z]{3}-|\d+-W\d+-)[\w-]+$/i.test(x);
 function slugTitle(x){
   const reels = DATA.reels || [];
@@ -936,7 +942,6 @@ function bubbleText(i){
   }
   if (i === 6) return (SI(6).text || (hasQueued ? 'Booked' : 'Nothing booked')).replace(/^\d+ booked · next /, 'Next post at ');   // Post: "1 booked · next 08:30" while idle
   if (s.waiting) {
-    if (i === 4 || i === 5) return s.held ? 'On hold with Edit' : 'Waiting for Edit';
     const f = shelf[i][0]; const n = shelf[i].length, more = n > 1 ? ` (+${n-1})` : '';
     if (s.held) return (i === 6 ? 'Rendered, on hold: ' : 'On hold: ') + f.reel.title + more;
     if (i === 6 && !f.reel.queued) return 'Rendered, not booked: ' + f.reel.title + more;
@@ -981,6 +986,7 @@ function applyData(d){
     if (j === 6) { if (d.stations ? ST[6].raw : hasQueued) { const q = reels.filter(r => r.queued).sort((x,y) => postKey(x).localeCompare(postKey(y)))[0]; if (q) titles = [q.title]; } }
     else {
       run.filter(r => r.st === j).forEach(r => titles.push(...r.titles));
+      Object.entries(FACT.running || {}).forEach(([dir, stg]) => { const r = reels.find(x => x.dir === dir); if (r && facStation(stg, d) === j) titles.push(r.title); });
       if (j === 2 && !titles.length && !d.stations) reels.forEach(r => { if (/^\d+\/\d+$/.test(r.judged || '')) titles.push(r.title); });
     }
     titles = titles.filter(t => byTitle[t]);
@@ -1003,7 +1009,7 @@ function applyData(d){
     // audit F2 (owner saw a box slide from Mix back to Voice): the server also sends next = "mix" / "render", which LINE did not
     // know (indexOf -1 → 0 = Voice → after 60 s a fake "redo"). Mix and Render sit on the Edit line slot like WORK_LINE says;
     // an unknown stage keeps the reel where it is — never sends it back.
-    const LI = { voice:0, scout:1, judge:2, edit:3, mix:3, render:3, post:4, posted:5 };
+    const LI = { voice:0, scout:1, mix:2, judge:3, edit:4, render:4, post:5, posted:6 };
     const li = (r.next in LI) ? LI[r.next] : (tk ? tk.kept : 0);
     if (!tk) { tk = { x:null, y:null, anim:null, station:-1, kept:li, lowSince:0, redo:false, col:TOKEN_COL[n % TOKEN_COL.length] }; tokens.set(r.dir, tk); }
     tk.reel = r; tk.order = n;
@@ -1014,7 +1020,7 @@ function applyData(d){
     tk.deskSt = -1;
     const j = desk.lastIndexOf(r.title);   // one box per reel: if two stations name it, it sits at the latest one
     if (j >= 0 && WORK_LINE[j] >= tk.kept) { tk.kept = Math.max(tk.kept, WORK_LINE[j]); tk.deskSt = j; }
-    tk.wall = tk.kept >= 5;
+    tk.wall = tk.kept >= 6;
   });
   [...tokens.keys()].forEach(k => { if (!seen.has(k)) tokens.delete(k); });
   // shelves
@@ -1024,7 +1030,6 @@ function applyData(d){
   tokens.forEach(tk => {
     if (tk.wall || tk.deskSt >= 0) return;
     // between cut / mix / render steps the reel stays on the desk it just left, never slides back to Edit's shelf
-    if (tk.kept === 3 && tk.station >= 4 && tk.station <= 5 && !deskTk[tk.station] && !lingering.some(l => l.station === tk.station)) { tk.linger = true; tk.st = tk.station; lingering.push(tk); return; }
     tk.st = LINE_ST[tk.kept]; shelf[tk.st].push(tk);
   });
   shelf.forEach((arr, si) => {
@@ -1045,7 +1050,8 @@ function applyData(d){
   };
   shelf.forEach((arr, si) => arr.forEach((tk, k) => {
     // waiting reels live in the queue cards under the stage; on the floor they rest out of sight under their desk
-    tk.hide = false; tk.inTray = true; target(tk, CX(si) - 3, 100, si);
+    const PILE = [[-19,100],[-11,100],[-19,95]];   // up to 3 boxes stacked at the desk's front-left; the card below counts the rest
+    tk.hide = k >= PILE.length; tk.inTray = true; target(tk, CX(si) + PILE[Math.min(k, PILE.length - 1)][0], PILE[Math.min(k, PILE.length - 1)][1], si);
   }));
   deskTk.forEach((tk, si) => { if (tk) { tk.hide = false; tk.inTray = false; target(tk, CX(si) - 17, 89, si); } });
   lingering.forEach(tk => { tk.hide = false; tk.inTray = false; target(tk, CX(tk.st) - 17, 89, tk.st); });
@@ -1057,7 +1063,6 @@ function applyData(d){
   });
   // waiting counts drive "ready" vs "idle"
   ST.forEach((st, i) => { st.waiting = shelf[i].length; st.held = shelf[i].length > 0 && shelf[i].every(tk => isHold(parkedFor(tk))); });
-  ST[4].waiting = ST[5].waiting = shelf[3].length; ST[4].held = ST[5].held = ST[3].held;
   const cnt = k => [...tokens.values()].filter(tk => tk.kept === k);
   IGN = Math.max([...tokens.values()].filter(tk => tk.wall).length, (d.queue||[]).filter(x => x.status === 'posted').length);
   dataReady = true;
@@ -1566,7 +1571,7 @@ function frame(ms){
     const [px,py] = tokenOf(tk,t); const hv = hover === tk;
     if (tk.wall && !tk.anim) return;
     // a box picked from the waiting pile appears on the desk only once its worker is seated; a delivered box shows on landing
-    if (tk.hide || tk.inTransit || tk.inTray) return;
+    if (tk.hide || tk.inTransit) return;
     if (tk.deskSt >= 0 && !tk.landed && workers[tk.deskSt] && workers[tk.deskSt].mode !== 'sit') return;
     if (tk.anim) { hops.push([tk,px,py,hv]); } else drawToken(tk,px,py,t,hv);
     drawn.push({tk, x:px, y:py});
@@ -1712,17 +1717,19 @@ function layout(){
   buildSky(); buildBg();
 }
 const lastKey = [];
-function stState(s){ return s.active ? 'work' : s.i === 6 ? 'idle' : s.held ? 'hold' : (s.waiting > 0 ? 'ready' : 'idle'); }
+const landedN = i => shelf[i].filter(tk => !tk.inTransit).length;   // a box counts once it has been put down, like the card below
+function stState(s){ return s.active ? 'work' : s.i === 6 ? (queuedList().length ? 'ready' : 'idle') : s.held ? 'hold' : (landedN(s.i) > 0 ? 'ready' : 'idle'); }
+function pillText(s, stt){ if (stt === 'ready') return s.i === 6 ? queuedList().length + ' booked' : landedN(s.i) + ' waiting'; return { work:'Working', hold:'On hold', idle:'Idle' }[stt]; }
 function syncLabels(){
   ST.forEach((s,i) => {
     const stt = stState(s);
     labels[i].classList.toggle('on', stt === 'work'); qCards[i].classList.toggle('on', stt === 'work');
-    const txt = bubbleText(i), key = stt + txt + OFFLINE;
+    const txt = bubbleText(i), key = stt + txt + OFFLINE + landedN(i) + '|' + queuedList().length;
     if (lastKey[i] !== key) {
       lastKey[i] = key;
       const idle = txt === 'Nothing waiting', qs = qCards[i].querySelector('.qs');
       qs.className = 'qs ' + (stt === 'work' ? 'work' : idle ? 'idle' : stt); qs.textContent = (OFFLINE && i !== 6) ? '' : txt; qs.title = txt;
-      setHTML(pills[i], '<i class="pd"></i>' + { work:'Working', hold:'On hold', ready:'Reels waiting', idle:'Idle' }[stt]);
+      setHTML(pills[i], '<i class="pd"></i>' + pillText(s, stt));
       pills[i].className = 'pill ' + stt;
       renderCrew();
     }
@@ -1732,7 +1739,7 @@ const tagEls = {};
 ST.forEach((_, i) => { const d = document.createElement('div'); d.className = 'tag'; d.style.display = 'none'; camEl.appendChild(d); tagEls[i] = d; });
 // queue cards (DOM, under the stage): what waits at each station, as small reel boxes
 const qRow = document.getElementById('queue');
-const qCards = ST.map((s, i) => { const d = document.createElement('div'); d.className = 'qc' + (i === 4 || i === 5 ? ' pass' : '');
+const qCards = ST.map((s, i) => { const d = document.createElement('div'); d.className = 'qc';
   d.innerHTML = `<div class="qn"><svg><use href="#i-${ST_ICON[i]}"/></svg>${s.lab}</div><div class="qh"></div><div class="qb"></div><div class="qs"></div>`; qRow.appendChild(d); return d; });
 const qMgr = document.createElement('button'); qMgr.className = 'qc qm live'; qMgr.innerHTML = '<div class="qn"><svg><use href="#i-user"/></svg>Manager</div><div class="qh"></div><div class="qb"></div><div class="qs"></div>'; qRow.appendChild(qMgr);
 qMgr.addEventListener('click', () => openDrawer(true));
@@ -1749,8 +1756,7 @@ function refreshOverlays(){
       return;
     }
     if (OFFLINE) { setHTML(qh, '\u2014'); qb.htmlIfChanged = ''; return; }
-    if (i === 4 || i === 5) { setHTML(qh, 'From Edit'); setHTML(qb, '<span class="pass">No waiting line<svg><use href="#i-arrow"/></svg></span>'); return; }
-    setHTML(qh, `In line <b>${list.length}</b>`);
+    setHTML(qh, i === 6 ? `Booked <b>${queuedList().length}</b>` : `In line <b>${list.length}</b>`);
     if (i === 6) { qb.htmlIfChanged = list.slice(0, 2).map(tk => `<span class="pr">${boxHTML(tk)}<time>${esc(slotLabel(tk.reel) || 'not booked')}</time></span>`).join('') + (list.length > 2 ? `<span class="more">+${list.length - 2}</span>` : '') || '<span class="none">Nothing else waiting</span>'; return; }
     const MAXB = 12;
     qb.htmlIfChanged = list.slice(0, MAXB).map(boxHTML).join('') + (list.length > MAXB ? `<span class="more">+${list.length - MAXB}</span>` : '') + (list.length ? '' : '<span class="none">Empty</span>');
@@ -1902,7 +1908,7 @@ function showTip(tk, ev){
   if (!tk) { tip.style.display = 'none'; view.style.cursor = 'default'; return; }
   view.style.cursor = 'pointer';
   const r = tk.reel;
-  const status = (tk.deskSt >= 0 ? 'Being worked on at the ' + ST[tk.deskSt].full.toLowerCase() : tk.wall ? 'Posted to Instagram' : tk.kept === 4 ? (r.queued ? 'Booked to post ' + slotLabel(r) : 'Rendered, not booked yet') : 'In line for the ' + ST[LINE_ST[tk.kept]].full.toLowerCase()) + (tk.redo ? ' (sent back for a redo)' : '');
+  const status = (tk.deskSt >= 0 ? 'Being worked on at the ' + ST[tk.deskSt].full.toLowerCase() : tk.wall ? 'Posted to Instagram' : tk.kept === 5 ? (r.queued ? 'Booked to post ' + slotLabel(r) : 'Rendered, not booked yet') : 'In line for the ' + ST[LINE_ST[tk.kept]].full.toLowerCase()) + (tk.redo ? ' (sent back for a redo)' : '');
   const pips = STAGES.map(s => {
     const v = r[s]; const cls = !v ? '' : (v === 'done' || s === 'posted' ? 'done' : 'part');
     const txt = (v && v !== 'done' && s !== 'posted') ? `${s} ${v}` : s;
@@ -1926,8 +1932,11 @@ view.addEventListener('click', ev => showTip(pick(ev), ev));
 const humanize = s => String(s || '').replace(/\bw\d+-\d+-[\w-]+/g, x => slugTitle(x)).replace(/\b\d+-(?:[A-Za-z]{3}|W\d+)-[\w-]+/g, x => slugTitle(x)).replace(/ ?(\d{4}-\d\d-\d\d \d\d:\d\d) IST/g, (_, a) => ' ' + dayLabel(a));
 function renderStrip(){
   const c = counts(), run = DATA.running || [];
+  // the process scan can miss short steps; the factory's own busy stations are the truth
+  const busy = ST.filter((st, i) => i < 6 && SI(i).busy).map((st, i) => friendly(SI(st.i).text) || st.full);
   let head, sub = '';
-  if (run.length) {
+  if (!run.length && busy.length) { head = busy.join('; '); sub = `${busy.length} job${busy.length > 1 ? 's' : ''} running`; }
+  else if (run.length) {
     head = run.map(l => { const [a, ...rest] = String(l).split(' · '); return cap1(a) + (rest.length ? ': ' + rest.join(', ') : ''); }).join('; ');
     sub = `${run.length} job${run.length > 1 ? 's' : ''} running`;
   } else if (c.held.length) {
@@ -1937,8 +1946,8 @@ function renderStrip(){
     sub = top ? `Your note: “${top[0]}”` : '';
   } else head = 'Quiet. Waiting for the next job.';
   document.getElementById('nowHead').textContent = head;
-  document.getElementById('nowbar').classList.toggle('run', !!run.length);
-  document.querySelector('#nowIc use').setAttribute('href', run.length ? '#i-run' : '#i-pause');
+  document.getElementById('nowbar').classList.toggle('run', !!(run.length || busy.length));
+  document.querySelector('#nowIc use').setAttribute('href', (run.length || busy.length) ? '#i-run' : '#i-pause');
   document.getElementById('nowSub').textContent = sub;
   // activity: newest first, slugs shown as reel titles, back-to-back repeats folded into one line
   const rows = [];
@@ -2115,7 +2124,7 @@ function handle(d){
   // the factory runs on GitHub at night; between runs the snapshot simply ages. Calm note, not an error.
   //   no snapshot yet      -> "Factory offline · waiting for the next run"
   //   snapshot > 30 min old (or HQ says stale.factory) and nothing running -> "Factory is asleep"
-  const idle = !(s.running || []).length, staleF = !!(s.stale && (s.stale.factory === true || s.stale.snapshot === true));
+  const idle = !(s.running || []).length && !Object.keys((s.factory || {}).running || {}).length, staleF = !!(s.stale && (s.stale.factory === true || s.stale.snapshot === true));
   const noSnap = !snapAt && !(s.reels || []).length;
   const asleep = !noSnap && idle && ((!!snapAt && Date.now() - snapAt > ASLEEP_MS) || staleF);
   OFFLINE = noSnap || asleep;
@@ -2136,6 +2145,21 @@ async function poll(){
   try { const res = await fetch(API, { cache:'no-store', signal:ac.signal }); if (!res.ok) throw new Error(res.status); handle(await res.json()); }
   catch (e) { fails++; setConn(false); if (fails === 1 || fails % 20 === 0) console.warn('HQ state failed:', e && (e.stack || e.message || e)); }   // keep the last state on screen
   finally { clearTimeout(to); polling = false; }
+}
+// self-update (owner 10-15: "why should I always refresh?"): every 60 s re-read this page; when the deployed build stamp
+// (<meta name="build">) differs, reload, at most once per 5 min and never while a worker is carrying a box
+const BUILD = (document.querySelector('meta[name="build"]') || {}).content || '';
+async function checkBuild(){
+  try {
+    if (document.visibilityState === 'hidden' || !BUILD) return;
+    const r = await fetch(location.pathname + '?build=' + Date.now(), { cache:'no-store' }); if (!r.ok) return;
+    const m = (await r.text()).match(/<meta name="build" content="([^"]*)"/); if (!m || m[1] === BUILD) return;
+    let last = 0; try { last = +sessionStorage.getItem('dhReloadAt') || 0; } catch (_) {}
+    if (Date.now() - last < 5 * 60e3) return;
+    if (workers.some(w => w.mode === 'carry' || w.jobs.length)) { setTimeout(checkBuild, 5000); return; }   // mid hand-off: retry in 5 s
+    try { sessionStorage.setItem('dhReloadAt', String(Date.now())); } catch (_) {}
+    location.reload();
+  } catch (_) {}
 }
 function startLive(){
   poll(); setInterval(() => { if (document.visibilityState !== 'hidden') poll(); }, 3000);
@@ -2214,7 +2238,7 @@ else { setTimeout(() => document.body.classList.add('ready'), 1500); intro.addEv
 
 layout(); tick(); setInterval(tick, 1000);
 (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => { mgrKey = ''; layoutOverlays(); }).catch(()=>{});
-if (!DEMO_PL) startLive();
+if (!DEMO_PL) { startLive(); setInterval(checkBuild, 60e3); }
 if (DEMO) setInterval(() => setMgr(demoMgr()), 1000);
 requestAnimationFrame(frame);
 })();

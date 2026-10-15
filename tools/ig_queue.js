@@ -18,7 +18,7 @@ const ROOT = path.resolve(__dirname, "..");
 const R = fs.existsSync(path.join(ROOT, ".relay.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, ".relay.json"), "utf8"))
   : process.env.RELAY_URL && process.env.RELAY_KEY ? { url: process.env.RELAY_URL.replace(/\/+$/, ""), key: process.env.RELAY_KEY }
   : (() => { console.error("⛔ no relay config: .relay.json or RELAY_URL + RELAY_KEY"); process.exit(1); })();
-const SLOTS = ["08:30", "21:00"];          // IST, 2 reels a day (owner, 10-13: 2/day for 3 weeks, then 1)
+const SLOTS = ["08:30", "14:00", "21:00"];   // IST — 10-15 growth push (target 1,000 followers by 10-26): 3 reels a day
 const IST = 330;                          // minutes ahead of UTC
 const START = Date.UTC(2026, 9, 14, 3, 0);   // slots from 14 Oct 2026 08:30 IST (= 03:00 UTC); reel 1 went out 13 Oct (owner: "start today")
 

@@ -20,23 +20,23 @@ WPS = 175 / 60   # our narrator's pace (Fish prosody ≈1.2 → ~175 wpm)
 metas = {}
 for m in re.finditer(r"^## (\d+) meta\n<!--\s*meta:(.*?)-->", text, re.S | re.M):
     body = m.group(2)
-    kv = dict(re.findall(r'(series|titleCard|bubble|caption hook|caption body|caption prompt|caption tags)\s*=\s*"?(.*?)"?\s*(?:,\s*\n|,\s*(?=[a-zA-Z ]+=)|$)', body, re.S))
+    kv = dict(re.findall(r'(series|lang|titleCard|bubble|caption hook|caption body|caption prompt|caption tags)\s*=\s*"?(.*?)"?\s*(?:,\s*\n|,\s*(?=[a-zA-Z ]+=)|$)', body, re.S))
     metas[m.group(1)] = {k: v.strip().strip('"') for k, v in kv.items()}
 
 made = []
 for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z)", text, re.S | re.M):
     num, series, title, body = m.group(1), m.group(2).strip(), m.group(3), m.group(4)
     lines = [l.strip() for l in body.strip().splitlines() if l.strip() and not l.startswith(("---", "<!--", "|"))]
-    if lines and lines[-1] == "Follow for more.": lines = lines[:-1]
+    if lines and lines[-1] in ("Follow for more.", "Follow for more", "फॉलो करो।"): lines = lines[:-1]
     lines.append(TAGLINE)
     meta = metas.get(num, {})
     words = sum(len(l.split()) for l in lines)
     est = words / WPS + 0.15 * (len(lines) - 1) + 0.6
     if est > 30: sys.exit(f"{num}: ~{est:.1f} s > 30 s cap — shorten the script")
     n = len(lines)
-    rehook = next((i for i, l in enumerate(lines) if i >= 2 and re.match(r"^(but|and|so here|wait)\b", l, re.I)), 3)
-    why = next((i for i, l in enumerate(lines) if i > rehook and re.search(r"\bbecause\b", l, re.I)), min(rehook + 1, n - 3))
-    prompt = next((i for i, l in enumerate(lines) if re.match(r"^(comment|send|save|screenshot|drop)\b", l, re.I)), n - 2)
+    rehook = next((i for i, l in enumerate(lines) if i >= 2 and re.match(r"^(but|and|so here|wait|पर|लेकिन|मगर|और)(?![\u0900-\u097F\w])", l, re.I)), 3)
+    why = next((i for i, l in enumerate(lines) if i > rehook and re.search(r"\bbecause\b|क्योंकि", l, re.I)), min(rehook + 1, n - 3))
+    prompt = next((i for i, l in enumerate(lines) if re.match(r"^(comment|send|save|screenshot|drop|कमेंट|भेज|सेव|स्क्रीनशॉट)(?![\u0900-\u097F\w])", l, re.I)), n - 2)
     script = [{"text": l, "ex": 0.62, "cfg": 0.42} if i == 0 else l for i, l in enumerate(lines)]
     gaps = [0.12] * n
     gaps[rehook - 1] = 0.3; gaps[prompt - 1] = max(gaps[prompt - 1], 0.25); gaps[n - 2] = 0.45; gaps[n - 1] = 0
@@ -47,6 +47,7 @@ for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z
            "gaps": gaps, "tail": 0.6, "lead": 0.08, "music": "auto", "drops": [why], "ctaLine": n - 1, "speed": 1.07,
            "accent": [], "voice_chain": 2,
            "coverKicker": meta.get("series", series), "coverHeadline": meta.get("titleCard", title)}
+    if meta.get("lang", "en").lower() == "hi": cfg["lang"] = "hi"   # Hinglish reel: Devanagari script + English loanwords; tagline stays English
     tags = " ".join(re.findall(r"#\w+", meta.get("caption tags", "#datingadviceformen #datingtips"))[:5])
     caption = "\n".join(x for x in [meta.get("caption hook", ""), meta.get("caption body", ""), "", meta.get("caption prompt", ""),
                                       "Follow @thedecodeher for more dating advice for men.", "", tags] if x is not None).strip() + "\n"

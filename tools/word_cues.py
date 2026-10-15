@@ -16,7 +16,8 @@ for c in [c for c in plan if "at" in c]:
     want = [norm(x) for x in c["at"].split()]
     hits = [k for k in range(len(W) - len(want) + 1) if all(W[k + i][0] == want[i] for i in range(len(want)))]
     n = c.get("n", 0)
-    if len(hits) <= n: sys.exit(f"sfx.json: {c['at']!r} (n={n}) is not spoken in this reel")
+    if len(hits) <= n:   # audit M1 (10-15): one planned sound on a word the voice never says just gets dropped — never stop the reel
+        print(f"  skipped cue: {c['at']!r} (n={n}) is not spoken in this reel", file=sys.stderr); continue
     k = hits[n]; t = W[k + len(want) - 1][2] if c.get("end") else W[k][1]
     cues.append({"type": c["type"], "t": round(t + c.get("offset", 0), 3), "gain": c.get("gain", 0), "at": c["at"]})
 for c in [c for c in plan if "every_cut" in c]:   # {"every_cut": "whoosh", "gain": -4}: a sound on every picture change (Zoltium's zooms)

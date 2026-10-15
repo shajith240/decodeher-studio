@@ -19,7 +19,8 @@
  "factory": {
   "batches": [
    "reels/w2-batch.json",
-   "reels/w3-batch.json"
+   "reels/w3-batch.json",
+   "reels/w3h-batch.json"
   ]
  }
 }

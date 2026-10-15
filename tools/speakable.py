@@ -65,8 +65,9 @@ SCALE = {"k": "thousand", "K": "thousand", "m": "million", "M": "million", "b": 
 CUR = {"$": "dollars", "₹": "rupees", "£": "pounds", "€": "euros", "A$": "Australian dollars", "C$": "Canadian dollars"}
 
 
-def speak(text):
+def speak(text, lang="en"):
     t = text
+    if lang == "hi": t = t.replace("।", ".").replace("॥", ".")   # Hindi danda → full stop (Fish reads Devanagari natively; Latin loanwords stay Latin)
     t = re.sub(r"\[([^\]]*)\]", r"\1", t).replace("<br>", " ")          # highlight brackets / line breaks
     t = re.sub(r"\{([^}]*)\}", r"\1", t)                                 # tell markers
     t = re.sub(r"[\w-]+\[\.\][\w./-]+", "a fake link", t)                # defanged links are never read out
@@ -122,9 +123,9 @@ def speak(text):
     return t
 
 
-def check(spoken):
-    """Strict gate: a spoken line may hold only letters, spaces and . , ? ! ' -"""
-    bad = re.findall(r"[^A-Za-z .,?!'\-]", spoken)
+def check(spoken, lang="en"):
+    """Strict gate: a spoken line may hold only letters, spaces and . , ? ! ' -  (lang "hi": plus Devanagari U+0900-U+097F and the danda)"""
+    bad = re.findall(r"[^A-Za-z\u0900-\u097F\u0964\u0965 .,?!'\-]" if lang == "hi" else r"[^A-Za-z .,?!'\-]", spoken)
     return sorted(set(bad))
 
 

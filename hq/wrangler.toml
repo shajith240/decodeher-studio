@@ -16,3 +16,7 @@ class_name = "HQ"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["HQ"]
+
+# Workers AI (free tier): writes the comment replies. Model: COMMENT_MODEL variable, default llama-3.3-70b-instruct-fp8-fast.
+[ai]
+binding = "AI"

@@ -6,6 +6,7 @@ import { DurableObject } from "cloudflare:workers";
 //   - a queue of reels with UTC publish times; every 10 min (Durable Object alarm) it posts what is due:
 //     due → REELS container → (next tick) FINISHED → media_publish → permalink → media deleted
 // Authenticated API (Bearer RELAY_KEY): PUT/DELETE /media/<key>, PUT /ig-token, GET /status, GET|PUT /queue, POST /pause|/resume
+// Comments (10-15, owner-approved auto-replies; the HQ does the thinking): GET /comments?days=N, POST /comments/reply {commentId, message}
 // Public: GET/HEAD /m/<key>.mp4
 
 const GRAPH = "https://graph.instagram.com/v25.0";
@@ -181,6 +182,33 @@ async function handle(req, env, ctx) {
         reels.push({ title: x.title, permalink: x.permalink || null, postedAt: x.postedAt, ...v, ...(m.error ? { error: m.error } : {}) });
       }
       return Response.json({ account: me.error ? { error: me.error } : me, reels });
+    }
+    if (url.pathname === "/comments" && req.method === "GET") {   // comments on reels posted in the last N days (HQ decides what to answer)
+      const t = await s.load("ig:token"); if (!t) return Response.json({ error: "no token" }, { status: 503 });
+      const days = Math.min(30, Math.max(1, Number(url.searchParams.get("days") || 7))), since = Date.now() - days * 86400e3;
+      const g = async (path, params) => { try { return await ig("GET", path, params, t.token); } catch (e) { return { error: e.message }; } };
+      const me = await g("me", { fields: "username" });
+      if (me.error || !me.username) return Response.json({ error: me.error || "no username" }, { status: 502 });
+      const ours = String(me.username).toLowerCase(), out = [];
+      const posted = ((await s.load("queue")) || []).filter((x) => x.status === "posted" && x.mediaId && (x.postedAt || 0) >= since);
+      for (const x of posted) {
+        const c = await g(`${x.mediaId}/comments`, { fields: "id,text,username,timestamp,replies{id,username}", limit: "50" });
+        if (c.error) continue;   // one reel failing must not hide the others
+        for (const k of c.data || []) {
+          if (String(k.username || "").toLowerCase() === ours) continue;   // never our own comments
+          out.push({ commentId: k.id, mediaId: x.mediaId, reelTitle: x.title, username: k.username || null, text: k.text || "", timestamp: k.timestamp || null,
+            repliedByUs: ((k.replies && k.replies.data) || []).some((r) => String(r.username || "").toLowerCase() === ours) });
+        }
+      }
+      return Response.json(out);
+    }
+    if (url.pathname === "/comments/reply" && req.method === "POST") {
+      const t = await s.load("ig:token"); if (!t) return Response.json({ ok: false, error: "no token" }, { status: 503 });
+      let b = null; try { b = await req.json(); } catch {}
+      const commentId = b && String(b.commentId || ""), message = b && String(b.message || "").trim();
+      if (!/^\d+$/.test(commentId || "") || !message || message.length > 2200) return Response.json({ ok: false, error: "need commentId (digits) and message" }, { status: 400 });
+      try { const r = await ig("POST", `${commentId}/replies`, { message }, t.token); return Response.json({ ok: true, id: r.id || null }); }
+      catch (e) { return Response.json({ ok: false, error: e.message }, { status: 502 }); }
     }
     if (url.pathname === "/status") {
       const t = await s.load("ig:token");

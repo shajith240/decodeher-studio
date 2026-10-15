@@ -41,7 +41,7 @@ function world({ relay, insights = 404 } = {}) {
   const obj = new HQ(ctx, env);
   env.HQ = { idFromName: () => "main", get: () => obj };
   env.ASSETS = { fetch: async () => new Response("<html>dashboard</html>", { headers: { "Content-Type": "text/html" } }) };
-  const w = { st, env, obj, calls: [], relay: relay ?? { paused: false, tokenAgeDays: 2, queue: [], log: [] }, relayDown: false, tgDown: false, ghDown: false, insights, msgId: 100 };
+  const w = { st, env, obj, calls: [], relay: relay ?? { paused: false, tokenAgeDays: 2, queue: [], log: [] }, relayDown: false, tgDown: false, ghDown: false, insights, msgId: 100, comments: null, replies: [], replyFail: false };
   globalThis.fetch = async (url, opts = {}) => {
     url = String(url);
     const body = opts.body ? (() => { try { return JSON.parse(opts.body); } catch { return opts.body; } })() : null;
@@ -60,6 +60,8 @@ function world({ relay, insights = 404 } = {}) {
       const p = url.slice(SECRETS.RELAY_URL.length);
       if (p === "/status") return Response.json(structuredClone(w.relay));
       if (p.startsWith("/insights")) return w.insights === 404 ? new Response("not found", { status: 404 }) : Response.json(w.insights);
+      if (p.startsWith("/comments/reply")) { const b = JSON.parse(opts.body); w.replies.push(b); return w.replyFail ? Response.json({ ok: false, error: "Graph says no" }, { status: 502 }) : Response.json({ ok: true, id: "R" + w.replies.length }); }
+      if (p.startsWith("/comments")) return w.comments ? Response.json(structuredClone(w.comments)) : new Response("not found", { status: 404 });
       if (p === "/pause" || p === "/resume") { w.relay.paused = p === "/pause"; return Response.json({ ok: true, paused: w.relay.paused }); }
       return new Response("not found", { status: 404 });
     }
@@ -319,6 +321,93 @@ test("relay answering garbage (HTML / 500) doesn't crash the alarm", async () =>
   const w = world();
   w.relay = "<html>oops</html>";
   await w.obj.alarm(); assert.ok(w.st.alarm > fakeNow);
+});
+
+
+// ---------- comment auto-replies ----------
+const cm = (id, text, o = {}) => ({ commentId: String(id), mediaId: "M1", reelTitle: "just-ask", username: "u" + id, text, timestamp: "t", repliedByUs: false, ...o });
+// a scripted fake of Workers AI: answers[] is consumed per call (a string, "ERR", or a function of the user message)
+function withAI(w, answers) {
+  w.aiCalls = []; let i = 0;
+  w.env.AI = { run: async (model, input) => { w.aiCalls.push({ model, input }); const a = answers[Math.min(i++, answers.length - 1)];
+    if (a === "ERR") throw new Error("AI down"); return { response: typeof a === "function" ? a(input.messages[1].content) : a }; } };
+  return w;
+}
+const alarmAt = async (w) => { fakeNow = at("2026-10-16", "09:00"); await w.obj.alarm(); };
+
+test("comments: replies once, never twice (handled ids survive the next alarm)", async () => {
+  const w = withAI(world(), ["she's testing if you'll chase. reply chill and change the topic"]);
+  w.comments = [cm(1, "she texted k lol what do i do"), cm(2, "old one", { repliedByUs: true })];
+  await alarmAt(w); assert.equal(w.replies.length, 1); assert.equal(w.replies[0].commentId, "1");
+  assert.match(w.replies[0].message, /chill/);
+  assert.ok(w.tgCalls("sendMessage").some((c) => /replied to 1 comment/.test(c.body.text) && /chill/.test(c.body.text)));
+  fakeNow += 10 * 60e3; await w.obj.alarm(); await w.obj.alarm();
+  assert.equal(w.replies.length, 1, "no second reply"); assert.equal(w.aiCalls.length, 1);
+});
+
+test("comments: handled is saved BEFORE posting (relay failure or crash never causes a double reply)", async () => {
+  const w = withAI(world(), ["nice one bro"]); w.comments = [cm(5, "great reel")]; w.replyFail = true;
+  await alarmAt(w); assert.equal(w.replies.length, 1);
+  assert.ok((await w.st.get("cmtHandled"))["5"]);
+  w.replyFail = false; fakeNow += 10 * 60e3; await w.obj.alarm(); assert.equal(w.replies.length, 1, "not retried");
+});
+
+test("comments: hostile/spam is skipped, marked handled, owner told", async () => {
+  const w = withAI(world(), ["SKIP"]); w.comments = [cm(1, "you are all idiots"), cm(2, "check my page http://spam.example")];
+  await alarmAt(w); assert.equal(w.replies.length, 0); assert.equal(w.aiCalls.length, 1, "the link comment never reaches the AI");
+  assert.ok(w.tgCalls("sendMessage").some((c) => /skipped 2 comments \(spam\/hostile\)/.test(c.body.text)));
+  const h = await w.st.get("cmtHandled"); assert.ok(h["1"] && h["2"]);
+});
+
+test("comments: max 15 per alarm, the rest next time", async () => {
+  const w = withAI(world(), ["ok sounds good bro"]); w.comments = Array.from({ length: 20 }, (_, i) => cm(i + 1, "nice " + i));
+  await alarmAt(w); assert.equal(w.replies.length, 15);
+  assert.equal(w.tgCalls("sendMessage").filter((c) => /replied to 15 comments/.test(c.body.text)).length, 1, "one digest");
+  fakeNow += 10 * 60e3; await w.obj.alarm(); assert.equal(w.replies.length, 20);
+});
+
+test("comments: AI failure = no reply, nothing marked handled, retried later", async () => {
+  const w = withAI(world(), ["ERR"]); w.comments = [cm(1, "help"), cm(2, "help too")];
+  await alarmAt(w); assert.equal(w.replies.length, 0); assert.equal(w.aiCalls.length, 1, "stops at the first failure");
+  assert.ok(!(await w.st.get("cmtHandled")) || !(await w.st.get("cmtHandled"))["1"]);
+  assert.equal(w.tgCalls("sendMessage").length, 0); assert.ok(w.st.alarm > fakeNow);
+  w.env.AI.run = async () => ({ response: "try again later bro" }); fakeNow += 10 * 60e3; await w.obj.alarm(); assert.equal(w.replies.length, 2);
+});
+
+test("comments: no AI binding or old relay (404) = silent, other alarm work unaffected", async () => {
+  const w = world(); w.comments = [cm(1, "hi")]; await alarmAt(w); assert.equal(w.replies.length, 0);
+  const v = withAI(world(), ["x y"]); await alarmAt(v); assert.equal(v.aiCalls.length, 0);
+});
+
+test("comments: Hinglish comment goes to the AI with the Hinglish rule and the Hinglish reply is posted", async () => {
+  const w = withAI(world(), ["bhai wo test kar rahi hai, chill reh aur topic change kar"]);
+  w.comments = [cm(1, "bhai usne bola 'ok' ab kya karu")]; await alarmAt(w);
+  assert.match(w.aiCalls[0].input.messages[0].content, /Hinglish/); assert.match(w.aiCalls[0].input.messages[1].content, /ab kya karu/);
+  assert.equal(w.replies[0].message, "bhai wo test kar rahi hai, chill reh aur topic change kar");
+});
+
+test("comments: 'are you a bot?' gets the non-answer, a human claim is rejected", async () => {
+  const w = withAI(world(), ["haha we just decode texts here, drop yours"]); w.comments = [cm(1, "is this a bot lol")]; await alarmAt(w);
+  assert.match(w.aiCalls[0].input.messages[0].content, /bot or AI/); assert.equal(w.replies[0].message, "haha we just decode texts here, drop yours");
+  const v = withAI(world(), ["nah i'm a real person bro", "i am a real human lol"]); v.comments = [cm(2, "ai?")]; await alarmAt(v);
+  assert.equal(v.replies.length, 0, "human claim never posted");
+});
+
+test("comments: formal reply is regenerated once; still formal = skipped silently", async () => {
+  const w = withAI(world(), ["Certainly! Let us delve into her text.", "she's just busy, don't overthink it"]); w.comments = [cm(1, "she replied late")];
+  await alarmAt(w); assert.equal(w.aiCalls.length, 2); assert.match(w.aiCalls[1].input.messages[0].content, /too formal/);
+  assert.equal(w.replies[0].message, "she's just busy, don't overthink it");
+  const v = withAI(world(), ["Indeed, you should navigate this carefully."]); v.comments = [cm(1, "help")]; await alarmAt(v);
+  assert.equal(v.aiCalls.length, 2); assert.equal(v.replies.length, 0); assert.ok((await v.st.get("cmtHandled"))["1"]);
+  assert.equal(v.tgCalls("sendMessage").length, 0, "silent, no spam to the owner");
+});
+
+test("comments: post-processing strips quotes/hashtags/links, one emoji, cuts to 25 words", async () => {
+  const long = Array.from({ length: 40 }, (_, i) => "w" + i).join(" ");
+  const w = withAI(world(), ['"love it bro 😂🔥 #decodeher https://x.co"', long]); w.comments = [cm(1, "lol"), cm(2, "another")];
+  await alarmAt(w);
+  assert.equal(w.replies[0].message, "love it bro 😂");
+  assert.equal(w.replies[1].message.split(" ").length, 25);
 });
 
 test.after(() => { Date.now = realNow; });

@@ -16,6 +16,12 @@ const fake = async (url, opt = {}) => { const u = String(url); calls.push(u.spli
   if (u.endsWith("/U/media_publish")) return j({ id: "M1" });
   if (u.includes("/M1?")) return j({ permalink: "https://ig/p" });
   if (u.includes("/M9/insights")) return j({ data: [{ name: "reach", values: [{ value: 115 }] }, { name: "shares", values: [{ value: 0 }] }] });
+  if (u.includes("/M9/comments")) return j({ data: [
+    { id: "111", text: "she said k what do i do", username: "bob", timestamp: "t1", replies: { data: [{ id: "r1", username: "thedecodeher" }] } },
+    { id: "112", text: "great reel", username: "amy", timestamp: "t2" },
+    { id: "113", text: "thanks all", username: "TheDecodeHer", timestamp: "t3" }] });
+  if (u.endsWith("/111/replies") && opt.method === "POST") { mode.lastReply = String(opt.body); return j({ id: "R9" }); }
+  if (u.endsWith("/999/replies")) return j({ error: { message: "comment not found" } });
   return j({}); };
 globalThis.fetch = fake;
 let fails = 0; const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) fails++; };
@@ -53,4 +59,14 @@ const r = await worker.fetch(new Request("https://x/insights?days=2", { headers:
 const jj = await r.json(); globalThis.fetch = fake;
 ok(jj.account.followers_count === 6 && jj.reels[0].reach === 115 && methods.every((m) => m === "GET"), "/insights: stats via GET only");
 ok((await (await worker.fetch(new Request("https://x/insights"), env, { waitUntil() {} })).text()) === "decodeher relay", "/insights needs the key");
+const R = (p, o = {}) => worker.fetch(new Request("https://x" + p, { ...o, headers: { Authorization: "Bearer k", ...(o.headers || {}) } }), env, { waitUntil() {} });
+mem.set("queue", [{ id: "q1", title: "T", status: "posted", mediaId: "M9", postedAt: Date.now(), key: "k", caption: "c", at: 0 }, { id: "q2", title: "Old", status: "posted", mediaId: "M8", postedAt: 1, key: "k2", caption: "c", at: 0 }]);
+const cm = await (await R("/comments?days=7")).json();
+ok(cm.length === 2 && cm[0].commentId === "111" && cm[0].repliedByUs === true && cm[1].repliedByUs === false && cm[1].reelTitle === "T", "/comments: replied flag, own comments dropped, old reels skipped");
+ok((await (await worker.fetch(new Request("https://x/comments"), env, { waitUntil() {} })).text()) === "decodeher relay", "/comments needs the key");
+const rp = await (await R("/comments/reply", { method: "POST", body: JSON.stringify({ commentId: "111", message: "chill, don't chase" }) })).json();
+ok(rp.ok && rp.id === "R9" && /message=chill/.test(mode.lastReply), "/comments/reply posts via Graph");
+const rb = await R("/comments/reply", { method: "POST", body: JSON.stringify({ commentId: "999", message: "hi" }) });
+ok(rb.status === 502 && (await rb.json()).error.includes("comment not found"), "Graph error comes back as JSON, no throw");
+ok((await R("/comments/reply", { method: "POST", body: "{}" })).status === 400, "reply validates input");
 fs.unlinkSync(tmp); console.log(fails ? `${fails} FAILED` : "ALL PASSED"); process.exit(fails ? 1 : 0);

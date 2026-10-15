@@ -3,23 +3,29 @@ so every caption word appears exactly when it is spoken (owner, 10-13: "the capt
 Usage: uv run --with faster-whisper --with numpy python tools/align_words.py <reel_dir> [...]
 Each line's wav is transcribed with word timestamps; if the recognised word count matches the script line, those times are
 used (offset by the line's start in the mix); otherwise the line keeps its estimate and is reported."""
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, unicodedata
 import numpy as np
 from faster_whisper import WhisperModel
 
 model = WhisperModel("small", device="cpu", compute_type="int8")
 for R in map(os.path.abspath, sys.argv[1:]):
+    LANG = json.load(open(os.path.join(R, "reel.json"))).get("lang", "en") if os.path.exists(os.path.join(R, "reel.json")) else "en"
     tj = os.path.join(R, "assets/timing.js"); s = open(tj).read(); T = json.loads(s[s.index("{"):s.rindex("}") + 1])
     fixed, kept = 0, []
     for i, words in enumerate(T["words"]):
         wav = os.path.join(R, f"assets/vo/l{i + 1:02d}.wav")
         a = np.frombuffer(subprocess.run(["ffmpeg", "-loglevel", "error", "-i", wav, "-ac", "1", "-ar", "16000", "-f", "f32le", "-"],
                                          capture_output=True).stdout, np.float32)
-        segs, _ = model.transcribe(a, language="en", word_timestamps=True)
+        segs, _ = model.transcribe(a, language=LANG, word_timestamps=True)
         heard = [w for sg in segs for w in sg.words]
         # map recognised words onto script words; a script word the recogniser split ("a.m." → "a." "m.", "late-night" →
         # "late" "night") absorbs heard words until their letters match it
         norm = lambda x: re.sub(r"[^a-z0-9]", "", x.lower())
+        if LANG == "hi":   # loose Devanagari match: drop nukta, matras, virama, anusvara/chandrabindu (a consonant skeleton), keep Latin/digits
+            norm = lambda x: re.sub(r"[^a-z0-9\u0904-\u0939\u0958-\u095F]", "", re.sub(r"[\u093C\u093E-\u094D\u0900-\u0903]", "", unicodedata.normalize("NFD", x).lower()))
+            if len(heard) == len(words):   # same word count (Latin loanwords come back in Devanagari, so letters can't match): take them in order
+                for w, h in zip(words, heard): w[1], w[2] = round(T["vo"][i] + h.start, 3), round(T["vo"][i] + h.end, 3)
+                fixed += 1; continue
         spans, j, ok = [], 0, True
         for w in words:
             if j >= len(heard): ok = False; break

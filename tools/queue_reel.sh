@@ -9,7 +9,7 @@ if [ -f "logs/queued/$slug" ]; then echo "already queued: $slug"; exit 0; fi   #
 # audit 10-15 H1: never write the queue while a post is going live — wait out 08:27-08:42 and 20:57-21:12 IST
 while python3 -c "
 import datetime as d; n=d.datetime.now(d.timezone(d.timedelta(hours=5,minutes=30))); m=n.hour*60+n.minute
-raise SystemExit(0 if any(s-3<=m<=s+12 for s in (8*60+30, 21*60)) else 1)"; do sleep 30; done
+raise SystemExit(0 if any(s-3<=m<=s+12 for s in (8*60+30, 14*60, 21*60)) else 1)"; do sleep 30; done
 # audit M4 (10-15): read the relay ONCE; if it can't be read, stop — an empty answer used to look like "not booked" → duplicate post
 # 10-15: Cloudflare refuses any single upload over 32 MiB (a 46 s reel came out at 34.4 MB and failed twice). The posting copy's
 # bitrate cap is set from the reel's length so the file lands under ~28 MB; the size is checked again after encoding.

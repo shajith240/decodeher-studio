@@ -67,6 +67,7 @@ PHONE_EQ = ("equalizer=f=300:t=q:w=1.0:g=-2.5,equalizer=f=3000:t=q:w=0.9:g=2.5,"
             "acompressor=threshold=0.1:ratio=2.5:attack=8:release=90:knee=4")
 if os.path.exists(f"{R}/reel.json") and RJ.get("voice_chain") != CHAIN:
     RJ["voice_chain"] = CHAIN; json.dump(RJ, open(f"{R}/reel.json", "w"), indent=1, ensure_ascii=False)
+LANG = RJ.get("lang", "en")   # "hi": Hinglish in Devanagari (Fish reads it correctly only in Devanagari; Latin loanwords stay Latin)
 lines = json.load(open(f"{R}/assets/vo/script.json"))
 # STRICT voiceover rule: the voice never sees digits or symbols. Every line is converted to how a person would say it,
 # and the reel stops here if anything unspeakable is left (see tools/speakable.py and BRAND.md → Voiceover).
@@ -76,7 +77,7 @@ style = [(l.get("ex"), l.get("cfg")) if isinstance(l, dict) else (None, None) fo
 lines = [l["text"] if isinstance(l, dict) else l for l in lines]
 spoken = []
 for i, text in enumerate(lines, 1):
-    s_ = speak(text); bad = check(s_)
+    s_ = speak(text, LANG) if LANG != "en" else speak(text); bad = check(s_, LANG) if LANG != "en" else check(s_)
     if bad: sys.exit(f"line {i} still has unspeakable characters {bad!r} after conversion: {s_!r}")
     spoken.append(s_)
 json.dump(spoken, open(f"{R}/assets/vo/spoken.json", "w"), indent=1, ensure_ascii=False)

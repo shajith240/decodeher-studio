@@ -4,6 +4,9 @@ import json, os, re, sys
 
 R = os.path.abspath(sys.argv[1]); cfg = json.load(open(f"{R}/reel.json")); H = f"{R}/index.html"; h = open(H).read()
 V3 = cfg.get("format") == "v3"   # growth plan 10-15 "v3" look (chat-bubble first frame, big title, 66 px captions, re-hook punch, 2.6 s outro); every other reel renders exactly as before
+HI = cfg.get("lang") == "hi"   # Hinglish reel: captions/title card/bubble in Devanagari; every English reel renders exactly as before
+HI_FAM = "'Rosarivo','Tiro Devanagari Hindi','Noto Serif Devanagari'"   # Latin loanwords stay in Rosarivo (brand), Devanagari glyphs fall through to Tiro
+HI_LINK = "family=Rosarivo:ital@0;1&family=Tiro+Devanagari+Hindi:ital@0;1&family=Noto+Serif+Devanagari:wght@400"
 esc = lambda s: s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 h = re.sub(r"const REEL_ACCENT = \[.*?\];", "const REEL_ACCENT = " + json.dumps([w.lower() for w in cfg.get("accent", [])]) + ";", h)
 h = re.sub(r"\[T\.vo\[[\d, \]T.vo\[]*\]\]\.forEach", "[" + ", ".join(f"T.vo[{i}]" for i in cfg.get("drops", [])) + "].forEach", h)
@@ -33,11 +36,12 @@ if RC.get("look") == "bw":
     od = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f"{R}/assets/brand/outro.mp4"]))
     h = re.sub(r'(id="outro"[^>]*data-duration=")[\d.]+', rf"\g<1>{od - 0.01:.2f}", h)
     F = RC.get("captionFont", "Rosarivo"); FS = RC.get("captionSizeV3", 66) if V3 else RC.get("captionSize", 60)   # v3: 66 px for phone readability
-    h = h.replace("<style>", '<!--look--><link href="https://fonts.googleapis.com/css2?family=' + F.replace(" ", "+")
-                  + ':ital@0;1&display=block" rel="stylesheet"><!--/look-->\n<style>', 1)
-    h = h.replace("</style>", " /*look*/.cap{font-family:'" + F + "',serif;font-weight:400;font-size:" + str(FS) + "px;line-height:1.18;letter-spacing:0;top:"
+    h = h.replace("<style>", '<!--look--><link href="https://fonts.googleapis.com/css2?family=' + (HI_LINK if HI else F.replace(" ", "+") + ":ital@0;1")
+                  + '&display=block" rel="stylesheet"><!--/look-->\n<style>', 1)
+    FQ = HI_FAM if HI else "'" + F + "'"
+    h = h.replace("</style>", " /*look*/.cap{font-family:" + FQ + ",serif;font-weight:400;font-size:" + str(FS) + "px;line-height:1.18;letter-spacing:0;top:"
                   + str(960 - FS * 0.6) + "px}\n .cap .w,.cap .a{color:#fff;filter:none;padding:0;text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 8px rgba(0,0,0,.7)}\n #haze{display:none}\n #wm{filter:grayscale(1);left:509px;top:1596px;height:78px}\n"
-                  " #tcard{font-family:'" + F + "',serif;font-weight:400;font-size:84px;line-height:1.15;letter-spacing:0;filter:none;text-shadow:0 2px 18px rgba(0,0,0,.55)}\n"
+                  " #tcard{font-family:" + FQ + ",serif;font-weight:400;font-size:84px;line-height:1.15;letter-spacing:0;filter:none;text-shadow:0 2px 18px rgba(0,0,0,.55)}\n"
                   " #tcard::after{display:none}/*/look*/\n</style>", 1)
     # hard swap at the word (Zoltium), no blur-in, no purple bloom; keep the punctuation on the card
     h = re.sub(r"tl\.fromTo\(`#c\$\{k\}`, \{ opacity: 0, letterSpacing.*?\);", "tl.set(`#c${k}`, { opacity: 1 }, Math.max(0, t0 - 0.05));", h)
@@ -76,9 +80,10 @@ if V3:
            " #v3msg{display:flex;flex-direction:column;align-items:flex-start;max-width:900px}\n"
            " #v3bub{max-width:900px;box-sizing:border-box;padding:28px 46px 32px;border-radius:54px 54px 54px 14px;background:#ededf1;color:#0d0d10;"
            "font:500 " + str(bs) + "px/1.16 'Inter',sans-serif;letter-spacing:-.012em;text-align:left;box-shadow:0 18px 50px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3)}\n"
-           " #v3title{margin-top:" + ("56" if bubble else "0") + "px;width:940px;padding:22px 0 30px;border-radius:60px;background:radial-gradient(ellipse 64% 62% at 50% 50%,rgba(0,0,0,.62),rgba(0,0,0,.3) 55%,rgba(0,0,0,0) 100%);text-align:center;text-wrap:balance;color:#fff;font:400 " + str(ts) + "px/1.08 '" + F + "',serif;"
+           " #v3title{margin-top:" + ("56" if bubble else "0") + "px;width:940px;padding:22px 0 30px;border-radius:60px;background:radial-gradient(ellipse 64% 62% at 50% 50%,rgba(0,0,0,.62),rgba(0,0,0,.3) 55%,rgba(0,0,0,0) 100%);text-align:center;text-wrap:balance;color:#fff;font:400 " + str(ts) + "px/1.08 " + (HI_FAM if HI else "'" + F + "'") + ",serif;"
            "text-shadow:0 0 3px rgba(0,0,0,.9),0 3px 14px rgba(0,0,0,.75),0 0 40px rgba(0,0,0,.55)}/*/v3*/\n")
     h = h.replace("<style>", '<!--v3--><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=block" rel="stylesheet"><!--/v3-->\n<style>', 1)
+    if HI: h = h.replace("<style>", '<!--v3--><link href="https://fonts.googleapis.com/css2?' + HI_LINK + '&display=block" rel="stylesheet"><!--/v3-->\n<style>', 1)
     h = h.replace("</style>", css + "</style>", 1)
     card = ('<div id="v3msg"><div id="v3meta"><b>Her</b> · ' + esc(cfg.get("bubbleTime", "11:47 PM")) + '</div><div id="v3bub">' + esc(bubble) + "</div></div>" if bubble else "") + ('<div id="v3title">' + esc(title) + "</div>" if title else "")
     if card: h = h.replace('<div id="caps"></div>', '<div id="caps"></div>\n  <!--v3--><div id="v3card">' + card + "</div><!--/v3-->", 1)
@@ -100,6 +105,14 @@ if V3:
         tl3 += f'  /*v3*/tl.to("#outro", {{ opacity: 0, duration: 0.5, ease: "sine.in" }}, END + {cap - 0.5:.2f});/*/v3*/\n'
         if TOT - END > 2.65: print(f"v3 note: the outro runs {TOT - END:.2f} s (target 2.6) — shorten the tagline or lower reel.json tail by {TOT - END - 2.6:.2f} s")
     h = h.replace("  tl.set({}, {}, ", tl3 + "  tl.set({}, {}, ", 1)
+# Hindi reels: Devanagari needs more line height (matras above/below), the chunker must also break at the danda and treat Hindi
+# postpositions as "weak" words (never end a card on का/की/के/में/पर...). English reels never enter this block.
+h = re.sub(r" */\*hi\*/.*?/\*/hi\*/\n?", "", h, flags=re.S)
+if HI:
+    h = h.replace("</style>", " /*hi*/.cap{line-height:1.34} #v3title{line-height:1.22} #tcard{line-height:1.3} #v3bub{font-family:'Inter','Noto Sans Devanagari',sans-serif}/*/hi*/\n</style>", 1)
+    if "।" not in h:
+        h = h.replace('/[.,!?…]["”’\']?$/.test(w[0])', '/[.,!?…।]["”’\']?$/.test(w[0])')
+        h = h.replace("/^(the|a|an|to|of|and|her|at|for|with|who's)$/i", "/^(the|a|an|to|of|and|her|at|for|with|who's|का|की|के|को|से|में|पर|और|ने|तो|भी|ही|है|हो|या|कि|जो|वो|ये)$/i")
 h = h.replace('<div id="title"><b>FOLLOW</b> FOR MORE</div>', '<div id="title"></div>')   # owner 10-15: no "follow for more" — the brand ending
 open(H, "w").write(h)
 print(f"{os.path.basename(R)}: title card {cfg.get('titleCard') or 'none'}, accent {len(cfg.get('accent', []))} words, reveal on lines {[i + 1 for i in cfg.get('drops', [])]}")
