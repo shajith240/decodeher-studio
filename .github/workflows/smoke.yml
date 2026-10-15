@@ -1,0 +1,59 @@
+# Cloud smoke test (10-15): proves the runner can install our tools, render a real reel page with HyperFrames/Chrome and deliver it
+# to the owner's Telegram — WITHOUT touching any real reel, the factory state on Drive, or the posting queue.
+# Input: a finished reel bundle copied to gdrive:decodeher-smoke/<name> (page, assets incl. bg.mp4 + final.wav, timing).
+name: smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      reel:
+        description: "Bundle name under gdrive:decodeher-smoke/"
+        default: "w2-01"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Kolkata
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/prepare
+      - name: Pull the test bundle (smoke folder only)
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: |
+          ( umask 077; printf '%s\n' "$RCLONE_CONF" > "$RUNNER_TEMP/rclone.conf" )
+          mkdir -p smoke/reel
+          rclone --config "$RUNNER_TEMP/rclone.conf" copy "gdrive:decodeher-smoke/${{ github.event.inputs.reel }}" smoke/reel -q
+          du -sh smoke/reel; ls smoke/reel smoke/reel/assets
+      - name: Render with HyperFrames (timed)
+        run: |
+          cd smoke/reel; start=$(date +%s)
+          timeout 2400 npx -y hyperframes render --fps 30 --quality delivery --output renders/raw.mp4
+          echo "render seconds: $(( $(date +%s) - start ))"
+          ffprobe -v error -show_entries format=duration -of csv=p=0 renders/raw.mp4
+      - name: Mux audio, make a Telegram-size copy, check length
+        run: |
+          cd smoke/reel
+          ffmpeg -loglevel error -y -i renders/raw.mp4 -i assets/audio/final.wav -map 0:v -map 1:a -c:v libx264 -preset veryfast -crf 26 \
+            -maxrate 6M -bufsize 6M -c:a aac -b:a 128k -shortest -movflags +faststart ../cloud-test.mp4
+          ls -la ../cloud-test.mp4; ffprobe -v error -show_entries format=duration -of csv=p=0 ../cloud-test.mp4
+      - name: Send to the owner on Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OWNER_CHAT_ID: ${{ secrets.OWNER_CHAT_ID }}
+        run: |
+          bash tools/cloud/tg_send.sh smoke/cloud-test.mp4 "☁️ Cloud test — this reel was rendered on GitHub's machine, not your laptop. If it plays fine, the PC-off factory works."
+      - name: Tell HQ
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+        run: python3 tools/cloud/report.py event activity "Cloud smoke test finished (${{ job.status }})"

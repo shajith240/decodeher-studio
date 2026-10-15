@@ -123,7 +123,7 @@ function stations(run) {
 }
 function newest(glob1) {   // newest file among reels/*/<sub>/* or deliverables/week-2/*-frames.png, as a /media URL
   let best = null;
-  for (const d of fs.readdirSync(REELS).filter((x) => x.startsWith("w2-"))) {
+  for (const d of fs.readdirSync(REELS).filter((x) => /^w\d+-/.test(x))) {
     for (const f of ls(path.join(REELS, d, glob1))) if (/\.(jpg|png)$/.test(f)) {
       const p = path.join(REELS, d, glob1, f), t = fs.statSync(p).mtimeMs; if (!best || t > best.t) best = { t, p, reel: d, name: f };
     }
@@ -175,7 +175,9 @@ ${rows.map((r) => `<tr><td class="t">${r.title}<small>${r.dir}</small></td>${["v
   const v = r[k]; return `<td class="${v === "done" ? "done" : v ? "part" : "none"}">${v === "done" ? "done" : v || "—"}</td>`; }).join("")}</tr>`).join("")}
 </table></main></body></html>`;
 
-const batchDirs = () => json(path.join(REELS, "w2-batch.json"), []).map((p) => path.basename(p)).filter((d) => exists(path.join(REELS, d)));
+// 10-15: every batch the factory works on (config.json factory.batches), not just week 2 — the w3 reels were invisible on the board
+const batchDirs = () => { const cfg = json(path.join(ROOT, "config.json"), {}), bs = (cfg.factory && cfg.factory.batches) || ["reels/w2-batch.json"];
+  return [...new Set(bs.flatMap((b) => json(path.join(ROOT, b), [])).map((p) => path.basename(p)))].filter((d) => exists(path.join(REELS, d))); };
 const snapshot = () => { const run = running(); return { reels: batchDirs().map(reelRow), running: run, activity: feed(), queue, stations: stations(run), manager: managerState(), media: { sheet: newest("clips/sheets"), frames: latestFrames() }, ver: pageVer(),
   queueStale, queueAt: queueOkAt ? new Date(queueOkAt).toISOString() : "" }; };
 function pageVer() { try { return String(fs.statSync(path.join(__dirname, "board/studio.html")).mtimeMs); } catch { return ""; } }   // the board reloads itself when this changes

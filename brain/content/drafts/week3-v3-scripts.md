@@ -10,7 +10,7 @@ Topics are new: none repeats week 1 or week 2 (jealousy, busy, good-morning text
   Simplest fix: make `new_reels.py` write `reels.tagline` as the last line. Until then, run `remake_reel.py` logic on each new reel before the voice step. Word counts below exclude it.
 - Meta blocks sit under their own `## NN meta` heading so the parser's section regex stops before them (it would otherwise voice the comment). They don't match `## NN · …` so no reel is made from them.
 - Numbers are spelled out, at most 2 ellipses per reel, no em dashes, no "Here's …", every quoted line is attributed ("She texts", "Just say", "Text her").
-- TTS watch-outs: "haha" (01) may come out as a laugh; check the take. "café" (08) keep the accent or write "cafe" if the voice stumbles.
+- TTS watch-outs: "haha" (01) may come out as a laugh; check the take. "cafe" (08) keep the accent or write "cafe" if the voice stumbles.
 
 ## Summary (computed by script, not estimated: whitespace words, 175 wpm = 2.92 words/s)
 | NN | Series | Title | Words | Est. s @175 wpm | Hook line (line 1) | Send / comment prompt |
@@ -191,7 +191,7 @@ And curiosity isn't a crush yet.
 I've checked my viewers at two a.m. for one name.
 But you can turn that view into a chat.
 Watching costs her nothing, because a view is one tap and zero risk.
-So reply to her story, "Wait, where's that café? I need to go."
+So reply to her story, "Wait, where's that cafe? I need to go."
 Send this to the friend who reads story views like stock charts.
 Follow for more.
 

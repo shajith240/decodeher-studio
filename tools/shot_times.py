@@ -11,6 +11,8 @@ i = 0
 for sh in shots:
     first = [norm(w) for w in sh["say"].split()][:2]
     j = next((k for k in range(i, len(W)) if W[k][0] == first[0] and (len(first) < 2 or k + 1 >= len(W) or W[k + 1][0] == first[1])), None)
+    if j is None and sh.get("q") == "OUTRO" and T["words"]:   # 10-15: the OUTRO always times to the LAST spoken line (the brand tagline),
+        j = next(k for k in range(len(W)) if W[k][1] == T["words"][-1][0][1])   # even if the plan still says an old CTA
     if j is None: sys.exit(f"shot not found in the voice: {sh['say']!r}")
     sh["t"] = round(W[j][1], 2); i = j + 1
 json.dump(shots, open(f"{R}/shots.json", "w"), indent=1, ensure_ascii=False)
