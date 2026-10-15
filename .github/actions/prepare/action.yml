@@ -1,0 +1,30 @@
+name: prepare
+description: Free disk, node 22, caches (uv, npm, hyperframes, playwright, whisper model) and tools/cloud/setup.sh
+runs:
+  using: composite
+  steps:
+    - name: Free disk space (the runner ships ~14 GB free; a pull + render needs more)
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+        df -h / | tail -1
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+    - name: Cache tools
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/uv
+          ~/.npm
+          ~/.cache/hyperframes/chrome
+          ~/.cache/hyperframes/fonts
+          ~/.cache/ms-playwright
+          ~/.cache/huggingface
+          node_modules
+        key: decodeher-tools-${{ runner.os }}-${{ hashFiles('package.json', 'tools/cloud/setup.sh') }}
+        restore-keys: |
+          decodeher-tools-${{ runner.os }}-
+    - name: Install (tools/cloud/setup.sh)
+      shell: bash
+      run: bash tools/cloud/setup.sh

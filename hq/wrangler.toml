@@ -1,0 +1,18 @@
+# decodeher-hq: the always-on HQ (Telegram bot + dashboard + watcher). Contract: brain/cloud-architecture.md. Setup: README.md.
+# Secrets are NOT here; set them with `npx wrangler secret put <NAME>` (see README).
+name = "decodeher-hq"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# the dashboard: files in ./public are served as-is; anything else (/api/*, /tg) runs worker.js
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[durable_objects.bindings]]
+name = "HQ"
+class_name = "HQ"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["HQ"]

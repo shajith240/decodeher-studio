@@ -1,0 +1,2223 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DecodeHer Studio</title>
+  <meta name="theme-color" content="#0f0608">
+  <meta name="description" content="DecodeHer HQ: the live studio board">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Geist:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    /* v4 shell (10-15, "royal hall"): the pixel studio as a Greek atelier at night. Brand = bronze warrior on royal crimson + champagne gold.
+   Gold = working, amber = on hold, red = stuck, stone = idle. 8 px grid; Cinzel = headings + station signs, Geist = all data. */
+    :root {
+      --bg: #0f0608;
+      --bg2: #160a0d;
+      --panel: #1b0b0f;
+      --panel2: #241015;
+      --line: #3b1c20;
+      --line2: #57302b;
+      --gold: #c9a45c;
+      --goldHi: #ecd6a3;
+      --goldD: #8a6a35;
+      --crimson: #6a121f;
+      --crimsonD: #3a0a12;
+      --bronze: #a8703a;
+      --text: #f3ead9;
+      --dim: #c4b196;
+      --faint: #8d7a66;
+      --work: #f2cd6e;
+      --warn: #ff9f43;
+      --alert: #ff6464;
+      --idle: #8f8578;
+      --ok: #9fd18b;
+      --serif: 'Cinzel', 'Trajan Pro', Georgia, serif;
+      --px: var(--serif);
+      --sans: 'Geist', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --top: 72px;
+      --side: clamp(320px, 21vw, 380px);
+      --gut: 16px;
+      --r: 6px;
+      --key: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8'%3E%3Cpath d='M0 7.5H16M1.5 7.5V1.5H12.5V5.5H5.5V3.5H9.5' fill='none' stroke='%23c9a45c' stroke-width='1'/%3E%3C/svg%3E");
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(120% 90% at 40% 0%, #1d0a0f 0%, var(--bg) 60%) fixed, var(--bg);
+      color: var(--text);
+      font: 400 13px/1.45 var(--sans);
+      -webkit-font-smoothing: antialiased
+    }
+
+    ul { list-style: none }
+    button { font: inherit; color: inherit }
+    :focus-visible { outline: 2px solid var(--goldHi); outline-offset: 2px }
+    .num { font-variant-numeric: tabular-nums }
+
+    .ic { width: 16px; height: 16px; flex: none; display: block }
+    .c-acc { color: var(--gold) }
+    .c-warn { color: var(--warn) }
+    .c-lil { color: var(--goldHi) }
+    .c-ok { color: var(--ok) }
+
+    .logo {
+      width: 40px; height: 40px; border-radius: 50%; flex: none; display: block;
+      background: #3a0a12 url("logo.jpg") center/cover;
+      box-shadow: 0 0 0 1px var(--goldD), 0 0 0 3px var(--bg2), 0 0 0 4px rgba(201, 164, 92, .45), 0 0 18px rgba(201, 164, 92, .18)
+    }
+
+    /* ---------- frame ---------- */
+    #app {
+      position: fixed; inset: 0; display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--side);
+      grid-template-rows: var(--top) minmax(0, 1fr);
+      gap: 0 var(--gut)
+    }
+
+    #top {
+      grid-column: 1/-1; display: flex; align-items: center; gap: 12px;
+      padding: 0 var(--gut); position: relative;
+      background: linear-gradient(#1f0b10, #160709);
+      border-bottom: 1px solid var(--line2)
+    }
+
+
+
+    #main {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 20px 0 12px var(--gut); min-width: 0; min-height: 0
+    }
+
+    #side {
+      display: flex; flex-direction: column; gap: var(--gut);
+      padding: 20px var(--gut) 12px 0; min-height: 0
+    }
+
+    /* ---------- top bar ---------- */
+    .brand {
+      display: flex; align-items: center; gap: 14px; padding-right: 8px;
+      font: 700 19px/1 var(--serif); letter-spacing: .04em; white-space: nowrap;
+      color: var(--goldHi); text-shadow: 0 1px 0 #000, 0 0 18px rgba(236, 214, 163, .18)
+    }
+
+    .card {
+      border: 1px solid var(--line2); border-radius: var(--r);
+      background: linear-gradient(rgba(106, 18, 31, .22), rgba(58, 10, 18, .18)), var(--panel);
+      box-shadow: inset 0 1px 0 rgba(236, 214, 163, .07)
+    }
+
+    .stats { display: flex; align-items: stretch; height: 52px; min-width: 0 }
+    #kpis { display: contents }
+
+    .stat {
+      display: flex; flex-direction: column; justify-content: center; gap: 4px;
+      padding: 0 18px; border-left: 1px solid var(--line); white-space: nowrap
+    }
+
+    .stat:first-child { border-left: 0 }
+    .stat .k { font-size: 11.5px; color: var(--dim); letter-spacing: .01em }
+
+    .stat .v {
+      font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text);
+      display: flex; align-items: center; gap: 8px
+    }
+
+    .stat .v small { margin-left: 5px; font-size: 13px; font-weight: 400; color: var(--dim) }
+    .stat.next { height: 52px; border-left: 1px solid var(--line2) }
+    .stat.next .v { font-size: 17px }
+
+    .tools { margin-left: auto; display: flex; align-items: center; gap: 8px }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
+      border: 1px solid var(--line2); border-radius: var(--r);
+      background: linear-gradient(rgba(106, 18, 31, .18), rgba(58, 10, 18, .1)), var(--panel);
+      color: var(--dim); font-size: 12.5px; white-space: nowrap; cursor: pointer
+    }
+
+    .chip:hover { color: var(--text); border-color: var(--goldD) }
+    .chip.on { color: var(--text); border-color: var(--gold) }
+    .chip .face { width: 22px; height: 22px; border-radius: 4px; background: #2a1216; box-shadow: 0 0 0 1px var(--goldD); image-rendering: pixelated }
+    #mgrBtn b { font-weight: 600; color: var(--ok) }
+    #mgrBtn b.warn { color: var(--warn) }
+    #mgrBtn b.work { color: var(--work) }
+    #mgrBtn b.off { color: var(--idle) }
+
+    .chip.needs {
+      background: linear-gradient(#ffc35a, #f0a33a); border-color: #ffd98a; color: #2a1a04; font-weight: 600;
+      box-shadow: 0 0 16px rgba(255, 170, 70, .3)
+    }
+
+    .chip.needs:hover { color: #2a1a04; filter: brightness(1.06) }
+    .chip.needs .ic { color: #2a1a04 }
+    .chip.needs .ic use { color: #2a1a04 }
+    .chip.needs svg { color: #3a2405 }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--idle); flex: none }
+    .dot.ok { background: #7fe08a; box-shadow: 0 0 8px rgba(127, 224, 138, .7) }
+    .dot.work { background: var(--work) }
+    .dot.warn { background: var(--warn) }
+    .dot.off { background: #4a3a36 }
+
+    .live { cursor: default; color: var(--dim) }
+    .live:hover { color: var(--dim); border-color: var(--line2) }
+    .live.bad { color: var(--warn) }
+    .live.bad .dot { background: var(--warn); box-shadow: none }
+    #clock { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 600 }
+
+    /* ---------- main: now strip + floor ---------- */
+    #nowbar {
+      display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px;
+      border: 1px solid var(--line2); border-radius: var(--r);
+      background: linear-gradient(90deg, rgba(106, 18, 31, .35), rgba(27, 11, 15, .9) 45%), var(--panel);
+      position: relative; overflow: hidden
+    }
+
+    #nowbar::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--gold) }
+    #nowbar .nowic { color: var(--gold) }
+    #nowbar.run .nowic { color: var(--work) }
+
+    #nowbar h1 { font: 700 15px/1.3 var(--serif); letter-spacing: .06em; color: var(--goldHi); flex: none }
+
+    #nowHead {
+      font-size: 15px; font-weight: 600; color: var(--text); min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 8px
+    }
+
+    #nowSub { font-size: 13px; color: var(--dim); margin-left: auto; white-space: nowrap; flex: none; font-style: italic }
+
+    #stage {
+      position: relative; overflow: hidden; background: #0a0405; flex: 1 1 0;
+      border: 1px solid var(--line2); border-radius: var(--r); min-height: 0;
+      box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(201, 164, 92, .12)
+    }
+
+    .cam { position: absolute; will-change: transform; line-height: 0 }
+    #scene { display: block }
+    #world { position: absolute; line-height: normal }
+
+    #vig {
+      position: absolute; inset: 0; pointer-events: none; z-index: 4;
+      background: radial-gradient(ellipse at 50% 45%, transparent 64%, rgba(8, 2, 3, .5) 100%)
+    }
+
+    #key { display: flex; gap: 24px; align-items: center; font-size: 12.5px; color: var(--dim); min-height: 20px; padding: 0 4px }
+    #key span { display: inline-flex; align-items: center; gap: 8px }
+    #key i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35) }
+    #key .w { background: var(--work) }
+    #key .h { background: var(--warn) }
+    #key .p { background: var(--alert) }
+    #key .hint { margin-left: auto; color: var(--faint) }
+
+    /* world overlays (positioned in floor pixels by layout()) */
+    /* station signs: one card, name over a plain status line (dot + text), no box inside the box */
+    .hc {
+      position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+      padding: 12px 10px; border: 1px solid #4a2c26; border-radius: 6px; pointer-events: none;
+      background: linear-gradient(#240c12, #1a080c); box-shadow: inset 0 1px 0 rgba(236, 214, 163, .06)
+    }
+
+    .hc.on { border-color: var(--gold); box-shadow: inset 0 1px 0 rgba(236, 214, 163, .16), 0 0 18px rgba(242, 205, 110, .22) }
+    .hc.alert { border-color: #a0602a }
+    .hc .hn { display: flex; align-items: center; gap: 7px; font: 700 15px/1 var(--serif); letter-spacing: .05em; color: var(--goldHi); white-space: nowrap }
+    .hc .hn svg { width: 14px; height: 14px; color: var(--gold); flex: none; margin-top: -1px }
+
+    .pill { display: inline-flex; align-items: center; gap: 6px; font: 500 12.5px/1 var(--sans); white-space: nowrap; color: var(--idle) }
+    .pill .pd { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: block; flex: none }
+    .pill.work { color: var(--work); font-weight: 600 }
+    .pill.ready { color: var(--dim) }
+    .pill.ready .pd { background: var(--goldHi) }
+    .pill.hold { color: #c9a27a }
+    .pill.hold .pd { background: #d98c3a }
+    .pill.ok { color: var(--dim) }
+    .pill.ok .pd { background: #7fc98a }
+    .pill.watch { color: var(--dim) }
+    .pill.watch .pd { background: #d98c3a }
+    .pill.warn { color: #ffc27a }
+    .pill.warn .pd { background: var(--warn) }
+    .pill.off { color: #7a6e64 }
+    .lab, .lab.mgr { position: absolute }
+
+    .bub {
+      position: absolute; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: .45em;
+      background: linear-gradient(#1f0a0f, #150709); border: 1px solid #4a2c26; border-top: 0; border-radius: 0 0 3px 3px;
+      color: var(--dim); font: 500 1em/1.25 var(--sans); padding: 0 .5em; pointer-events: none; text-align: left; overflow: hidden
+    }
+
+    .bub span { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere }
+    .bub svg { width: 1.1em; height: 1.1em; flex: none }
+    .bub.busy { color: #ffe9b0; border-color: #8a6a35 }
+    .bub.busy svg { color: var(--work) }
+    .bub.ready { color: var(--text) }
+    .bub.hold { color: #ffd9a8 }
+    .bub.hold svg { color: var(--warn) }
+    .bub.idle { color: var(--faint) }
+    .bub.nextp { border-color: var(--gold); color: var(--goldHi); box-shadow: 0 6px 18px rgba(201, 164, 92, .18) }
+    .bub.nextp svg { color: var(--goldHi) }
+
+    .bub.mgrb {
+      transform: translate(-50%, -100%); border: 1px solid #8a5a22; border-radius: 4px; color: #ffe7c2;
+      background: rgba(26, 8, 12, .94); font-size: 11px; padding: 4px 6px 5px; display: block; text-align: center
+    }
+
+    .bub.mgrb.off { display: none }
+
+    .shl { position: absolute; font-family: var(--sans); font-weight: 500; color: var(--dim); white-space: nowrap; pointer-events: none; line-height: 1 }
+    .shl b { color: var(--goldHi); font-weight: 700 }
+    .shl.ig { color: var(--dim) }
+    .shl.sign { color: #9d8a74; font-weight: 500; display: flex; align-items: flex-end; gap: .4em; white-space: normal }
+    .shl.sign svg { width: 1.5em; height: 1.5em; color: var(--gold); flex: none; margin-bottom: -.1em }
+    .more { position: absolute; color: var(--goldHi); font: 700 1em/1 var(--sans); pointer-events: none; letter-spacing: .05em }
+
+    .tag {
+      position: absolute; background: #f6efdf; color: #2a0e12; font: 600 9px var(--sans); padding: 0 .5em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; border-radius: 3px;
+      box-shadow: 0 0 0 1px rgba(201, 164, 92, .8), 0 2px 6px rgba(0, 0, 0, .5)
+    }
+
+    .slt { position: absolute; font-family: var(--sans); font-weight: 600; color: var(--goldHi); white-space: nowrap; pointer-events: none; font-variant-numeric: tabular-nums }
+
+    .mon { position: absolute; background: #0a0405; cursor: zoom-in; overflow: hidden; line-height: 0 }
+    .mon img { width: 100%; height: 100%; object-fit: cover; display: block }
+    .mon::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .14) 0 1px, transparent 1px 3px) }
+    .mon.flash img { animation: flick .5s steps(5) 1 }
+
+    @keyframes flick { 0% { opacity: .15 } 40% { opacity: 1 } 55% { opacity: .45 } 100% { opacity: 1 } }
+
+    #office { position: absolute; cursor: pointer; background: transparent; border: 0; border-radius: 2px }
+    #office:hover { outline: 1px solid rgba(201, 164, 92, .55) }
+
+    .compact .bub, .compact .shl, .compact .tag, .compact .slt, .compact .more { display: none !important }
+    .compact .hc .pill { display: none }
+
+
+    /* queue cards under the stage, aligned to the station columns */
+    #queue { position: relative; height: 104px; min-width: 0; flex: none }
+    #nowbar, #key, #sleep { flex: none }
+    #stageIn { position: absolute; inset: 0 }
+    .qc .qn { display: none }
+
+    .qc {
+      position: absolute; top: 0; bottom: 0; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px;
+      border: 1px solid var(--line2); border-radius: var(--r); text-align: left; overflow: hidden;
+      background: linear-gradient(rgba(106, 18, 31, .16), transparent 60%), var(--panel); box-shadow: inset 0 1px 0 rgba(236, 214, 163, .06)
+    }
+
+    .qc .qh { font-size: 12.5px; color: var(--dim); white-space: nowrap; line-height: 16px }
+    .qc .qh b { color: var(--goldHi); font-weight: 700; margin-left: 2px }
+    .qc .qb { display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; flex: 1; min-height: 0; overflow: hidden }
+    .qc .qs { font-size: 11.5px; line-height: 14px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+    .qc .qs.hold { color: #e8b57a }
+    .qc .qs.work { color: var(--work) }
+    .qc .qs.ready { color: var(--text) }
+    .qc .qs.ok { color: var(--ok) }
+    .qc .qs.warn { color: var(--warn) }
+    .qc .none { font-size: 12px; color: #6e5e50 }
+    .qc .more { position: static; font-size: 12px; font-weight: 600; color: var(--goldHi); line-height: 14px; padding-left: 2px }
+    .qc.pass .pass { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--faint) }
+    .qc.pass .pass svg { width: 14px; height: 14px; color: var(--gold) }
+    .qc .pr { display: flex; align-items: center; gap: 8px; width: 100%; font-size: 12.5px; color: var(--text); font-variant-numeric: tabular-nums; line-height: 14px }
+    .qc .pr time { color: var(--work); font-weight: 600 }
+    .qc .pr { white-space: nowrap; overflow: hidden; min-width: 0 }
+    .qc .pr time { overflow: hidden; text-overflow: ellipsis }
+    [hidden] { display: none !important }
+
+    .rb {
+      display: block; width: 14px; height: 14px; border-radius: 2px; background: var(--c); position: relative; cursor: pointer;
+      box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35), inset 0 -2px 0 rgba(0, 0, 0, .25)
+    }
+
+    .rb.hold::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 0 1.5px var(--panel) }
+    .rb.stuck::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--alert); box-shadow: 0 0 0 1.5px var(--panel) }
+    .rb:hover { outline: 1px solid var(--goldHi); outline-offset: 1px }
+    .qm { cursor: pointer; font: inherit; color: inherit }
+    .qm { opacity: 1 !important }
+    .qm:hover { border-color: var(--goldD) }
+    .qm .need1 { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #ffc27a }
+    .qm .need1 svg { width: 14px; height: 14px; color: var(--warn) }
+
+    /* ---------- side panels ---------- */
+    .panel {
+      background: linear-gradient(rgba(106, 18, 31, .14), transparent 140px), var(--panel);
+      border: 1px solid var(--line2); border-radius: var(--r); display: flex; flex-direction: column; min-height: 0;
+      box-shadow: inset 0 1px 0 rgba(236, 214, 163, .06)
+    }
+
+    .ph {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 13px;
+      position: relative; border-bottom: 1px solid var(--line)
+    }
+
+
+    .ph h2 { display: flex; align-items: center; gap: 10px; font: 700 15px/1 var(--serif); letter-spacing: .05em; color: var(--goldHi) }
+    .ph h2 .ic { color: var(--gold) }
+    .ph .aux { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums }
+    .pb { padding: 12px 16px 16px; min-height: 0 }
+    #schedP { flex: none }
+
+    #sched .row {
+      display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 8px 0;
+      border-bottom: 1px solid var(--line); font-size: 13.5px
+    }
+
+    #sched .row:last-child { border-bottom: 0 }
+    #sched .row time { font-weight: 600; color: var(--work); font-variant-numeric: tabular-nums }
+    #sched .row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500 }
+    #sched .row.past time { color: var(--dim); font-weight: 500 }
+    #sched .row.past span { color: var(--dim); font-weight: 400 }
+
+    .empty { font-size: 13px; color: var(--dim); line-height: 1.5 }
+    .empty b { color: var(--text); font-weight: 500; display: block; margin-bottom: 2px }
+    .sub { font-size: 12px; color: var(--faint); margin: 14px 0 2px }
+    .stale { margin-top: 12px; font-size: 12px; color: #e8b57a }
+
+    #lr { display: none; margin-top: 16px }
+    #lr .h { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+    #lr .h em { font-style: normal; color: var(--dim); font-weight: 400 }
+    #lr .mon { position: relative; width: 100%; aspect-ratio: 2.4; background: transparent; cursor: zoom-in }
+    #lr .mon::after { display: none }
+    #lr .mon img { position: absolute; width: 1px; height: 1px; opacity: 0 }
+    #lr .thumbs { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
+
+    #lr .thumbs i {
+      display: block; border-radius: 3px; background-repeat: no-repeat; background-size: 400% 100%;
+      box-shadow: 0 0 0 1px var(--line2), inset 0 0 0 1px rgba(0, 0, 0, .3)
+    }
+
+    #lr .thumbs i:nth-child(1) { background-position: 0 50% }
+    #lr .thumbs i:nth-child(2) { background-position: 33.333% 50% }
+    #lr .thumbs i:nth-child(3) { background-position: 66.667% 50% }
+    #lr .thumbs i:nth-child(4) { background-position: 100% 50% }
+    #lr .mon:hover .thumbs i { box-shadow: 0 0 0 1px var(--gold) }
+
+    #actP { flex: 1 }
+
+    #actP .pb {
+      overflow: hidden; flex: 1; padding-top: 6px;
+      -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent);
+      mask-image: linear-gradient(to bottom, #000 84%, transparent)
+    }
+
+    #act li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; font-size: 13.5px; padding: 6px 0; line-height: 1.4; border-bottom: 1px solid rgba(59, 28, 32, .55) }
+    #act time { color: var(--faint); font-variant-numeric: tabular-nums }
+    #act span { color: var(--dim); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+    #act span b { color: var(--text); font-weight: 600 }
+    #act li:first-child span { color: var(--text) }
+    #act em { font-style: normal; color: var(--faint); margin-left: 6px }
+
+    /* ---------- manager drawer (covers the side column only, never the floor) ---------- */
+    #drawer {
+      position: fixed; top: var(--top); right: 0; bottom: 0; width: calc(var(--side) + var(--gut)); max-width: 100vw; z-index: 20;
+      background: var(--panel); border-left: 1px solid var(--line2); box-shadow: -24px 0 48px rgba(0, 0, 0, .6);
+      display: flex; flex-direction: column; transform: translateX(102%); transition: transform .28s cubic-bezier(.2, .7, .2, 1); visibility: hidden
+    }
+
+    #drawer.open { transform: none; visibility: visible }
+    #drawer .ph { padding: 16px 20px }
+    #drawer .x { width: 32px; height: 32px; border: 1px solid var(--line2); border-radius: var(--r); background: transparent; color: var(--dim); cursor: pointer; font-size: 16px; line-height: 1 }
+    #drawer .x:hover { color: var(--text) }
+    #drawer .body { padding: 16px 20px 24px; overflow: auto; display: flex; flex-direction: column; gap: 24px }
+
+    .mstate { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--dim) }
+    #mgrNow { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4 }
+    .need { border: 1px solid #7a4a1a; background: rgba(255, 159, 67, .07); border-radius: var(--r); padding: 12px 16px }
+    .need .t { font-size: 12px; font-weight: 600; color: var(--warn); margin-bottom: 6px }
+    .need p { font-size: 13px; color: #f6e9d2; line-height: 1.5 }
+    .need details { margin-top: 8px; font-size: 12px; color: var(--dim) }
+    .need summary { cursor: pointer; color: var(--dim) }
+    .need details p { margin-top: 6px; color: var(--dim); font-size: 12.5px }
+    .sec h3 { font-size: 12px; font-weight: 500; color: var(--faint); margin-bottom: 8px }
+    #mgrLog li { display: grid; grid-template-columns: 72px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.4 }
+    #mgrLog time { color: var(--faint); font-variant-numeric: tabular-nums }
+    #mgrLog .tx { color: var(--dim) }
+    #mgrLog .tx b { font-weight: 500; color: var(--text) }
+    #mgrLog .n { display: block; color: var(--faint); white-space: nowrap }
+    #mgrLog .st { display: inline-block; font-size: 11px; color: var(--dim); border: 1px solid var(--line2); border-radius: 3px; padding: 0 5px; margin-right: 6px }
+    #mgrLog li.none { display: block; color: var(--faint) }
+    .foot { font-size: 12px; color: var(--faint) }
+
+    /* tooltip + lightbox */
+    #tip {
+      position: fixed; z-index: 30; pointer-events: none; background: var(--panel2); border: 1px solid var(--goldD);
+      border-radius: var(--r); padding: 12px 14px; max-width: 280px; display: none; line-height: 1.4; box-shadow: 0 12px 32px rgba(0, 0, 0, .55)
+    }
+
+    #tip .t { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px }
+    #tip .s { font-size: 12px; color: var(--work); margin-bottom: 8px }
+    #tip .pips { display: flex; gap: 8px; flex-wrap: wrap }
+    #tip .pip { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--faint) }
+    #tip .pip i { width: 6px; height: 6px; border-radius: 1px; background: #3b2a26; display: block }
+    #tip .pip.done { color: var(--dim) }
+    #tip .pip.done i { background: var(--work) }
+    #tip .pip.part { color: var(--dim) }
+    #tip .pip.part i { background: var(--warn) }
+    #tip .park { margin-top: 8px; font-size: 12px; color: var(--warn) }
+    #tip .park.bad { color: var(--alert) }
+    #tip .meta { font-size: 11px; color: var(--faint); margin-top: 6px }
+
+    #lb { position: fixed; inset: 0; z-index: 40; background: rgba(8, 3, 4, .94); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; padding: 24px; cursor: zoom-out }
+    #lb.open { display: flex }
+    #lb img { max-width: 94vw; max-height: 84vh; border: 1px solid var(--line2); border-radius: 4px; background: #000 }
+    #lb .cap { font-size: 13px; color: var(--dim); text-align: center }
+
+    #intro { position: fixed; inset: 0; z-index: 50; background: var(--bg); display: flex; align-items: center; justify-content: center; pointer-events: none; animation: introOut 2.1s ease forwards }
+    #intro b { font: 700 clamp(22px, 3.4vw, 44px)/1 var(--serif); color: var(--goldHi); letter-spacing: .05em; animation: introIn .7s ease both; display: flex; align-items: center; gap: .5em }
+    #intro .logo { width: 1.6em; height: 1.6em }
+
+    @keyframes introIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+    @keyframes introOut { 0%, 65% { opacity: 1 } 100% { opacity: 0; visibility: hidden } }
+
+    @media (prefers-reduced-motion:reduce) { #drawer { transition: none } }
+
+    @media (max-width:1599px) {
+      .stat { padding: 0 14px }
+      .stat.next .v small { display: none }
+      .brand { font-size: 17px }
+    }
+
+    @media (max-width:1439px) {
+      .stat.opt { display: none }
+      #connTxt { display: none }
+    }
+
+    @media (max-width:1279px) {
+      :root { --side: 300px }
+      .chip .lbl, #snd span { display: none }
+      #key .hint { display: none }
+      .brand { font-size: 0; gap: 0 }
+    }
+
+    /* ---------- cloud: asleep banner ---------- */
+    #sleep {
+      display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-height: 44px;
+      border: 1px solid #4a3a2a; border-radius: var(--r); color: var(--dim); font-size: 13.5px; line-height: 1.4;
+      background: linear-gradient(90deg, rgba(201, 164, 92, .10), rgba(27, 11, 15, .6) 60%), var(--panel)
+    }
+    #sleep[hidden] { display: none }
+    #sleep .moon { width: 18px; height: 18px; color: var(--goldHi); flex: none }
+    #sleep b { color: var(--text); font-weight: 600 }
+    #sleep span { min-width: 0 }
+    #scrim { display: none }
+    #key .swipehint { display: none }
+    #key .swipehint svg { width: 16px; height: 16px; flex: none }
+    @media (max-width:768px) and (pointer:coarse) {
+      #key .swipehint:not([hidden]) { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; color: var(--faint); font-size: 13px }
+    }
+    /* factory offline / asleep: one calm banner replaces the Now line; station cards grey out (posting stays live) */
+    body.offline #nowbar { display: none }
+    body.offline .qc:not(.live) { opacity: .55 }
+    body.offline .qc:not(.live) .qh { color: var(--faint) }
+    @media (max-width:1100px) { body.offline #queue.swipe .qc { min-height: 96px } }
+
+    /* ---------- tablet + phone: one column, the page scrolls ---------- */
+    @media (max-width:1100px) {
+      html, body { overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100% }
+      body { background-attachment: scroll }
+      #app { position: static; display: flex; flex-direction: column; gap: 0; min-height: 100vh }
+      #top { flex-wrap: wrap; gap: 12px; padding: 12px var(--gut) 14px; height: auto }
+      .brand { font-size: 17px; gap: 12px; padding-right: 0 }
+      .tools { margin-left: auto; flex-wrap: nowrap; gap: 8px }
+      .chip { height: 44px; font-size: 13px }
+      .chip .lbl { display: inline }
+      #snd span { display: none }
+      #connTxt { display: inline }
+      #kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; width: 100%; order: 3 }
+      #kpis .stats { display: contents }
+      #kpis .stat, #kpis .stat.next {
+        display: flex; height: auto; min-height: 60px; padding: 10px 12px; border: 1px solid var(--line2); border-radius: var(--r);
+        background: linear-gradient(rgba(106, 18, 31, .22), rgba(58, 10, 18, .18)), var(--panel); box-shadow: inset 0 1px 0 rgba(236, 214, 163, .07); min-width: 0
+      }
+      #kpis .stat.opt { display: flex }
+      .stat .k { font-size: 13px }
+      .stat .v { font-size: 17px; min-width: 0 }
+      .stat .v > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+      .stat .v small, .stat.next .v small { display: inline; font-size: 13px }
+      #main { padding: 16px var(--gut) 0; gap: 12px }
+      #nowbar { flex-wrap: wrap; padding: 10px 14px; row-gap: 4px }
+      #nowHead { white-space: normal; flex: 1 1 200px }
+      #nowSub { margin-left: 0; white-space: normal; flex-basis: 100%; padding-left: 28px }
+      #stage { flex: none; height: auto; aspect-ratio: auto }
+      #stage.fit { height: clamp(300px, 52vw, 520px) }
+      #stage.scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch }
+      #stage.scroll::-webkit-scrollbar { display: none }
+      #stage.scroll #stageIn { position: relative; inset: auto }
+      #side { padding: 16px var(--gut) 24px; gap: 12px }
+      #actP { flex: none }
+      #actP .pb { -webkit-mask-image: none; mask-image: none; padding-bottom: 8px }
+      .ph .aux, .sub, .stale, .foot { font-size: 13px }
+      #key { flex-wrap: wrap; gap: 8px 20px; font-size: 13px }
+      #key .hint { display: none }
+      .stage-wrap { position: relative }
+      /* queue cards: a swipe row, one card per station, named */
+      #queue.swipe {
+        height: auto; display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory;
+        padding-bottom: 2px; scrollbar-width: none; overscroll-behavior-x: contain
+      }
+      #queue.swipe::-webkit-scrollbar { display: none }
+      #queue.swipe .qc { position: relative; left: auto !important; width: auto !important; flex: 0 0 172px; min-height: 120px; scroll-snap-align: start; gap: 8px; padding: 12px 14px }
+      #queue.swipe .qc .qn { display: flex; align-items: center; gap: 8px; font: 700 14px/1 var(--serif); letter-spacing: .05em; color: var(--goldHi) }
+      #queue.swipe .qc .qn svg { width: 14px; height: 14px; color: var(--gold); flex: none }
+      #queue.swipe .qc .qh, #queue.swipe .qc .qs, #queue.swipe .qc .none, #queue.swipe .qc.pass .pass, #queue.swipe .qc .pr, #queue.swipe .qm .need1 { font-size: 13px; line-height: 18px }
+      #queue.swipe .qc .qs { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical }
+      #queue.swipe .qc .qb { gap: 8px; flex: none }
+      #queue.swipe .rb { width: 20px; height: 20px }
+      #queue.swipe .rb::before { content: ""; position: absolute; inset: -12px }
+      #queue.swipe .qc.on { border-color: var(--gold) }
+      #sched .row { grid-template-columns: 128px 1fr; font-size: 14px; padding: 10px 0 }
+      #act li { grid-template-columns: 48px 1fr; font-size: 14px; padding: 8px 0 }
+      #act span { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical }
+      #lr { display: none !important }
+      /* manager drawer: a bottom sheet */
+      #drawer {
+        top: auto; left: 0; right: 0; bottom: 0; width: 100%; max-height: 86vh; max-height: 86dvh; border-left: 0; border-top: 1px solid var(--goldD);
+        border-radius: 16px 16px 0 0; transform: translateY(102%); box-shadow: 0 -24px 48px rgba(0, 0, 0, .6); padding-bottom: env(safe-area-inset-bottom)
+      }
+      #drawer::before { content: ""; display: block; width: 44px; height: 4px; border-radius: 2px; background: var(--line2); margin: 10px auto 0; flex: none }
+      #drawer .ph { padding: 10px 20px 14px }
+      #drawer .x { width: 44px; height: 44px; font-size: 20px }
+      #drawer .body { overscroll-behavior: contain }
+      #mgrLog li { grid-template-columns: 56px 1fr; font-size: 14px }
+      #mgrLog .st, .need .t, .need details, .mstate { font-size: 13px }
+      #scrim { display: block; position: fixed; inset: 0; z-index: 19; background: rgba(8, 3, 4, .6); opacity: 0; visibility: hidden; transition: opacity .2s }
+      #scrim.on { opacity: 1; visibility: visible }
+      #tip { max-width: min(300px, calc(100vw - 16px)) }
+      #tip .s, #tip .park, #tip .t { font-size: 13px }
+    }
+
+    @media (max-width:899px) and (min-width:700px) {
+      #kpis { grid-template-columns: repeat(4, minmax(0, 1fr)) }
+      #kpis .stat.next { grid-column: 1 / -1 }
+    }
+
+    @media (max-width:1100px) and (min-width:700px) {
+      #side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start }
+    }
+
+    /* ---------- phone ---------- */
+    @media (max-width:699px) {
+      :root { --gut: 14px }
+      #top { padding-top: 10px; gap: 10px }
+      .brand { font-size: 16px; gap: 10px }
+      .brand .logo { width: 34px; height: 34px }
+      .brand .bt { display: none }
+      #mgrBtn .lbl { display: none }
+      #conn { padding: 0 12px }
+      #connTxt { display: none }
+      #kpis { grid-template-columns: 1fr 1fr }
+      #kpis .stat.next { grid-column: 1 / -1 }
+      #kpis .stat { min-height: 58px; padding: 9px 12px }
+      #nowbar h1 { font-size: 14px }
+      #nowHead { font-size: 14px; flex-basis: 100%; margin-left: 0 }
+      #nowSub { padding-left: 0 }
+      #key span { font-size: 13px }
+      #sched .row { grid-template-columns: 112px 1fr }
+    }
+    @media (max-width:380px) {
+      #snd { display: none }
+    }
+    @media (prefers-reduced-motion:reduce) { #scrim { transition: none } }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header id="top">
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+          <symbol id="i-play" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.6 5.4v5.2L10.8 8z" fill="currentColor"/></symbol>
+          <symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 4.6V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+          <symbol id="i-cal" viewBox="0 0 16 16"><rect x="1.8" y="3" width="12.4" height="11" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.8 6.6h12.4M5 1.4v3M11 1.4v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><rect x="4.4" y="8.6" width="2.4" height="2.2" fill="currentColor"/></symbol>
+          <symbol id="i-check" viewBox="0 0 16 16"><path d="M2.6 8.4l3.6 3.6 7.2-7.6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+          <symbol id="i-pause" viewBox="0 0 16 16"><rect x="3" y="2.5" width="3.6" height="11" rx=".8" fill="currentColor"/><rect x="9.4" y="2.5" width="3.6" height="11" rx=".8" fill="currentColor"/></symbol>
+          <symbol id="i-run" viewBox="0 0 16 16"><path d="M4 2.5v11L13 8z" fill="currentColor"/></symbol>
+          <symbol id="i-alert" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M8 4.2v4.6" stroke="#ffd27a" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="11.4" r="1.15" fill="#ffd27a"/></symbol>
+          <symbol id="i-sound-off" viewBox="0 0 16 16"><path d="M2 6h2.6L8 3v10L4.6 10H2z" fill="currentColor"/><path d="M10.6 6l3.6 4M14.2 6l-3.6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+          <symbol id="i-sound-on" viewBox="0 0 16 16"><path d="M2 6h2.6L8 3v10L4.6 10H2z" fill="currentColor"/><path d="M10.4 5.6a3.4 3.4 0 010 4.8M12.4 3.8a6 6 0 010 8.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+          <symbol id="i-list" viewBox="0 0 16 16"><path d="M5.5 4h8.5M5.5 8h8.5M5.5 12h8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="1.6" y="3" width="2" height="2" fill="currentColor"/><rect x="1.6" y="7" width="2" height="2" fill="currentColor"/><rect x="1.6" y="11" width="2" height="2" fill="currentColor"/></symbol>
+          <symbol id="i-eye" viewBox="0 0 16 16"><path d="M1.2 8s2.5-4.6 6.8-4.6S14.8 8 14.8 8s-2.5 4.6-6.8 4.6S1.2 8 1.2 8z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="2.1" fill="currentColor"/></symbol>
+          <symbol id="i-mic" viewBox="0 0 16 16"><rect x="5.4" y="1.2" width="5.2" height="8.6" rx="2.6" fill="currentColor"/><path d="M3.2 7.6a4.8 4.8 0 009.6 0M8 12.4v2.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+          <symbol id="i-search" viewBox="0 0 16 16"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.4 10.4l4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+          <symbol id="i-scale" viewBox="0 0 16 16"><path d="M8 1.6v12.6M4 14.2h8M2.4 4.2h11.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.4 4.6L.8 9h3.2zM13.6 4.6L12 9h3.2z" fill="currentColor"/><circle cx="8" cy="3" r="1.4" fill="currentColor"/></symbol>
+          <symbol id="i-pen" viewBox="0 0 16 16"><path d="M10.8 1.8l3.4 3.4-8.6 8.6-4.2.8.8-4.2z" fill="currentColor"/><path d="M9.4 3.2l3.4 3.4" stroke="#1a0a0e" stroke-width="1.2"/></symbol>
+          <symbol id="i-sliders" viewBox="0 0 16 16"><path d="M4 1.6v12.8M8 1.6v12.8M12 1.6v12.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".55"/><rect x="2.2" y="8.4" width="3.6" height="2.6" rx=".6" fill="currentColor"/><rect x="6.2" y="3.4" width="3.6" height="2.6" rx=".6" fill="currentColor"/><rect x="10.2" y="10" width="3.6" height="2.6" rx=".6" fill="currentColor"/></symbol>
+          <symbol id="i-gear" viewBox="0 0 16 16"><path d="M8 .9l1.3 1.9 2.2-.6.4 2.3 2.2.8-.9 2.1 1.4 1.8-1.9 1.3.1 2.3-2.3.1-.9 2.1-2-1.1-1.9 1.3-1.2-2-2.3-.1.2-2.3L.6 9.5l1.5-1.8-1-2.1 2.2-.7.4-2.3 2.2.5z" fill="currentColor"/><circle cx="8" cy="8" r="2.4" fill="#1a0a0e"/></symbol>
+          <symbol id="i-plane" viewBox="0 0 16 16"><path d="M15 1L1 7.2l5.2 1.8L8 14.4l2.2-4.6z" fill="currentColor"/><path d="M6.2 9L15 1" stroke="#1a0a0e" stroke-width="1.1"/></symbol>
+          <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+          <symbol id="i-user" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.2 14.6c.6-3.2 3-4.9 5.8-4.9s5.2 1.7 5.8 4.9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+          <symbol id="i-moon" viewBox="0 0 16 16"><path d="M10.6 1.6a6.6 6.6 0 103.8 10.6A5.6 5.6 0 0110.6 1.6z" fill="currentColor"/></symbol>
+          <symbol id="i-swipe" viewBox="0 0 16 16"><path d="M1.5 8h13M4.5 5L1.5 8l3 3M11.5 5l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+          <symbol id="i-face" viewBox="0 0 12 12" shape-rendering="crispEdges"><rect x="2" y="1" width="8" height="3" fill="#c9ccd6"/><rect x="1" y="2" width="1" height="4" fill="#c9ccd6"/><rect x="10" y="2" width="1" height="4" fill="#c9ccd6"/><rect x="2" y="4" width="8" height="5" fill="#e8b98f"/><rect x="3" y="5" width="2" height="1" fill="#1a1530"/><rect x="7" y="5" width="2" height="1" fill="#1a1530"/><rect x="5" y="7" width="2" height="1" fill="#b77a5c"/><rect x="2" y="9" width="8" height="3" fill="#2f3f6b"/><rect x="5" y="9" width="2" height="3" fill="#e9e3d6"/><rect x="5.5" y="10" width="1" height="2" fill="#d6455a"/></symbol>
+        </defs>
+      </svg>
+      <div class="brand"><span class="logo" aria-hidden="true"></span><span class="bt">DecodeHer Studio</span></div>
+      <div id="kpis">
+      <div class="stats card">
+        <div class="stat" title="Reels in this batch with a finished video"><span class="k">Rendered</span><span
+            class="v"><svg class="ic c-acc"><use href="#i-play"/></svg><span id="mRend">–</span></span></div>
+        <div class="stat" title="Reels the owner has put on hold (factory will not move them)"><span class="k">On
+            hold</span><span class="v"><svg class="ic c-warn"><use href="#i-clock"/></svg><span id="mHold">–</span></span></div>
+        <div class="stat" title="Posts booked on the relay, waiting for their time slot"><span class="k">Booked to
+            post</span><span class="v"><svg class="ic c-lil"><use href="#i-cal"/></svg><span id="mBooked">–</span></span></div>
+        <div class="stat" title="Posts the relay has published to Instagram"><span class="k">Posted</span><span
+            class="v"><svg class="ic c-ok"><use href="#i-check"/></svg><span id="mPosted">–</span></span></div>
+      </div>
+      <div class="stat next card opt" title="The next booked post and how long until it goes out"><span class="k">Next post</span><span
+          class="v"><svg class="ic c-lil"><use href="#i-cal"/></svg><span id="mNext">–</span></span></div>
+      </div>
+      <div class="tools">
+        <button class="chip" id="mgrBtn" aria-controls="drawer" aria-expanded="false"><svg class="ic c-acc"><use href="#i-user"/></svg><span class="lbl">Manager</span><b id="mgrWord">–</b><span class="dot" id="mgrDot" hidden></span></button>
+        <button class="chip needs" id="mgrBadge" hidden><svg class="ic"><use href="#i-alert"/></svg><span id="mgrBadgeTxt"></span></button>
+        <span class="chip live" id="conn"><span class="dot ok"></span><span id="connTxt">Live</span> <span
+            id="clock">--:--:--</span></span>
+        <button class="chip" id="snd" title="Soft lo-fi ambience" aria-pressed="false"><svg class="ic"><use href="#i-sound-off"/></svg><span>Sound off</span></button>
+      </div>
+    </header>
+
+    <main id="main">
+      <div id="nowbar">
+        <svg class="ic nowic" id="nowIc"><use href="#i-pause"/></svg><h1>Now</h1><span id="nowHead">Loading the studio…</span><span id="nowSub"></span>
+      </div>
+      <div id="sleep" role="status" hidden><svg class="moon"><use href="#i-moon"/></svg><span id="sleepTx"></span></div>
+      <div id="stage" class="fit" aria-label="The studio floor">
+        <div id="stageIn">
+          <div class="cam" id="cam"><canvas id="scene"></canvas>
+            <div id="world"></div>
+          </div>
+          <div id="vig"></div>
+        </div>
+      </div>
+      <div id="queue" aria-label="Reels waiting at each station"></div>
+      <div id="key"><span><i class="w"></i>Station working</span><span><i class="h"></i>Reel on hold</span><span><i
+            class="p"></i>Reel stuck</span><span class="hint">Each small box is one reel. Point at it for
+          details.</span><span class="swipehint" hidden><svg><use href="#i-swipe"/></svg>Swipe the studio</span></div>
+    </main>
+
+    <aside id="side">
+      <section class="panel" id="schedP">
+        <div class="ph">
+          <h2><svg class="ic"><use href="#i-cal"/></svg>Posting schedule</h2><span class="aux" id="schedAux"></span>
+        </div>
+        <div class="pb">
+          <div id="sched"></div>
+          <div id="lr">
+            <div class="h"></div>
+            <div class="mon big"><img alt="" decoding="async"><div class="thumbs"><i></i><i></i><i></i><i></i></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="panel" id="actP">
+        <div class="ph">
+          <h2><svg class="ic"><use href="#i-list"/></svg>Activity</h2><span class="aux">newest first</span>
+        </div>
+        <div class="pb">
+          <ul id="act"></ul>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <aside id="drawer" aria-label="Manager" aria-hidden="true">
+    <div class="ph">
+      <h2>Manager</h2><button class="x" id="drawerX" aria-label="Close">&times;</button>
+    </div>
+    <div class="body">
+      <div>
+        <div class="mstate"><span class="dot" id="mgrDot2"></span><span id="mgrSt"></span></div>
+        <p id="mgrNow" style="margin-top:8px">&nbsp;</p>
+      </div>
+      <div id="needs"></div>
+      <div class="sec">
+        <h3>What it did</h3>
+        <ul id="mgrLog"></ul>
+      </div>
+      <p class="foot">Talk to the manager on Telegram: ask for a change and it sends you a preview to approve. Anything it
+        needs you for is listed here.</p>
+    </div>
+  </aside>
+  <div id="scrim"></div>
+  <div id="tip"></div>
+  <div id="lb"><img alt="">
+    <div class="cap"></div>
+  </div>
+  <div id="intro"><b><span class="logo" aria-hidden="true"></span>DecodeHer Studio</b></div>
+
+<script>
+(() => {
+'use strict';
+const W = 352, SH = 170, OFF = 30, H = SH + OFF, N = 7;
+const CX = i => 28 + 48 * i;
+let VW = W, VH = H, M = 0, ox = 0, oy = 0, CAMX = 0, CAMY = OFF, X0 = 0, X1 = W, Y0 = -OFF, Y1 = SH;
+const view = document.getElementById('scene'), vg = view.getContext('2d');
+const cv = document.createElement('canvas');
+const g = cv.getContext('2d');
+let K = 1;
+cv.width = W; cv.height = H;
+g.imageSmoothingEnabled = false;
+
+/* ---------- palette ---------- */
+const C = {
+  wall:'#1f0b0e', wallHi:'#260e12', base:'#4a2a1c', floorA:'#231416', floorB:'#2a191a', corr:'#1a0d0e',
+  tray:'#26130f', trayEdge:'#6a4426', plate:'#291114',
+  deskTop:'#6b4228', deskEdge:'#9a6a3c', deskFront:'#3e2416', deskFront2:'#331a10',
+  acc:'#f2cd6e', accD:'#c9a45c', accDD:'#8a6a35', warm:'#FFC978', warmD:'#b9843f',
+  dark:'#0d0506', metal:'#452227', metal2:'#5a3035', off:'#3e1e23',
+  chair:'#4a1219', chairHi:'#6a1d27', gold:'#c9a45c', goldHi:'#ecd6a3', crim:'#6a121f', crimD:'#3a0a12', marble:'#efe6d6'
+};
+const R = (x,y,w,h,c) => { g.fillStyle = c; g.fillRect(Math.round(x),Math.round(y),w,h); };
+const P = (x,y,c) => { g.fillStyle = c; g.fillRect(Math.round(x),Math.round(y),1,1); };
+function disc(cx,cy,rx,ry,c){
+  g.fillStyle = c; ry = ry || rx;
+  for (let dy=-ry; dy<=ry; dy++){
+    const w = Math.floor(rx*Math.sqrt(1-(dy*dy)/(ry*ry+.0001)));
+    g.fillRect(Math.round(cx-w), Math.round(cy+dy), w*2+1, 1);
+  }
+}
+function line(x0,y0,x1,y1,c){
+  x0|=0;y0|=0;x1|=0;y1|=0;
+  const dx=Math.abs(x1-x0), dy=-Math.abs(y1-y0), sx=x0<x1?1:-1, sy=y0<y1?1:-1; let e=dx+dy;
+  for(;;){ P(x0,y0,c); if(x0===x1&&y0===y1)break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} }
+}
+function bitmap(x,y,rows,map){
+  for (let j=0;j<rows.length;j++) for (let i=0;i<rows[j].length;i++){
+    const k = rows[j][i]; if (k !== '.' && map[k]) P(x+i,y+j,map[k]);
+  }
+}
+function glow(x,y,rx,ry,rgb,a,steps){
+  for (let k=0;k<steps;k++){
+    const f = 1 - k/steps;
+    disc(x,y,Math.round(rx*f),Math.round(ry*f),`rgba(${rgb},${a})`);
+  }
+}
+
+/* ---------- sprites ---------- */
+// 16 x 22 figures (big heads, readable faces at desk height). Rows 0-10 head, 11-19 body, 20-21 legs.
+const BODY = [
+ "....HHHHHHHH....",
+ "..HHHHHHHHHHHH..",
+ ".HHHHHHHHHHHHHH.",
+ ".HHHHHHHHHHHHHH.",
+ ".HHSSHSSSSHSSHH.",
+ ".HSSSSSSSSSSSSH.",
+ ".HSSEESSSSEESSH.",
+ ".HSSEWSSSSEWSSH.",
+ "..SBSSSSSSSSBS..",
+ "..SSSSSMMSSSSS..",
+ "....SSSSSSSS....",
+ ".....TTSSTT.....",
+ "...TTTTTTTTTT...",
+ "..TTTTTTTTTTTT..",
+ ".TTTTTTTTTTTTTT.",
+ ".TTTTTTTTTTTTTT.",
+ ".STTTTTTTTTTTTS.",
+ ".STTTTTTTTTTTTS.",
+ "..TTTTTTTTTTTT..",
+ "..PPPPPPPPPPPP.."
+];
+const LEGS = [
+ ["...PPP....PPP...","...KKK....KKK..."],
+ ["...PPP....PPP...","..KKK......KKK.."],
+ ["...PPP....PPP...","...KKK....KKKK.."]
+];
+const LONG = []; for (let y = 4; y <= 14; y++) { LONG.push([0,y],[15,y]); if (y >= 8) LONG.push([1,y],[14,y]); }
+const CREW = [
+ {hair:'#d9694f',skin:'#f2c9a0',shirt:'#4fb3a9',pants:'#4a272c',long:1},            // voice
+ {hair:'#3a2a1f',skin:'#c58c62',shirt:'#e0b04a',pants:'#4a272c',hat:'#dab160'},      // scout
+ {hair:'#e8c46a',skin:'#f0d2b8',shirt:'#e07a6a',pants:'#412226',long:1},            // judge
+ {hair:'#452227',skin:'#8d5a3b',shirt:'#dab160',pants:'#4a272c'},                    // edit
+ {hair:'#e5ca92',skin:'#f2c9a0',shirt:'#e9e3d6',pants:'#412226',long:1},            // mix
+ {hair:'#6b4a2c',skin:'#c58c62',shirt:'#8bbf7a',pants:'#4a272c',hat:'#e07a6a'},      // render
+ {hair:'#a33d3d',skin:'#f0d2b8',shirt:'#e5ca92',pants:'#4a272c'}                     // post
+];
+const HELPER = {hair:'#5e494c',skin:'#c58c62',shirt:'#ab8288',pants:'#412226',hat:'#e0b04a'};
+const spriteCache = {};
+function sprite(c, dir, leg){
+  const key = [c.hair,c.shirt,c.skin,dir,leg].join('|');
+  if (spriteCache[key]) return spriteCache[key];
+  const rows = BODY.concat(LEGS[leg]).map(r => r.split(''));
+  if (dir === 'up') for (let j=4;j<=10;j++) rows[j] = rows[j].map(ch => 'SEWBM'.includes(ch) ? (j >= 10 ? 'S' : 'H') : ch);
+  if (c.long) LONG.forEach(([x,y]) => { if (rows[y][x]==='.') rows[y][x]='H'; });
+  const cvs = document.createElement('canvas'); cvs.width = 16; cvs.height = 22;
+  const k = cvs.getContext('2d');
+  const map = {H:c.hair,S:c.skin,T:c.shirt,P:c.pants,K:'#1e0e10',E:'#1e0e10',W:'#fff6e6',B:'#f0a08c',M:'#a0524a'};
+  rows.forEach((r,j) => r.forEach((ch,i) => {
+    if (ch==='.') return;
+    let col = map[ch];
+    if (c.hat && (j<=2) && ch==='H') col = c.hat;
+    k.fillStyle = col; k.fillRect(i,j,1,1);
+  }));
+  // a little shading: darker hair edge + shirt fold
+  k.fillStyle = 'rgba(0,0,0,.18)'; k.fillRect(1,3,14,1); k.fillRect(3,18,10,1);
+  return spriteCache[key] = cvs;
+}
+function drawSprite(c,x,y,dir,leg,dy){ g.drawImage(sprite(c,dir,leg), Math.round(x-8), Math.round(y-22+(dy||0))); }
+function shadow(x,y){ R(x-6,y,12,2,'rgba(0,0,0,.35)'); }
+
+/* ---------- stations ---------- */
+const ST = [
+ {key:'voice', lab:'Voice', full:'Voice booth',  run:'recording a voice'},
+ {key:'scout', lab:'Scout', full:'Clip scout',   run:'searching clips'},
+ {key:'judge', lab:'Judge', full:"Judges' table",run:'building contact sheets'},
+ {key:'edit',  lab:'Edit',  full:'Edit bay',     run:'cutting the clip film'},
+ {key:'mix',   lab:'Mix',   full:'Mixing desk',  run:'mixing audio'},
+ {key:'render',lab:'Render',full:'Render rig',   run:'rendering a reel'},
+ {key:'post',  lab:'Post',  full:'Post office',  run:null}
+];
+ST.forEach((s,i) => { s.i = i; s.cx = CX(i); s.lit = 0; s.active = false; s.raw = false; s.last = -99; });
+const SEAT_Y = 86, CARD_Y = 40;
+const TOKEN_COL = ['#e0b04a','#5a86c8','#d0703f','#93a85a','#efe3cc','#4fb3a9'];
+
+/* ---------- data state ---------- */
+let DATA = { reels:[], running:[], activity:[], queue:[] };
+let hasQueued = false, hasPosted = false, partialJudged = false;
+const tokens = new Map();
+let now = 0;
+const MEDIA = { sheet:null, frames:null };
+const packets = [];
+window.__tokens = tokens; window.__packets = packets;
+function addPacket(p){ packets.push(p); Snd.blip(); }
+const LINE = ['voice','scout','judge','edit','post','posted'];
+const LINE_ST = [0,1,2,3,6,6];
+const WORK_LINE = [0,1,2,3,3,3,4];
+const deskHold = [null,null,null,null,null,null,null];
+const shelf = [[],[],[],[],[],[],[]];
+const deskTk = [null,null,null,null,null,null,null];
+let IGN = 0;
+const pnow = () => performance.now() / 1000;
+
+const STAGES = ['voice','audio','clips','judged','video','posted'];
+const STAGE_ST = [0,0,1,2,5,6];
+function reelInfo(r){
+  let idx = -1, partial = false;
+  STAGES.forEach((s,i) => { if (r[s]) { idx = i; partial = (r[s] !== 'done') && s !== 'posted'; } });
+  return { idx, partial };
+}
+function parseRunning(list){
+  const out = [];
+  (list||[]).forEach(line => {
+    const [label, rest] = String(line).split(' · ');
+    const st = ST.findIndex(s => s.run && label.trim() === s.run);
+    const titles = rest ? rest.split(',').map(s => s.trim()) : [];
+    out.push({ label:label.trim(), st, titles, line });
+  });
+  return out;
+}
+const isSlug = x => /^(w\d+-\d+-|\d+-[A-Za-z]{3}-|\d+-W\d+-)[\w-]+$/i.test(x);
+function slugTitle(x){
+  const reels = DATA.reels || [];
+  let r = reels.find(q => q.dir === x);
+  if (!r) { const tail = x.replace(/^\d+-W\d+-/i, '').replace(/^\d+-[A-Za-z]{3}-/, '').replace(/^w\d+-\d+-/, ''); r = reels.find(q => q.dir.endsWith('-' + tail)); if (!r) { const t = tail.replace(/-(t|s|re|ll|ve|d|m)(?=-|$)/g, "'$1").replace(/-/g,' '); return t.charAt(0).toUpperCase() + t.slice(1); } }
+  return r.title;
+}
+function friendly(text){
+  if (!text) return '';
+  const p = text.split(' · ').map(x => x.trim()), head = p[0], rest = p.slice(1);
+  const m = rest.map(x => isSlug(x) ? slugTitle(x) : x);
+  if (head === 'Clip search') { const n = (rest[rest.length-1]||'').match(/(\d+) of (\d+)/); return 'Searching clips: ' + (m[0]||'') + (n ? ` (${n[1]}/${n[2]})` : ''); }
+  if (head === 'Contact sheet') { const shot = rest.find(x => /^shot/.test(x)); return 'Judging clips: ' + (m[0]||'') + (shot ? ' · ' + shot : ''); }
+  if (head === 'Next post') { const tm = (rest[rest.length-1]||'').match(/(\d\d:\d\d)$/); return 'Next post: ' + (m[0]||'') + (tm ? ' · ' + tm[1] : ''); }
+  const verbs = { Render:'Rendering', Mix:'Mixing', Voice:'Recording', Cut:'Cutting', Edit:'Cutting' };
+  return (verbs[head] || head) + (m.length ? ': ' + m.join(' · ') : '');
+}
+const SI = i => ((DATA.stations || {})[ST[i].key]) || { busy:false, text:'', at:'' };
+function bubbleText(i){
+  const s = ST[i], info = SI(i);
+  if (s.active) {
+    let t = friendly(info.text);
+    if (!t) { const r = parseRunning(DATA.running).find(x => x.st === i); t = r ? (r.label.charAt(0).toUpperCase() + r.label.slice(1) + (r.titles.length ? ': ' + r.titles.join(', ') : '')) : 'Working'; }
+    return t;
+  }
+  if (i === 6) return (SI(6).text || (hasQueued ? 'Booked' : 'Nothing booked')).replace(/^\d+ booked · next /, 'Next post at ');   // Post: "1 booked · next 08:30" while idle
+  if (s.waiting) {
+    if (i === 4 || i === 5) return s.held ? 'On hold with Edit' : 'Waiting for Edit';
+    const f = shelf[i][0]; const n = shelf[i].length, more = n > 1 ? ` (+${n-1})` : '';
+    if (s.held) return (i === 6 ? 'Rendered, on hold: ' : 'On hold: ') + f.reel.title + more;
+    if (i === 6 && !f.reel.queued) return 'Rendered, not booked: ' + f.reel.title + more;
+    return 'Up next: ' + f.reel.title + (i === 6 ? ', ' + slotLabel(f.reel) : '') + more;
+  }
+  return 'Nothing waiting';
+}
+function slotLabel(r){
+  const m = String(r.posted || '').match(/(\d\d-\d\d) (\d\d:\d\d)/); if (!m) return '';
+  const today = new Date(), mmdd = String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  if (m[1] === mmdd) return m[2];
+  const dt = new Date(today.getFullYear() + '-' + m[1] + 'T12:00:00');
+  return (isNaN(dt) ? m[1] : dt.toLocaleDateString('en-GB',{weekday:'short'})) + ' ' + m[2];
+}
+function queuedList(){
+  return (DATA.queue || []).filter(q => q.status === 'queued').slice().sort((a,b) => String(a.at).localeCompare(String(b.at)));
+}
+function applyData(d){
+  DATA = d;
+  const run = parseRunning(d.running);
+  const runByTitle = {};
+  run.forEach(r => r.titles.forEach(t => { if (r.st >= 0) runByTitle[t] = r; }));
+  ST.forEach(s => { s.raw = false; });
+  if (d.stations) ST.forEach(s => { s.raw = !!(d.stations[s.key] && d.stations[s.key].busy); });
+  else run.forEach(r => { if (r.st >= 0) ST[r.st].raw = true; });
+  partialJudged = (d.reels||[]).some(r => /^\d+\/\d+$/.test(r.judged||''));
+  if (partialJudged && !d.stations) ST[2].raw = true;
+  const q = (d.queue||[]);
+  hasQueued = q.some(x => x.status === 'queued') || (d.reels||[]).some(r => /^queued/.test(r.posted||''));
+  hasPosted = q.some(x => x.status === 'posted') || (d.reels||[]).some(r => /^posted/.test(r.posted||''));
+  if (hasQueued && !d.stations) ST[6].raw = true;
+  ST.forEach(s => { if (s.raw) s.last = now; });
+
+  const reels = d.reels || [];
+  const pn = pnow();
+  const byTitle = {}; reels.forEach(r => { byTitle[r.title] = r; });
+  const postKey = r => String(r.posted || '').split(' · ')[1] || '';
+  // who is on each station's desk (sticky, so it does not flicker between polls)
+  const desk = ST.map(() => null);
+  ST.forEach((st, j) => {
+    let titles = [];
+    if (j === 6) { if (d.stations ? ST[6].raw : hasQueued) { const q = reels.filter(r => r.queued).sort((x,y) => postKey(x).localeCompare(postKey(y)))[0]; if (q) titles = [q.title]; } }
+    else {
+      run.filter(r => r.st === j).forEach(r => titles.push(...r.titles));
+      if (j === 2 && !titles.length && !d.stations) reels.forEach(r => { if (/^\d+\/\d+$/.test(r.judged || '')) titles.push(r.title); });
+    }
+    titles = titles.filter(t => byTitle[t]);
+    const hold = deskHold[j]; let pick = null;
+    if (titles.length) {
+      if (hold && titles.includes(hold.title)) pick = hold.title;
+      else {
+        const txt = ((d.stations || {})[st.key] || {}).text || '', slug = (txt.split(' · ')[1] || '').trim();
+        const sr = reels.find(r => r.dir === slug);
+        pick = (sr && titles.includes(sr.title)) ? sr.title : titles[0];
+      }
+      deskHold[j] = { title:pick, until:pn + 8 };
+    } else if (hold && pn < hold.until) pick = hold.title;
+    desk[j] = pick;
+  });
+  const seen = new Set();
+  reels.forEach((r, n) => {
+    seen.add(r.dir);
+    let tk = tokens.get(r.dir);
+    // audit F2 (owner saw a box slide from Mix back to Voice): the server also sends next = "mix" / "render", which LINE did not
+    // know (indexOf -1 → 0 = Voice → after 60 s a fake "redo"). Mix and Render sit on the Edit line slot like WORK_LINE says;
+    // an unknown stage keeps the reel where it is — never sends it back.
+    const LI = { voice:0, scout:1, judge:2, edit:3, mix:3, render:3, post:4, posted:5 };
+    const li = (r.next in LI) ? LI[r.next] : (tk ? tk.kept : 0);
+    if (!tk) { tk = { x:null, y:null, anim:null, station:-1, kept:li, lowSince:0, redo:false, col:TOKEN_COL[n % TOKEN_COL.length] }; tokens.set(r.dir, tk); }
+    tk.reel = r; tk.order = n;
+    // forward only: a lower station must persist for 60 s before it counts as a redo
+    if (li > tk.kept) { tk.kept = li; tk.lowSince = 0; tk.redo = false; }
+    else if (li < tk.kept) { if (!tk.lowSince) tk.lowSince = pn; else if (pn - tk.lowSince >= 60) { tk.kept = li; tk.redo = true; tk.lowSince = 0; tk.backHop = true; } }
+    else tk.lowSince = 0;
+    tk.deskSt = -1;
+    const j = desk.lastIndexOf(r.title);   // one box per reel: if two stations name it, it sits at the latest one
+    if (j >= 0 && WORK_LINE[j] >= tk.kept) { tk.kept = Math.max(tk.kept, WORK_LINE[j]); tk.deskSt = j; }
+    tk.wall = tk.kept >= 5;
+  });
+  [...tokens.keys()].forEach(k => { if (!seen.has(k)) tokens.delete(k); });
+  // shelves
+  shelf.forEach((_, i) => { shelf[i] = []; deskTk[i] = null; });
+  const lingering = [];
+  tokens.forEach(tk => { tk.linger = false; if (!tk.wall && tk.deskSt >= 0) { deskTk[tk.deskSt] = tk; tk.st = tk.deskSt; } });
+  tokens.forEach(tk => {
+    if (tk.wall || tk.deskSt >= 0) return;
+    // between cut / mix / render steps the reel stays on the desk it just left, never slides back to Edit's shelf
+    if (tk.kept === 3 && tk.station >= 4 && tk.station <= 5 && !deskTk[tk.station] && !lingering.some(l => l.station === tk.station)) { tk.linger = true; tk.st = tk.station; lingering.push(tk); return; }
+    tk.st = LINE_ST[tk.kept]; shelf[tk.st].push(tk);
+  });
+  shelf.forEach((arr, si) => {
+    arr.sort(si === 6 ? ((a,b) => postKey(a.reel).localeCompare(postKey(b.reel))) : ((a,b) => a.order - b.order));
+  });
+  const target = (tk, x, y, st) => {
+    if (tk.x === null) { tk.x = x; tk.y = y; tk.tx = x; tk.ty = y; tk.station = st; return; }
+    if (tk.tx !== x || tk.ty !== y || tk.station !== st) {
+      if (st > tk.station) {
+        // a physical hand-off: the worker who finished carries the box over (the count moves when it arrives)
+        handOff(tk.station, st, tk);
+        tk.x = x; tk.y = y; tk.anim = null;
+      } else if (st < tk.station) { handOff(tk.station, st, tk); tk.x = x; tk.y = y; tk.anim = null; }   // a redo is carried back, too
+      else { tk.x = x; tk.y = y; tk.anim = null; }                                                      // same station: pile <-> desk, no sliding
+      tk.tx = x; tk.ty = y;
+    }
+    tk.station = st;
+  };
+  shelf.forEach((arr, si) => arr.forEach((tk, k) => {
+    // waiting reels live in the queue cards under the stage; on the floor they rest out of sight under their desk
+    tk.hide = false; tk.inTray = true; target(tk, CX(si) - 3, 100, si);
+  }));
+  deskTk.forEach((tk, si) => { if (tk) { tk.hide = false; tk.inTray = false; target(tk, CX(si) - 17, 89, si); } });
+  lingering.forEach(tk => { tk.hide = false; tk.inTray = false; target(tk, CX(tk.st) - 17, 89, tk.st); });
+  tokens.forEach(tk => {
+    if (tk.wall && tk.x !== null && !tk.gone) {
+      tk.gone = true;
+      if (tk.station >= 0 && tk.station < 6) handOff(tk.station, 6, tk);
+    }
+  });
+  // waiting counts drive "ready" vs "idle"
+  ST.forEach((st, i) => { st.waiting = shelf[i].length; st.held = shelf[i].length > 0 && shelf[i].every(tk => isHold(parkedFor(tk))); });
+  ST[4].waiting = ST[5].waiting = shelf[3].length; ST[4].held = ST[5].held = ST[3].held;
+  const cnt = k => [...tokens.values()].filter(tk => tk.kept === k);
+  IGN = Math.max([...tokens.values()].filter(tk => tk.wall).length, (d.queue||[]).filter(x => x.status === 'posted').length);
+  dataReady = true;
+  updateMedia(d.media || {});
+  refreshOverlays(); renderStrip(); renderSched(); renderMetrics();
+}
+
+/* ---------- workers ---------- */
+let dataReady = false;
+const workers = ST.map((s,i) => {
+  const seatX = s.cx + (i === 2 ? -9 : 0);
+  return { i, s, c:CREW[i], seatX, lane:s.cx+24, x:seatX, y:SEAT_Y, mode:'sit', path:[], dir:'down', leg:0, dist:0, was:false, seen:false, jobs:[], job:null, pause:0, reach:0 };
+});
+/* ---------- hand-offs: a reel box is always carried, never slides on its own ----------
+   The worker of the station that finished stands up, takes the box, walks along the floor in front of the desks to the next
+   station, puts it down there (that station's count goes up only now), walks back and sits down. One box per trip; several
+   finished reels at one station are carried one after another; different stations walk at the same time. */
+const WALK_Y = 108;
+function handOff(from, to, tk){
+  if (from < 0 || from > 6 || to < 0 || to > 6 || to === from) return;
+  if (tk) { tk.inTransit = true; tk.landed = false; }
+  workers[from].jobs.push({ tk, to });
+}
+function arrive(w){
+  const job = w.job; if (!job) return;
+  if (job.tk) { job.tk.inTransit = false; job.tk.landed = true; }
+  const rw = workers[job.to]; if (rw) rw.reach = now + .9;     // the receiving worker reaches for it
+  Snd.blip(); if (dataReady) refreshOverlays();
+}
+function startJob(w){
+  const job = w.job = w.jobs.shift();
+  const dx = CX(job.to) + (job.to > w.i ? -10 : 10);
+  w.mode = 'carry'; w.dist = 0; w.pause = 0;
+  w.path = [[w.lane, SEAT_Y], [w.lane, WALK_Y], [dx, WALK_Y], [dx, WALK_Y - 4]];
+}
+function stepTo(w, tx, ty, dt, speed){
+  const dx = tx - w.x, dy = ty - w.y, d = Math.hypot(dx,dy);
+  if (d < .5) { w.x = tx; w.y = ty; return true; }
+  const m = Math.min(d, speed*dt);
+  w.x += dx/d*m; w.y += dy/d*m; w.dist += m;
+  if (Math.abs(dy) > Math.abs(dx)) w.dir = dy < 0 ? 'up' : 'down'; else w.dir = 'down';
+  w.leg = (Math.floor(w.dist/2.5) % 2) + 1;
+  return false;
+}
+function followPath(w, dt){
+  if (!w.path.length) return true;
+  if (stepTo(w, w.path[0][0], w.path[0][1], dt, 24)) w.path.shift();
+  return !w.path.length;
+}
+// Workers stay at their desks. The only walk: a station flipping idle -> busy (in through the side door, once).
+// A station only counts as idle after 20 s of not being busy.
+function updateWorker(w, dt, t){
+  const s = w.s;
+  // a station works (types) only while the data says so AND the reel's box has physically landed on its desk
+  const box = deskTk[s.i]; s.active = (s.raw || (t - s.last < 20)) && !!box && !box.inTransit && w.mode === 'sit';   // and the worker is in the chair
+  if (w.mode === 'sit' && w.jobs.length) startJob(w);
+  if (w.mode === 'carry') {
+    if (w.pause > 0) { w.pause -= dt; w.leg = 0; if (w.pause <= 0) { arrive(w); w.job = null; w.mode = 'return'; w.path = [[w.lane, WALK_Y], [w.lane, SEAT_Y], [w.seatX, SEAT_Y]]; } }
+    else if (followPath(w, dt)) { w.pause = .7; w.dir = 'up'; }
+  } else if (w.mode === 'return') {
+    if (followPath(w, dt)) { w.mode = 'sit'; w.dir = 'down'; w.leg = 0; w.x = w.seatX; w.y = SEAT_Y; }
+  } else if (!dataReady) {
+  } else if (w.mode === 'sit') {
+    // workers are persistent: a data update never moves or re-spawns anyone; only a hand-off (carry + return) makes them walk
+  } else if (w.mode === 'walk') {
+    if (followPath(w, dt)) { w.mode = 'sit'; w.dir = 'down'; w.leg = 0; w.x = w.seatX; w.y = SEAT_Y; }
+  }
+  if (dataReady) { w.was = s.active; w.seen = true; }
+}
+function drawIdleExtra(w,t){
+  const x = w.seatX;
+  R(x+6,81,4,3,'#e9e3d6'); P(x+10,82,'#e9e3d6'); R(x+7,82,2,1,'#5a3a22');
+  const k = Math.floor(t*2)%2; P(x+7+k,79,'rgba(255,255,255,.45)'); P(x+8-k,77,'rgba(255,255,255,.25)');
+}
+
+/* ---------- manager (office right of POST, walks the floor) ---------- */
+// the manager works at the end of the same row: a wider desk, same floor, same scale
+const MOX = W - 8, MW = 56, MSEATX = MOX + 28, MSEATY = 86, MDOORX = MOX + MW - 4, MCY = 112;
+const MGRC = {hair:'#d6d1c9',skin:'#e8b98f',shirt:'#702e36',pants:'#3a1a1f'};
+const MG = { x:MSEATX, y:MSEATY, dir:'down', leg:0, dist:0, path:[], pause:0, look:'down', task:'sit', target:-1, nextAmb:25 + Math.random()*20, lastCheck:null };
+let MGR = null;
+// preview: /studio?demo=manager (or /#demo=manager), optional &state=ok|checking|fixing|watching to hold one state
+const DEMO_Q = new URLSearchParams(location.search + '&' + location.hash.replace(/^#/, ''));
+const DEMO = DEMO_Q.get('demo') === 'manager';
+const DEMO_PIN = DEMO_Q.get('state');
+function demoMgr(){
+  const phases = ['ok','checking','fixing','watching'];
+  const ph = phases.includes(DEMO_PIN) ? DEMO_PIN : phases[Math.floor(Date.now()/6000) % 4];
+  const hist = [
+    {at:'21:12', text:"FIXED: the render crashed because a clip was missing; I fetched it again and it is rendering again", target:'render'},
+    {at:'19:40', text:"'W2-just-ask' was booked twice · removed the second booking, moved the rest up", target:'post'},
+    {at:'17:05', text:'disk low (3.9 GB free) · cleared 2.1 GB of old cut films + caches · now 6.0 GB', target:''},
+    {at:'14:22', text:'voice take for Stay you came out silent · re-recorded it', target:'voice'},
+    {at:'11:58', text:'clip search for Be someone stalled · restarted the scout', target:'scout'}
+  ];
+  const m = { status:ph, text:'', target:'', at:'demo-' + Math.floor(Date.now()/24000), queueUntil:'Sat 17 08:30', history:hist.slice(), needsOwner:[] };
+  if (ph === 'ok') m.text = 'all clear';
+  if (ph === 'checking') m.text = 'walking the line';
+  if (ph === 'fixing') { m.target = 'render'; m.text = 'looking into: render failed 3 times for Just ask'; m.history.unshift({at:'21:30', text:m.text, target:'render'}); }
+  if (ph === 'watching') { m.text = 'render is retrying Just ask · keeping an eye on it'; m.history.unshift({at:'21:31', text:m.text, target:'render'}); m.needsOwner = [{at:'21:31', text:'Instagram login expired · log in again on the phone so posts can go out'}]; }
+  m.history = m.history.slice(0, 6);
+  return m;
+}
+const mgrSt = () => (MGR && MGR.status) || 'off';
+const mgrTi = () => MGR ? ST.findIndex(s => s.key === MGR.target) : -1;
+function mgrInOffice(){ return MG.x >= MOX && MG.y < MCY - 2; }
+function mgrExit(){
+  if (mgrInOffice()) return [[MDOORX, MSEATY], [MDOORX, MCY]];
+  return MG.y < MCY - .5 ? [[MG.x, MCY]] : [];
+}
+const mgrEnter = () => [[MDOORX, MCY],[MDOORX, MSEATY],[MSEATX, MSEATY]];
+const toPath = pts => pts.map(p => ({ x:p[0], y:p[1], pause:p[2]||0, look:p[3]||'down' }));
+function mgrPatrol(){
+  const stops = []; for (let i = N-1; i >= 0; i--) stops.push([CX(i), MCY, .9, 'up']);
+  MG.task = 'patrol'; MG.path = toPath([...mgrExit(), ...stops, ...mgrEnter()]);
+}
+function updateMgr(dt, t){
+  if (!dataReady) return;
+  const st = mgrSt();
+  if (st === 'fixing') {
+    const ti = mgrTi();
+    if (MG.task !== 'fix' || MG.target !== ti) {
+      const spot = ti >= 0 ? [CX(ti)+22, 100] : [CX(3), MCY];
+      MG.task = 'fix'; MG.target = ti; MG.pause = 0;
+      MG.path = toPath([...mgrExit(), [spot[0], MCY], spot]);
+    }
+  } else {
+    if (MG.task === 'fix') { MG.task = 'return'; MG.pause = 0; MG.path = toPath([...mgrExit(), ...mgrEnter()]); }
+    if (st === 'checking' && MG.task === 'sit' && MGR.at !== MG.lastCheck) { MG.lastCheck = MGR.at; mgrPatrol(); }
+    else if (st === 'ok' && MG.task === 'sit' && !reduceMotion && t > MG.nextAmb) mgrPatrol();
+  }
+  if (MG.pause > 0) { MG.pause -= dt; MG.leg = 0; return; }
+  if (MG.path.length) {
+    const p = MG.path[0];
+    if (stepTo(MG, p.x, p.y, dt, 26)) { MG.path.shift(); if (p.pause) { MG.pause = p.pause; MG.dir = p.look; MG.leg = 0; } }
+    if (!MG.path.length && !MG.pause) { MG.dir = 'down'; MG.leg = 0; }
+  } else if (MG.task === 'patrol' || MG.task === 'return') {
+    MG.task = 'sit'; MG.dir = 'down'; MG.leg = 0; MG.nextAmb = t + 120 + Math.random()*60;
+  }
+}
+const mgrSeated = () => MG.task === 'sit' && !MG.path.length;
+const mgrHidden = () => mgrSeated() && mgrSt() === 'off';
+function mgrLampCol(st, t){
+  if (st === 'ok') return '#6fd1a0';
+  if (st === 'checking') return C.acc;
+  if (st === 'fixing') return (reduceMotion || Math.floor(t*2.5)%2) ? C.warm : C.warmD;
+  if (st === 'watching') return C.warm;
+  return '#452227';
+}
+function drawOfficeBack(t){
+  const x = MOX, st = mgrSt(), ti = mgrTi();
+  // olive tree in a terracotta pot, right of the desk
+  const px = x + MW - 9; R(px,90,8,8,'#a0522d'); R(px-1,89,10,2,'#c0693a'); R(px+3,78,1,11,'#5a3a22');
+  [[1,76],[5,74],[-1,79],[6,78],[3,71],[0,73],[6,72]].forEach(([a,b],q) => R(px+a,b,3,3,['#6f7f45','#8a9a52','#5a6a3a'][q%3]));
+  // chair
+  R(MSEATX-9,68,18,15,C.chair); R(MSEATX-8,69,16,1,C.chairHi); R(MSEATX-9,83,18,2,'#1f0d0f');
+}
+function drawOfficeDesk(t){
+  const x = MOX + 6, w = 40, st = mgrSt();
+  R(x,82,w,6,C.deskTop); R(x,82,w,1,C.deskEdge);
+  R(x,88,w,10,C.deskFront); R(x,88,w,1,'#2b1316'); R(x+2,90,w-4,6,C.deskFront2);
+  // the line board as a small desk screen: one lamp per station, amber where the problem is
+  const ti = mgrTi(); R(x+1,74,14,8,'#8a6034'); R(x+2,75,12,6,'#140708'); R(x+7,82,2,1,'#5a4030');
+  for (let k=0;k<N;k++){ let col = st === 'off' ? '#34151a' : '#7fc98a';
+    if (k === ti && (st === 'fixing' || st === 'watching')) col = (st === 'fixing' && !reduceMotion && Math.floor(t*3)%2) ? C.warmD : C.warm;
+    P(x+3+k*1.5|0, 77, col); }
+  for (let k=0;k<10;k++) P(x+3+k, 79 - (k%3===1 ? 1 : 0), st === 'off' ? '#34151a' : '#8a6034');
+  // lamp
+  R(x+w-8,80,6,2,'#a87a44'); R(x+w-7,79,4,1,'#d0a060'); P(x+w-6,78,'#ffd27a'); P(x+w-6,77,'#fff1c4');
+  if (mgrSeated() && st !== 'off') {
+    R(x+17,81,6,2,'#8a5a3d'); R(x+18,81,4,1,'#e9e3d6'); // clipboard
+    const f = (!reduceMotion && Math.floor(t*1.3)%3 === 0) ? 1 : 0;
+    R(MSEATX-7,81,3,1,MGRC.shirt); R(MSEATX+4,81,3,1,MGRC.shirt);
+    R(MSEATX-6,82,3,1,MGRC.skin); R(MSEATX+3,82+f,3,1,MGRC.skin);
+  }
+}
+function drawOfficeFront(t){
+  if (mgrSt() === 'off') { g.fillStyle = 'rgba(8,2,4,.55)'; g.fillRect(MOX, 60, MW, 40); }
+}
+function drawOfficeLight(t){
+  if (mgrSt() === 'off') return;
+  g.globalCompositeOperation = 'lighter';
+  glow(MOX+MW-10,80,18,10,'255,201,120',.03*flick(t, 9),4);
+  g.globalCompositeOperation = 'source-over';
+}
+function drawMgrSprite(t){
+  if (mgrHidden()) return;
+  const seated = mgrSeated(), x = MG.x, y = MG.y;
+  if (!seated) shadow(x, y);
+  const bob = seated ? ((!reduceMotion && Math.sin(t*1.1) > .85) ? 1 : 0) : 0;
+  drawSprite(MGRC, x, y, MG.dir, seated ? 0 : MG.leg, bob);
+  if (MG.dir !== 'down') return;
+  const sx = Math.round(x-8), sy = Math.round(y-22+bob);
+  P(sx+5,sy+11,'#e9e3d6'); P(sx+10,sy+11,'#e9e3d6'); R(sx+6,sy+11,4,1,'#e9e3d6');
+  R(sx+7,sy+12,2,4,'#d6455a'); R(sx+7,sy+16,2,1,'#a8324a');
+  if (seated) return;
+  const fixing = MG.task === 'fix';
+  if (fixing && !MG.path.length) {
+    // spanner, tapping
+    const k = (!reduceMotion && Math.floor(t*3)%2) ? 1 : 0, wx = sx+14, wy = sy+9+k;
+    line(wx, wy+5, wx+3, wy+2, '#e5dbca'); R(wx+3,wy,1,2,'#e5dbca'); R(wx+4,wy+1,1,1,'#e5dbca'); R(wx+2,wy+1,1,1,'#e5dbca'); P(wx+5,wy,'#e5dbca');
+    R(sx+13,sy+14,2,2,MGRC.skin);
+  } else if (fixing) {
+    // "!" over the head while heading to the problem
+    const by = sy - 7 - ((!reduceMotion && Math.floor(t*3)%2) ? 1 : 0);
+    R(sx+7,by,2,4,C.warm); R(sx+7,by+5,2,1,C.warm);
+  } else {
+    const up = MG.task === 'patrol';
+    const cy = sy + (up ? 9 : 12);
+    R(sx+13,cy,4,6,'#8a5a3d'); R(sx+14,cy+1,2,4,'#e9e3d6'); R(sx+14,cy,2,1,'#e5dbca');
+  }
+}
+function drawMgrAlert(t){
+  const st = mgrSt(), ti = mgrTi();
+  if (st !== 'fixing' || ti < 0) return;
+  const cx = CX(ti), a = reduceMotion ? .7 : .35 + .5*(.5 + .5*Math.sin(t*4));
+  g.globalCompositeOperation = 'lighter';
+  glow(cx,82,28,22,'255,170,80',.02 + .02*a,3);
+  g.globalCompositeOperation = 'source-over';
+  g.globalAlpha = a;
+  R(cx-23,53,46,1,C.warm); R(cx-23,101,46,1,C.warm); R(cx-23,53,1,49,C.warm); R(cx+22,53,1,49,C.warm);
+  g.globalAlpha = 1;
+  R(cx+18,50,4,3,'#452227'); R(cx+19,49,2,1, (reduceMotion || Math.floor(t*3)%2) ? C.warm : C.warmD);
+  // tether from the bubble to the manager once he is there
+  if (MG.task === 'fix' && !MG.path.length) for (let y = (ti === 6 ? 42 : 52); y < MG.y - 16; y += 2) P(MG.x, y, 'rgba(255,201,120,.55)');
+}
+
+/* ---------- background (cached) ---------- */
+const TRAY_HW = 17;
+// The hall (static, cached): one flat stage in a single perspective. A plain oxblood back wall meets ONE polished marble floor
+// at the horizon; the desks stand on that floor in a row. Reflections of the desks are drawn per frame.
+const LAMPX = [];
+const HZ = 84;                              // horizon: where the back wall meets the floor (world y)
+const bg = document.createElement('canvas');
+function buildBg(){
+  LAMPX.length = 0; ST.forEach(st => LAMPX.push(st.cx + 11)); LAMPX.push(MOX + 40);
+  const ctx = bg.getContext('2d'); ctx.imageSmoothingEnabled = false;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,bg.width,bg.height); ctx.translate(CAMX, CAMY);
+  const fr = (x,y,w,h,c) => { ctx.fillStyle = c; ctx.fillRect(x,y,w,h); };
+  const bw = X1 - X0;
+  // back wall: deep oxblood, darker towards the top; thin gold dado line; skirting at the horizon
+  for (let y = Y0; y < HZ; y++) { const u = (y - Y0) / Math.max(1, HZ - Y0); const r = Math.round(18 + 14*u), gg = Math.round(6 + 4*u), b = Math.round(9 + 5*u); fr(X0, y, bw, 1, `rgb(${r},${gg},${b})`); }
+  // a thin clerestory of night sky along the top of the wall (static), mullions on the station rhythm
+  { const ny0 = Y0 + M + 6, nh = 11;
+    for (let y = ny0; y < ny0 + nh; y++) fr(X0, y, bw, 1, ['#0b0912','#0d0b16','#100d1a','#130f1d','#17101f','#1b1220','#1f1320','#231420','#261520','#281620','#2a1720'][y - ny0]);
+    let a = 5; const rnd = () => { a = (a * 16807) % 2147483647; return a / 2147483647; };
+    for (let q = 0; q < bw / 5; q++) fr(Math.floor(X0 + rnd()*bw), Math.floor(ny0 + 1 + rnd()*(nh - 4)), 1, 1, rnd() < .25 ? 'rgba(255,244,220,.85)' : 'rgba(217,203,176,.4)');
+    for (let x = Math.floor((X0 - 4) / 48) * 48 + 4; x < X1; x += 48) fr(x - 1, ny0, 3, nh, '#3a2418');
+    fr(X0, ny0 - 2, bw, 2, '#4a2e1c'); fr(X0, ny0 - 2, bw, 1, 'rgba(201,164,92,.6)'); fr(X0, ny0 + nh, bw, 2, '#4a2e1c'); fr(X0, ny0 + nh + 1, bw, 1, 'rgba(201,164,92,.45)'); }
+  fr(X0, HZ - 4, bw, 4, '#2a1410'); fr(X0, HZ - 4, bw, 1, 'rgba(201,164,92,.55)');
+  // a marble pilaster at each edge of the room
+  [X0 + 6, X1 - 13].forEach(x => { fr(x, Y0, 7, HZ - Y0, '#3a2c28'); fr(x, Y0, 1, HZ - Y0, '#5a4840'); fr(x+3, Y0, 1, HZ - Y0, '#2e2220'); fr(x - 1, HZ - 8, 9, 4, '#4a3a34'); });
+  // the floor: big marble tiles in one perspective (rows get deeper towards the viewer), thin gold inlay
+  const fy0 = Math.round(HZ + CAMY), fw = bg.width, fh = Math.max(1, bg.height - fy0);
+  if (fy0 < bg.height) {
+    const img = ctx.createImageData(fw, fh), d = img.data;
+    const vpX = (FX0 + FX1) / 2, vpY = HZ - 90, T = 34;          // vanishing point + tile width at the base
+    const yb = Y1, sAt = y => (y - vpY) / (yb - vpY);
+    // row boundaries: equal steps in depth
+    const rows = []; { let y = HZ, r = 0; while (y < Y1 + 40) { rows.push(y); y += Math.max(3, T * .42 * sAt(y)); r++; } }
+    let ri = 0;
+    for (let j = 0; j < fh; j++) {
+      const wy = j + (fy0 - CAMY);
+      while (ri < rows.length - 1 && wy >= rows[ri + 1]) ri++;
+      const s = sAt(wy), tw = T * s, onRow = wy - rows[ri] < 1;
+      const depth = (wy - HZ) / Math.max(1, Y1 - HZ);
+      for (let i = 0; i < fw; i++) {
+        const wx = i - CAMX, u = (wx - vpX) / tw + .5, c = Math.floor(u), fu = u - c;
+        const h = ((c * 73856093) ^ (ri * 19349663)) >>> 0;
+        const odd = (c + ri) & 1;
+        let R0 = odd ? 38 : 30, G0 = odd ? 24 : 18, B0 = odd ? 24 : 19;
+        const tone = (h % 7) - 3; R0 += tone; G0 += tone; B0 += tone;
+        // sheen: lighter at the back (lamp light from the desks), darker towards the viewer
+        const k = 1.15 - .55 * depth; R0 *= k; G0 *= k; B0 *= k;
+        // lamp light on the polished stone: warm streaks under each desk lamp
+        let lw = 0; for (let q = 0; q < LAMPX.length; q++) { const dx = Math.abs(wx - LAMPX[q]); if (dx < 6) lw = Math.max(lw, (1 - dx/6) * Math.pow(Math.max(0, 1 - (wy - 98) / 46), 1.6) * (wy > 99 ? 1 : 0)); }
+        R0 += 60*lw; G0 += 36*lw; B0 += 16*lw;
+        const dv = Math.min(fu, 1 - fu) * tw, ga = Math.max(0, 1 - dv) * .32 + (onRow ? .3 : 0);
+        if (ga > 0) { const gk = Math.min(.6, ga) * (1 - depth * .5); R0 += (150 - R0) * gk; G0 += (118 - G0) * gk; B0 += (66 - B0) * gk; }
+        const o = (j * fw + i) * 4; d[o] = R0; d[o+1] = G0; d[o+2] = B0; d[o+3] = 255;
+      }
+    }
+    ctx.setTransform(1,0,0,1,0,0); ctx.putImageData(img, 0, fy0); ctx.translate(CAMX, CAMY);
+  }
+  // soft shadows where the desks stand on the floor
+  ST.forEach(st => { fr(st.cx - 19, 98, 38, 2, 'rgba(0,0,0,.35)'); fr(st.cx - 17, 100, 34, 1, 'rgba(0,0,0,.18)'); });
+  fr(MOX + 5, 98, 42, 2, 'rgba(0,0,0,.35)');
+}
+
+/* ---------- station art ---------- */
+function deskBase(s, act){
+  const cx = s.cx;
+  R(cx-18,82,36,6,C.deskTop); R(cx-18,82,36,1,C.deskEdge);
+  R(cx-18,88,36,10,C.deskFront); R(cx-18,88,36,1,'#2b1316');
+  R(cx-16,90,14,6,C.deskFront2); R(cx+2,90,14,6,C.deskFront2);
+  R(cx-10,92,2,1,C.metal2); R(cx+8,92,2,1,C.metal2);
+}
+function deskProp(i, s, act, t){
+  const cx = s.cx;
+  if (i === 0) {
+    R(cx-14,72,1,13,'#6c4147'); R(cx-17,84,7,2,'#452227');
+    const mc = act ? C.acc : '#ab8288'; R(cx-16,67,5,7,'#452227'); R(cx-15,68,3,5,mc); P(cx-15,69,'#fff');
+    for (let x=-18;x<=-10;x++) P(cx+x,75,'#7f5258');
+    if (act) for (let k=0;k<2;k++){ const r = 4+((t*5+k*2)%6); const a = 1-(r-4)/6; g.fillStyle = `rgba(236,196,110,${a*.6})`;
+      g.fillRect(Math.round(cx-10+r),71,1,4); g.fillRect(Math.round(cx-10+r+1.5),72,1,2); }
+    R(cx+6,83,6,3,'#452227'); R(cx+6,82,6,1,'#5a3035'); // headphones
+  } else if (i === 1) {
+    R(cx-15,83,5,3,'#dab160'); R(cx-14,85,5,2,'#e0b04a'); R(cx+6,84,6,2,'#452227'); R(cx+6,83,6,1,'#5a3035');
+    R(cx+9,83,4,3, act ? '#e5ca92' : '#6d3b42');
+  } else if (i === 2) {
+    R(cx-6,83,18,5,'#e8dfd0'); R(cx-5,84,16,3,'#452227');
+    for (let r=0;r<2;r++) for (let k=0;k<5;k++) R(cx-4+k*3,84+r*2,2,1, act && (k+r+Math.floor(t*2))%3===0 ? C.acc : '#7f5258');
+    const mx = act ? cx+2+Math.sin(t*2.2)*6 : cx+6, my = act ? 81+Math.cos(t*3)*1 : 80;
+    disc(mx,my,2,2,'#d19f3b'); disc(mx,my,1,1,'#220e11'); P(mx-1,my-1,'#fff');
+    line(mx+2,my+2,mx+5,my+5,'#ab8288');
+  } else if (i === 3) {
+    R(cx-6,85,12,2,'#5a3035'); for (let k=0;k<6;k++) P(cx-5+k*2,85,'#7f5258');
+    R(cx+8,85,3,2,'#5a3035');
+    const rx = cx-15, ry = 80; disc(rx+3,ry+3,3,3,'#5a3035'); disc(rx+3,ry+3,1,1,C.deskTop);
+    const rot = act ? t*6 : 0; for (let k=0;k<3;k++) P(rx+3+Math.round(Math.cos(rot+k*2.094)*2), ry+3+Math.round(Math.sin(rot+k*2.094)*2), act?C.acc:'#ab8288');
+  } else if (i === 4) {
+    R(cx-16,83,32,5,'#220e11'); R(cx-16,83,32,1,'#4d262b');
+    for (let k=0;k<8;k++){
+      const x = cx-14+k*4; R(x,84,1,3,'#4e252a');
+      const y = act ? 84 + Math.round(1.5+1.5*Math.sin(t*3+k*1.3)) : 85 - (k%3===0?1:0);
+      R(x-1,y-1,3,2, k%3===0 ? C.warm : '#e5dbca');
+    }
+  } else if (i === 5) {
+    R(cx-6,85,12,2,'#5a3035'); for (let k=0;k<6;k++) P(cx-5+k*2,85,'#7f5258');
+    R(cx+9,81,5,5,'#e5dbca'); R(cx+10,82,3,3,'#5c2b32'); P(cx+14,83,'#e5dbca'); { const q = Math.floor(t*2)%2; P(cx+10+q,79,'rgba(255,255,255,.4)'); P(cx+11-q,77,'rgba(255,255,255,.22)'); }
+  } else if (i === 6) {
+    R(cx-15,83,8,5,'#e8dfd0'); R(cx-15,83,8,1,'#c4b69f'); R(cx-14,84,3,1,'#c4b69f'); R(cx-15,85,8,1,'#dbcfba');
+    R(cx-13,81,8,4,'#e9e3d6'); R(cx-13,81,8,1,'#c4b69f'); P(cx-9,83,C.acc);
+    R(cx+5,85,4,2,'#452227'); R(cx+6,84,2,1,'#d19f3b');
+    if (act) { const k = (t*.9)%1; const x = cx-8+k*34, y = 80-Math.sin(k*3.14)*10; R(x,y,5,3,'#e9e3d6'); P(x+2,y+1,C.acc); P(x,y,'#c4b69f'); }
+  }
+}
+function drawLamp(s, act, t){
+  // a small bronze oil lamp on the desk; the flame is the one ambient flicker on the floor
+  const x = s.cx + 14;
+  R(x-3,81,7,1,'#6e4a2a'); R(x-2,79,5,2,'#a87a44'); R(x-2,79,5,1,'#d0a060'); R(x+3,79,1,1,'#a87a44');
+  const f = reduceMotion ? 0 : (Math.sin(t*11 + s.i*1.7) > .2 ? 0 : 1);
+  R(x-3,78-f,1,1,'#ffd27a'); R(x-3,77-f,1,1,'#fff1c4'); if (act) P(x-3,76-f,'rgba(255,230,170,.6)');
+}
+/* ---------- drawing ---------- */
+function drawChair(w){
+  const x = w.seatX; R(x-9,68,18,15,C.chair); R(x-8,69,16,1,C.chairHi); R(x-9,83,18,2,'#1f0d0f');
+}
+function drawHelper(t, act){
+  const s = ST[2]; const x = s.cx+9;
+  R(x-9,68,18,15,C.chair); R(x-8,69,16,1,C.chairHi);
+  const bob = act ? (Math.sin(t*5)>0?0:1) : (Math.sin(t*1.2)>0.8?1:0);
+  g.drawImage(sprite(HELPER,'down',0), Math.round(x-8), Math.round(SEAT_Y-22+bob));
+}
+function drawSeatedHands(w, t){
+  const act = w.s.active; const x = w.seatX;
+  const f = act ? Math.floor(t*6)%2 : 0;
+  const sk = w.c.skin;
+  R(x-7,81,3,1,w.c.shirt); R(x+4,81,3,1,w.c.shirt);
+  const ya = 83 + (f?1:0), yb = 83 + (f?0:1);
+  R(x-6,ya,3,1,sk); R(x+3,yb,3,1,sk);
+}
+function drawHelperHands(t, act){
+  const x = ST[2].cx+9; const f = act ? Math.floor(t*5)%2 : 0;
+  R(x-6,83,3,1,HELPER.skin); R(x+3,83+f,3,1,HELPER.skin);
+}
+function drawCarry(w, t){
+  if (w.mode !== 'carry' || !w.job) return;
+  const bob = w.pause > 0 ? 0 : (w.leg === 1 ? 1 : 0);
+  const up = w.dir === 'up', bx = Math.round(w.x) - 4, by = Math.round(w.y) - (up ? 12 : 9) + bob - (w.pause > 0 ? 2 : 0);
+  if (!up) drawToken({ col:(w.job.tk && w.job.tk.col) || '#e0b04a', reel:w.job.tk && w.job.tk.reel }, bx, by, t, false);
+  R(bx - 1, by + 3, 2, 2, w.c.skin); R(bx + 6, by + 3, 2, 2, w.c.skin);       // both hands on the box
+  if (up) drawToken({ col:(w.job.tk && w.job.tk.col) || '#e0b04a', reel:w.job.tk && w.job.tk.reel }, bx, by, t, false);
+}
+function drawWalker(w, t){
+  const idleSip = w.mode==='idle' && w.sip>0;
+  shadow(w.x, w.y);
+  drawSprite(w.c, w.x, w.y, idleSip ? 'down' : w.dir, w.leg, 0);
+  drawCarry(w, t);
+  if (idleSip) {
+    const k = w.sip; const up = (k < 2.3 && k > .6);
+    const cxp = Math.round(w.x)+5, cyp = Math.round(w.y)-(up?12:7);
+    R(cxp,cyp,3,3,'#e9e3d6'); P(cxp+3,cyp+1,'#e9e3d6');
+    if (up) { P(cxp+1,cyp-2-(Math.floor(t*3)%2),'rgba(255,255,255,.5)'); P(cxp+1,cyp-4,'rgba(255,255,255,.25)'); }
+  }
+}
+function tokenOf(tk, t, hovered){
+  let x = tk.x, y = tk.y;
+  if (tk.anim) {
+    let k = (t - tk.anim.t0) / tk.anim.dur;
+    if (k >= 1) { tk.anim = null; x = tk.tx; y = tk.ty; }
+    else { const e = k<.5 ? 2*k*k : 1-Math.pow(-2*k+2,2)/2; x = tk.anim.fx + (tk.tx-tk.anim.fx)*e; y = tk.anim.fy + (tk.ty-tk.anim.fy)*e - Math.sin(k*Math.PI)*tk.anim.hop; }
+  }
+  tk.x = x; tk.y = y;
+  return [Math.round(x), Math.round(y)];
+}
+function drawToken(tk, px, py, t, hovered){
+  const nstart = false;
+  const body = tk.col;
+  if (tk.anim && tk.anim.dim) g.globalAlpha = .5;
+  if (hovered) { R(px-1,py-1,9,8,'#fff'); }
+  R(px,py,7,6,'#16090b');
+  R(px+1,py+2,5,3,body); R(px,py+2,1,4,body); R(px+6,py+2,1,4,body); R(px,py+5,7,1,body);
+  R(px+1,py+1,5,1, nstart?'#5a3035':'#e9e3d6');
+  for (let k=0;k<7;k+=2) P(px+k,py,nstart?'#452227':'#220e11');
+  for (let k=1;k<7;k+=2) P(px+k,py,nstart?'#5a3035':'#e9e3d6');
+  if (!nstart) { R(px+2,py+3,3,1,'rgba(255,255,255,.45)'); }
+  if (tk.redo) R(px+5,py+4,1,1,C.warm);
+  { const pk = parkedFor(tk); if (pk && isHold(pk)) { R(px+5,py+2,2,2,'#ff9f43'); }
+    else if (pk) { R(px+5,py-6,5,7,'#220e11'); R(px+7,py-5,2,3,'#ff5b5b'); R(px+7,py-1,2,1,'#ff5b5b'); } }
+  g.globalAlpha = 1;
+}
+let mx = 0, mxT = 0;
+function buildSky(){}
+const flick = (t, i) => reduceMotion ? 1 : 1 + .06*Math.sin(t*9 + i*2.1) + .04*Math.sin(t*23 + i);
+function drawLight(t, dt){
+  ST.forEach(s => { s.lit += ((s.active ? 1 : 0) - s.lit) * (1 - Math.exp(-dt*2.2)); });
+  g.globalCompositeOperation = 'lighter';
+  ST.forEach((s, i) => { const lx = s.cx + 14, f = flick(t, i);
+    glow(lx, 77, Math.round(20*f), 12, '255,190,110', (.022 + .03*s.lit)*f, 4);   // lamp pool on the desk
+    glow(lx, 108, 4, 9, '255,190,110', (.014 + .02*s.lit), 3);                   // its reflection on the polished floor
+  });
+  g.globalCompositeOperation = 'source-over';
+}
+function drawPlates(t){}
+// polished floor: the desks and trays mirrored, faint, fading out
+const reflC = document.createElement('canvas');
+function drawReflection(){
+  const h = 30, sy = Math.round(CAMY + 99 - h);
+  if (reflC.width !== cv.width) reflC.width = cv.width; reflC.height = h;
+  const rc = reflC.getContext('2d'); rc.clearRect(0, 0, reflC.width, h); rc.drawImage(cv, 0, sy, cv.width, h, 0, 0, cv.width, h);
+  g.save(); g.setTransform(1, 0, 0, -1, 0, 2 * (CAMY + 99));
+  for (let k = 0; k < h; k++) { g.globalAlpha = .16 * Math.pow(k / h, 2); g.drawImage(reflC, 0, k, reflC.width, 1, 0, sy + k, reflC.width, 1); }
+  g.restore(); g.globalAlpha = 1;
+}
+
+function drawPackets(t){
+  for (let i=packets.length-1; i>=0; i--) {
+    const p = packets[i], k = (t - p.t0) / p.dur;
+    if (k >= 1) { packets.splice(i,1); continue; }
+    const ease = u => u < .5 ? 2*u*u : 1 - Math.pow(-2*u+2,2)/2;
+    const at = u => p.from + (p.to - p.from) * ease(Math.max(0, u));
+    const y = 108 + Math.round(Math.sin(k*Math.PI*6)*.8);
+    for (let j=9; j>=1; j--) { g.globalAlpha = (1 - j/10) * .55; const tx = at(k - j*.03); R(tx-1, y-1, 3, 3, C.acc); }
+    g.globalAlpha = 1;
+    disc(at(k), y, 7, 6, 'rgba(236,196,110,.16)');
+    drawToken({ col:p.col }, Math.round(at(k)-3), y-3, t, false);
+  }
+}
+function drawPlates(t){
+  ST.forEach(s => { if (s.active) R(s.cx-21,69,42,1,'rgba(236,196,110,.5)'); });
+}
+
+let hover = null, drawn = [];
+// Layers, back to front: hall (wall + floor) -> chairs + anyone behind the desks (feet above the desk line) -> desks, props, lamps,
+// boxes on desks -> lamp light -> floor reflections -> everyone in front of the desks, depth-sorted by feet y, each with what
+// they carry -> nothing else. DOM desk tags hide while a character overlaps them; header cards + tooltips sit above the stage.
+const DESK_LINE = 90;
+// F9: after the tab was hidden (or any frame gap > 2 s) nobody replays a backlog of walks: queued hand-offs are dropped,
+// boxes land where the data says they are, workers sit, the manager is back at his desk
+function snapAll(){
+  workers.forEach(w => { if (w.job) arrive(w); w.jobs = []; w.job = null; w.path = []; w.pause = 0; w.mode = 'sit'; w.dir = 'down'; w.leg = 0; w.x = w.seatX; w.y = SEAT_Y; });
+  tokens.forEach(tk => { tk.inTransit = false; tk.landed = true; tk.anim = null; if (tk.tx != null) { tk.x = tk.tx; tk.y = tk.ty; } });
+  MG.path = []; MG.pause = 0; MG.task = 'sit'; MG.x = MSEATX; MG.y = MSEATY; MG.dir = 'down'; MG.leg = 0;
+  if (dataReady) refreshOverlays();
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { snapAll(); frame.last = undefined; } });
+function frame(ms){
+  const t = ms/1000; if (frame.last !== undefined && t - frame.last > 2 && !DEMO_PL) snapAll();
+  const dt = Math.min(.05, t - (frame.last||t)); frame.last = t; now = t;
+  updateMgr(dt, t);
+  if (DEMO && MGR && !frame.ffDone) { frame.ffDone = true; const ff = parseFloat(DEMO_Q.get('ff') || '0'); for (let k = 0; k < ff / .02; k++) updateMgr(.02, t); }   // ?demo=manager&state=checking&ff=8
+  if (DEMO_HO) demoHandoff(t);
+  if (DEMO_PL) {
+    if (!frame.plFF) { frame.plFF = true; const ff = parseFloat(DEMO_Q.get('ff') || '0');   // replay the first ff seconds at 50 steps/s
+      for (let st = 0; st < ff; st += .02) { demoPipeline(st); now = st; workers.forEach(w => updateWorker(w, .02, st)); } frame.plOff = ff - t; }
+    demoPipeline(t + (frame.plOff || 0)); }
+  const tw = DEMO_PL ? t + (frame.plOff || 0) : t; if (DEMO_PL) now = tw;
+  workers.forEach(w => updateWorker(w, dt, tw));
+
+  g.setTransform(1,0,0,1,0,0);
+  g.drawImage(bg,0,0);
+  g.save(); g.translate(CAMX,CAMY);
+  const mgrAt = { mgr:true, y:MG.y };
+  const behind = [], front = [];
+  workers.forEach(w => { (w.y <= DESK_LINE ? behind : front).push(w); });
+  if (!mgrHidden()) (MG.y <= DESK_LINE ? behind : front).push(mgrAt);
+  // 1. chairs, then the people behind the desks
+  workers.forEach(drawChair);
+  drawOfficeBack(t);
+  drawHelper(t, ST[2].active);
+  behind.sort((a,b) => a.y-b.y).forEach(w => {
+    if (w.mgr) { drawMgrSprite(t); return; }
+    shadow(w.x,w.y); const rel = w.mode==='sit' && !w.s.active && !w.s.waiting, reach = w.mode==='sit' && w.reach > t;
+    drawSprite(w.c, w.x, w.y, w.dir, w.mode==='sit' ? 0 : w.leg, reach ? -1 : rel ? 1 : ((w.mode==='sit' && w.s.active && Math.sin(t*4.2+w.i)>.6) ? 1 : 0)); drawCarry(w, t);
+  });
+  // 2. desks, props, lamps, hands on keyboards, boxes on desks
+  ST.forEach((s,i) => { deskBase(s,s.active); deskProp(i,s,s.active,t); drawLamp(s,s.active,t); });
+  workers.forEach(w => { if (w.mode === 'sit') { drawSeatedHands(w,t); if (!w.s.active && !w.s.waiting) drawIdleExtra(w,t); } });
+  drawHelperHands(t, ST[2].active);
+  drawOfficeDesk(t);
+  drawOfficeFront(t);
+  drawn = [];
+  const hops = [];
+  tokens.forEach(tk => {
+    const [px,py] = tokenOf(tk,t); const hv = hover === tk;
+    if (tk.wall && !tk.anim) return;
+    // a box picked from the waiting pile appears on the desk only once its worker is seated; a delivered box shows on landing
+    if (tk.hide || tk.inTransit || tk.inTray) return;
+    if (tk.deskSt >= 0 && !tk.landed && workers[tk.deskSt] && workers[tk.deskSt].mode !== 'sit') return;
+    if (tk.anim) { hops.push([tk,px,py,hv]); } else drawToken(tk,px,py,t,hv);
+    drawn.push({tk, x:px, y:py});
+  });
+  hops.forEach(a => drawToken(a[0],a[1],a[2],t,a[3]));
+  // 3. lamp light, then the polished floor mirrors what stands on it
+  drawLight(t, dt);
+  drawOfficeLight(t);
+  drawMgrAlert(t);
+  g.restore();
+  drawReflection();
+  g.save(); g.translate(CAMX,CAMY);
+  // 4. people on the open floor, nearest last
+  front.sort((a,b) => a.y-b.y).forEach(w => { if (w.mgr) drawMgrSprite(t); else drawWalker(w,t); });
+  g.restore();
+  vg.imageSmoothingEnabled = false; vg.drawImage(cv, 0, 0, view.width, view.height);
+  updateCamera(dt,t);
+  syncLabels();
+  syncMgr();
+  syncTags(front.concat(behind.filter(w => w.mgr ? !mgrSeated() : w.mode !== 'sit')));
+  requestAnimationFrame(frame);
+}
+// a desk tag (HTML) steps aside while anyone stands over it, so it never covers a character
+function syncTags(people){
+  ST.forEach((_, i) => { const el = tagEls[i]; if (el.style.display === 'none') return;
+    const x0 = ST[i].cx - 9, x1 = ST[i].cx + 18, y0 = 90, y1 = 97;
+    const tk = deskTk[i], away = tk && !tk.landed && workers[i].mode !== 'sit';   // its box is still in the pile
+    const hit = away || people.some(p => { const px = p.mgr ? MG.x : p.x, py = p.mgr ? MG.y : p.y; return px + 8 > x0 && px - 8 < x1 && py > y0 && py - 22 < y1; });
+    const o = hit ? '0' : ''; if (el.style.opacity !== o) el.style.opacity = o; });
+}
+const DEMO_HO = DEMO_Q.get('demo') === 'handoff';
+/* ?demo=pipeline : one reel walks voice -> scout -> judge -> edit -> mix -> render -> post on fake states (10 s per step),
+   with unrelated activity updates every 2.5 s in between; &ff=<s> fast-forwards for screenshots. No live data is read. */
+const DEMO_PL = /^(pipeline|concurrent)$/.test(DEMO_Q.get('demo') || '');
+const PL_KEY = ['voice','scout','judge','edit','mix','render','post'], PL_NEXT = ['voice','scout','judge','edit','edit','edit','post'];
+const PL_RUN = ['recording a voice','searching clips','building contact sheets','cutting the clip film','mixing audio','rendering a reel',null];
+let plKey = '';
+function plState(ph, cycle, tick){
+  const title = 'The test reel', posted = ph >= 7;
+  const reel = { dir:`w9-0${cycle % 10}-the-test-reel`, title, voice:'done', audio:ph >= 1 ? 'done' : '', clips:ph >= 2 ? 'done' : '', judged:ph >= 3 ? 'done' : '', video:ph >= 6 ? 'done' : '',
+    next: posted ? 'posted' : PL_NEXT[ph], queued: ph === 6, posted: ph === 6 ? 'queued · 10-15 21:00' : posted ? 'posted · 10-15 21:00' : '' };
+  const stations = {}; PL_KEY.forEach((k, i) => { stations[k] = { busy: i === ph, text: i === ph ? (k === 'post' ? 'Posting now · ' + title : (PL_RUN[i] || '') + ' · ' + reel.dir) : '', at:'' }; });
+  return { reels:[reel], running: ph < 6 ? [`${PL_RUN[ph]} · ${title}`] : [], stations,
+    activity:[`${new Date().toTimeString().slice(0, 8)}  Demo update ${tick} (unrelated log line)`],
+    queue: ph === 6 ? [{ status:'queued', at:'2026-10-15 21:00 IST', title }] : posted ? [{ status:'posted', at:'2026-10-15 21:00 IST', title }] : [],
+    media:{}, manager:{ status:'ok', text:'all clear', history:[], needsOwner:[] } };
+}
+/* ?demo=concurrent : the real overlapping case. Phase 0: voice works A, mix works C, render works D, B waits at voice.
+   Phase 1 (10 s): A goes voice -> mix (skips scout/judge), C mix -> render, D render -> post, all at once; voice starts B
+   while its worker is still away delivering A, and mix receives A while its worker is away delivering C. */
+function ccState(ph, cycle, tick){
+  const id = k => `w9-${k}${cycle % 10}-${['a','b','c','d'][k]}`, T = ['Reel A','Reel B','Reel C','Reel D'];
+  const R = (k, next, extra) => Object.assign({ dir:id(k), title:T[k], voice:'done', audio:'', clips:'done', judged:'done', video:'', posted:'', queued:false, next }, extra || {});
+  const p1 = ph >= 1;
+  const reels = [R(0, p1 ? 'edit' : 'voice'), R(1, 'voice'), R(2, 'edit'), R(3, p1 ? 'post' : 'edit', p1 ? { video:'done', queued:true, posted:'queued · 10-15 21:00' } : {})];
+  const run = p1 ? [['recording a voice', 1], ['mixing audio', 0], ['rendering a reel', 2]] : [['recording a voice', 0], ['mixing audio', 2], ['rendering a reel', 3]];
+  const busyK = { voice:1, mix:1, render:1, post:p1 ? 1 : 0 };
+  const stations = {}; PL_KEY.forEach(k => { stations[k] = { busy:!!busyK[k], text: k === 'post' && p1 ? 'Queuing post · ' + T[3] : '', at:'' }; });
+  run.forEach(([lab, k]) => { const st = ST.find(x => x.run === lab); stations[st.key].text = lab + ' · ' + id(k); });
+  return { reels, running: run.map(([lab, k]) => `${lab} · ${T[k]}`), stations,
+    activity:[`${new Date().toTimeString().slice(0, 8)}  Demo update ${tick} (unrelated log line)`],
+    queue: p1 ? [{ status:'queued', at:'2026-10-15 21:00 IST', title:T[3] }] : [], media:{}, manager:{ status:'ok', text:'all clear', history:[], needsOwner:[] } };
+}
+const DEMO_CC = DEMO_Q.get('demo') === 'concurrent';
+function demoPipeline(t){
+  if (DEMO_CC) { const ph = Math.floor(t / 10) % 4 >= 1 ? 1 : 0, cycle = Math.floor(t / 40), tick = Math.floor(t / 2.5), key = 'c' + ph + '|' + cycle + '|' + tick;
+    if (key === plKey) return; plKey = key; now = t; handle(ccState(ph, cycle, tick)); return; }
+  const ph = Math.floor(t / 10) % 8, cycle = Math.floor(t / 80), tick = Math.floor(t / 2.5), key = ph + '|' + cycle + '|' + tick;
+  if (key === plKey) return; plKey = key; now = t; handle(plState(ph, cycle, tick));
+}
+let demoNext = 0;
+function demoHandoff(t){
+  // ?demo=handoff : Judge carries one box to Edit, on a loop (no data is touched)
+  const w = workers[2];
+  if (t > demoNext && w.mode === 'sit' && !w.jobs.length) { demoNext = t + 9; handOff(2, 3, null);
+    // &ff=<seconds> fast-forwards the walk (for screenshots)
+    const ff = parseFloat(DEMO_Q.get('ff') || '0'); if (ff > 0 && !demoHandoff.done) { demoHandoff.done = true; for (let k = 0; k < ff / .02; k++) updateWorker(w, .02, t); } }
+}
+
+/* ---------- labels / scaling ---------- */
+const stage = document.getElementById('stage'), camEl = document.getElementById('world'), worldEl = camEl;
+const ST_ICON = ['mic','search','scale','pen','sliders','gear','plane'];
+const labels = ST.map((s,i) => { const d = document.createElement('div'); d.className = 'hc'; d.innerHTML = `<div class="hn"><svg><use href="#i-${ST_ICON[i]}"/></svg><span>${s.lab}</span></div>`; camEl.appendChild(d); return d; });
+const pills = labels.map(l => { const d = document.createElement('div'); d.className = 'pill'; l.appendChild(d); return d; });
+const mgrLab = document.createElement('div'); mgrLab.className = 'hc mgr'; mgrLab.innerHTML = '<div class="hn"><svg><use href="#i-user"/></svg><span>Manager</span></div>'; camEl.appendChild(mgrLab);
+const mgrPill = document.createElement('div'); mgrPill.className = 'pill'; mgrLab.appendChild(mgrPill);
+const mgrBub = document.createElement('div'); mgrBub.className = 'bub mgrb off'; camEl.appendChild(mgrBub);
+const officeBtn = document.createElement('button'); officeBtn.id = 'office'; officeBtn.title = "Open the manager's notes"; officeBtn.setAttribute('aria-label', "Open the manager's notes"); camEl.appendChild(officeBtn);
+officeBtn.addEventListener('click', () => openDrawer(true));
+const sched = document.getElementById('sched');
+let scale = 1;
+const FX0 = 6, FX1 = MOX + MW + 2;   // floor content in floor px: first station sign .. the manager's desk
+// cloud: two stage modes. Wide screens fit the whole floor (as on the local board). On narrow screens (stacked layout) the floor
+// keeps the same scale (fit width if that gives >= 1.75x, else an integer 2x) and a too-wide floor scrolls sideways inside the stage.
+const stageIn = document.getElementById('stageIn');
+let SCROLLMODE = false;
+const stacked = () => matchMedia('(max-width:1100px)').matches;
+function layout(){
+  const FW = FX1 - FX0;
+  let vw, vh, sc;
+  const narrow = stacked(), avail = Math.max(200, stage.clientWidth);
+  if (narrow) {
+    const fitW = Math.floor(avail / FW * 8) / 8;
+    sc = fitW >= 2 ? Math.min(3, fitW) : fitW >= 1.75 ? fitW : 2;
+    vw = Math.max(avail, Math.ceil(FW * sc + 12)); vh = Math.round(Math.max(118, 128 - (sc - 2) * 8) * sc);
+    SCROLLMODE = vw > avail + 1;
+    stage.className = SCROLLMODE ? 'scroll' : 'fit narrowfit';
+    stage.style.height = vh + 'px'; stageIn.style.width = vw + 'px'; stageIn.style.height = vh + 'px';
+  } else {
+    SCROLLMODE = false; stage.className = 'fit'; stage.style.height = ''; stageIn.style.width = ''; stageIn.style.height = '';
+    vw = avail; vh = Math.max(120, stage.clientHeight);
+    sc = Math.min(vw / FW, vh / H);
+    sc = sc >= 1 ? Math.max(1, Math.floor(sc * 8) / 8) : sc;
+  }
+  document.querySelector('.swipehint').hidden = !SCROLLMODE;
+  qRow.classList.toggle('swipe', narrow);
+  scale = sc; K = Math.max(1, Math.ceil(sc - 1e-6));
+  document.body.classList.toggle('compact', sc < 1.75);
+  VW = Math.ceil(vw / sc); VH = Math.ceil(vh / sc); M = Math.ceil(16 / sc) + 2;
+  ox = Math.floor((VW - FW) / 2) - FX0;
+  const ytop = narrow ? CARD_Y - 22 : CARD_Y - Math.max(8, Math.round((VH - 110) * .42)); oy = -ytop - OFF;   // signs sit in the upper third, the rest is open floor
+  const CW = VW + 2*M, CH = VH + 2*M;
+  cv.width = CW; cv.height = CH; g.imageSmoothingEnabled = false;
+  view.width = CW*K; view.height = CH*K; view.style.imageRendering = (K === sc) ? 'pixelated' : 'auto';
+  bg.width = CW; bg.height = CH;
+  CAMX = M + ox; CAMY = M + oy + OFF; X0 = -CAMX; X1 = CW - CAMX; Y0 = -CAMY; Y1 = CH - CAMY;
+  cam.style.left = Math.round(-M*sc) + 'px'; cam.style.top = Math.round(-M*sc) + 'px';
+  view.style.width = (CW*sc) + 'px'; view.style.height = (CH*sc) + 'px';
+  worldEl.style.left = Math.round((M+ox)*sc) + 'px'; worldEl.style.top = Math.round((M+oy)*sc) + 'px';
+  worldEl.style.width = Math.round(W*sc) + 'px'; worldEl.style.height = Math.round(H*sc) + 'px';
+  const place = (el, x, y, w, h) => { el.style.left = Math.round(x*sc) + 'px'; el.style.top = Math.round((OFF+y)*sc) + 'px'; el.style.width = Math.round(w*sc) + 'px'; if (h) el.style.height = Math.round(h*sc) + 'px'; };
+  const ch = Math.min(64, Math.round((SEAT_Y - 22 - 3 - CARD_Y) * sc));   // equal heights, always clear of the heads below
+  labels.forEach((l,i) => { place(l, ST[i].cx - 21, CARD_Y, 42); l.style.height = ch + 'px'; });
+  place(mgrLab, MSEATX - 21, CARD_Y, 42); mgrLab.style.height = ch + 'px';
+  place(officeBtn, MOX, 62, MW, 40);
+  // queue cards under the stage, one per station column, aligned to the desks above
+  const qx = X => Math.round((ox + X) * sc);
+  if (!narrow) qCards.forEach((q, i) => { q.style.left = qx(ST[i].cx - 22) + 'px'; q.style.width = (qx(ST[i].cx + 22) - qx(ST[i].cx - 22)) + 'px'; });
+  if (!narrow) qMgr.style.left = qx(MOX + 2) + 'px'; qMgr.style.width = (qx(MOX + MW - 2) - qx(MOX + 2)) + 'px';
+  mgrKey = '';
+  layoutOverlays();
+  const box = (m,x,y,w,h) => { m.style.left = Math.round(x*sc)+'px'; m.style.top = Math.round(y*sc)+'px'; m.style.width = Math.round(w*sc)+'px'; m.style.height = Math.round(h*sc)+'px'; };
+  buildSky(); buildBg();
+}
+const lastKey = [];
+function stState(s){ return s.active ? 'work' : s.i === 6 ? 'idle' : s.held ? 'hold' : (s.waiting > 0 ? 'ready' : 'idle'); }
+function syncLabels(){
+  ST.forEach((s,i) => {
+    const stt = stState(s);
+    labels[i].classList.toggle('on', stt === 'work'); qCards[i].classList.toggle('on', stt === 'work');
+    const txt = bubbleText(i), key = stt + txt + OFFLINE;
+    if (lastKey[i] !== key) {
+      lastKey[i] = key;
+      const idle = txt === 'Nothing waiting', qs = qCards[i].querySelector('.qs');
+      qs.className = 'qs ' + (stt === 'work' ? 'work' : idle ? 'idle' : stt); qs.textContent = (OFFLINE && i !== 6) ? '' : txt; qs.title = txt;
+      setHTML(pills[i], '<i class="pd"></i>' + { work:'Working', hold:'On hold', ready:'Reels waiting', idle:'Idle' }[stt]);
+      pills[i].className = 'pill ' + stt;
+      renderCrew();
+    }
+  });
+}
+const tagEls = {};
+ST.forEach((_, i) => { const d = document.createElement('div'); d.className = 'tag'; d.style.display = 'none'; camEl.appendChild(d); tagEls[i] = d; });
+// queue cards (DOM, under the stage): what waits at each station, as small reel boxes
+const qRow = document.getElementById('queue');
+const qCards = ST.map((s, i) => { const d = document.createElement('div'); d.className = 'qc' + (i === 4 || i === 5 ? ' pass' : '');
+  d.innerHTML = `<div class="qn"><svg><use href="#i-${ST_ICON[i]}"/></svg>${s.lab}</div><div class="qh"></div><div class="qb"></div><div class="qs"></div>`; qRow.appendChild(d); return d; });
+const qMgr = document.createElement('button'); qMgr.className = 'qc qm live'; qMgr.innerHTML = '<div class="qn"><svg><use href="#i-user"/></svg>Manager</div><div class="qh"></div><div class="qb"></div><div class="qs"></div>'; qRow.appendChild(qMgr);
+qMgr.addEventListener('click', () => openDrawer(true));
+const boxHTML = tk => { const pk = parkedFor(tk); return `<i class="rb${pk ? (isHold(pk) ? ' hold' : ' stuck') : ''}" data-k="${esc(tk.reel.dir)}" style="--c:${tk.col}"></i>`; };
+function refreshOverlays(){
+  ST.forEach((_, i) => { const tk = deskTk[i]; const el = tagEls[i];
+    if (tk && !tk.inTransit) { el.style.display = 'block'; el.textContent = tk.reel.title + (i === 6 ? ' · ' + slotLabel(tk.reel) : ''); } else el.style.display = 'none'; });
+  qCards.forEach((q, i) => {
+    const list = shelf[i].filter(tk => !tk.inTransit), qh = q.querySelector('.qh'), qb = q.querySelector('.qb');
+    q.classList.toggle('live', i === 6);
+    if (OFFLINE && i === 6) {   // posting is live from the relay even while the factory sleeps
+      const ql = queuedList(); setHTML(qh, `Booked <b>${ql.length}</b>`);
+      qb.htmlIfChanged = ql.slice(0, 2).map(x => `<span class="pr"><time>${esc(dayLabel(x.at))}</time></span>`).join('') + (ql.length > 2 ? `<span class="more">+${ql.length - 2}</span>` : '') || '<span class="none">Nothing booked</span>';
+      return;
+    }
+    if (OFFLINE) { setHTML(qh, '\u2014'); qb.htmlIfChanged = ''; return; }
+    if (i === 4 || i === 5) { setHTML(qh, 'From Edit'); setHTML(qb, '<span class="pass">No waiting line<svg><use href="#i-arrow"/></svg></span>'); return; }
+    setHTML(qh, `In line <b>${list.length}</b>`);
+    if (i === 6) { qb.htmlIfChanged = list.slice(0, 2).map(tk => `<span class="pr">${boxHTML(tk)}<time>${esc(slotLabel(tk.reel) || 'not booked')}</time></span>`).join('') + (list.length > 2 ? `<span class="more">+${list.length - 2}</span>` : '') || '<span class="none">Nothing else waiting</span>'; return; }
+    const MAXB = 12;
+    qb.htmlIfChanged = list.slice(0, MAXB).map(boxHTML).join('') + (list.length > MAXB ? `<span class="more">+${list.length - MAXB}</span>` : '') + (list.length ? '' : '<span class="none">Empty</span>');
+  });
+  layoutOverlays();
+}
+function layoutOverlays(){
+  const sc = scale;
+  ST.forEach((_, i) => { const e = tagEls[i]; e.style.left = Math.round((ST[i].cx-9)*sc)+'px'; e.style.top = Math.round((OFF+90)*sc)+'px'; e.style.width = Math.round(27*sc)+'px'; e.style.height = Math.round(6.5*sc)+'px'; e.style.fontSize = Math.max(9, Math.round(3.3*sc))+'px'; e.style.lineHeight = Math.round(6.5*sc)+'px'; });
+}
+qRow.addEventListener('mouseover', ev => { const b = ev.target.closest('.rb'); if (!b) return; const tk = tokens.get(b.dataset.k); if (tk) showTip(tk, ev); });
+qRow.addEventListener('mouseout', ev => { if (ev.target.closest('.rb')) showTip(null); });
+qRow.addEventListener('click', ev => { const b = ev.target.closest('.rb'); if (!b) return; ev.stopPropagation(); const tk = tokens.get(b.dataset.k); if (tk) showTip(tk, ev); });
+document.addEventListener('click', ev => { if (hover && !ev.target.closest('.rb') && ev.target !== view) showTip(null); });
+
+/* ---------- manager overlays + HUD panel ---------- */
+let mgrKey = '';
+const MGR_PILL = { ok:['All clear','ok'], checking:['Checking','work'], fixing:['Fixing','warn'], watching:['Watching','watch'], off:['Off duty','off'] };
+const clip = (s, n) => { s = String(s || '').replace(/\s+/g,' ').trim(); if (s.length <= n) return s; const c = s.slice(0, n-1); const sp = c.lastIndexOf(' '); return (sp > n*.6 ? c.slice(0, sp) : c).replace(/[\s·,;:.-]+$/,'') + '…'; };
+const cap1 = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+function syncMgr(){
+  const st = mgrSt(), ti = mgrTi(), sc = scale;
+  const seated = mgrSeated(), there = MG.task === 'fix' && !MG.path.length;
+  let mode = 'off', bx = 0, by = 0, w = 0, html = '';
+  if (st === 'fixing' && there) {
+    mode = 'warn'; w = 60;
+    if (ti >= 0) { bx = ti === 6 ? CX(ti) + 22 : CX(ti); by = ti === 6 ? 41 : 51; }
+    else { bx = MG.x; by = MG.y - 16; }
+    html = esc(cap1(clip(plural(MGR.text), 60)));
+  }
+  const key = [mode, html, Math.round(bx), by, st, ti, sc].join('|');
+  if (key !== mgrKey) {
+    mgrKey = key;
+    const [pt, pc] = MGR_PILL[st] || MGR_PILL.off;
+    mgrPill.innerHTML = '<i class="pd"></i>' + pt; mgrPill.className = 'pill ' + pc;
+    mgrBub.className = 'bub mgrb ' + mode;
+    if (mode !== 'off') {
+      mgrBub.innerHTML = html; mgrBub.title = MGR ? (MGR.text || '') : '';
+      mgrBub.style.left = Math.round(bx*sc) + 'px'; mgrBub.style.top = Math.round((OFF+by)*sc) + 'px';
+      mgrBub.style.width = Math.round(w*sc - 8) + 'px';
+    }
+    labels.forEach((l, i) => l.classList.toggle('alert', st === 'fixing' && i === ti));
+  }
+}
+const isHold = pk => !!pk && /owner|hold/i.test(pk);
+const plural = s => String(s || '').replace(/\b(\d+) ([a-z]+)\(s\)/gi, (_, n, w) => n + ' ' + w + (n === '1' ? '' : 's'));
+const MGR_WORD = { ok:'All clear', checking:'Checking', fixing:'Fixing', watching:'Watching', off:'Off duty' };
+const MGR_DOT = { ok:'ok', checking:'work', fixing:'warn', watching:'warn', off:'off' };
+const stripNeeds = s => String(s || '').replace(/^\s*NEEDS OWNER:\s*/i, '').trim();
+const keyWords = s => new Set(stripNeeds(s).toLowerCase().match(/[a-z0-9]{5,}/g) || []);
+function similar(a, b){ const A = keyWords(a), B = keyWords(b); let n = 0; A.forEach(w => { if (B.has(w)) n++; }); return n / Math.max(1, Math.min(A.size, B.size)) >= .3; }
+function lead(s, n){ const parts = s.match(/[^.!?]+[.!?]+["')\]]*(\s+|$)/g) || [s]; let out = ''; for (const p of parts) { if (out && (out + p).length > n) break; out += p; } return out.trim() || clip(s, n); }
+let drawerOpen = false;
+function renderMgrPanel(){
+  const m = MGR, st = mgrSt();
+  ['mgrDot','mgrDot2'].forEach(id => { document.getElementById(id).className = 'dot ' + MGR_DOT[st]; });
+  const mw = document.getElementById('mgrWord'); mw.textContent = MGR_WORD[st]; mw.className = MGR_DOT[st] === 'ok' ? '' : MGR_DOT[st];
+  const last = m && m.at ? String(m.at).slice(11, 16) : '';
+  document.getElementById('mgrSt').textContent = MGR_WORD[st] + (last ? `, last check ${last}` : '');
+  const tname = k => { const s = ST.find(x => x.key === k); return s ? s.full.toLowerCase() : ''; };
+  let now = '';
+  if (!m || st === 'off') now = 'The manager is not running, so nobody is watching the line.';
+  else if (st === 'ok' && OFFLINE) now = 'Listening on Telegram. The factory is between runs.' + (m.queueUntil ? ` Posts are booked until ${m.queueUntil}.` : '');
+  else if (st === 'ok') now = 'Everything is running normally.' + (m.queueUntil ? ` Posts are booked until ${m.queueUntil}.` : '');
+  else if (st === 'checking') now = 'Walking the line and checking every station.';
+  else if (st === 'fixing') now = 'Fixing' + (tname(m.target) ? ' the ' + tname(m.target) : '') + ': ' + clip(plural(m.text), 140);
+  else now = cap1(clip(plural(m.text), 160)).replace(/([^.!?])$/, '$1.');
+  document.getElementById('mgrNow').textContent = now;
+  // needs-you notes: the manager often writes the same request twice, so notes on the same subject become one card
+  const groups = [];
+  ((m && m.needsOwner) || []).forEach(n => { const g = groups.find(x => similar(x[0].text, n.text)); if (g) g.push(n); else groups.push([n]); });
+  document.getElementById('needs').htmlIfChanged = groups.map(g => {
+    const full = stripNeeds(g[0].text), short = clip(full, 230), more = g.length - 1;
+    const when = String(g[0].at || '').slice(11, 16);
+    const extra = (short.length < full.length ? `<p>${esc(full)}</p>` : '') + g.slice(1).map(n => `<p>Earlier note (${esc(String(n.at || '').slice(11, 16))}): ${esc(stripNeeds(n.text))}</p>`).join('');
+    const sum = short.length < full.length ? 'Read the full note' + (more ? ` and ${more} earlier one` : '') : `${more} earlier note on the same thing`;
+    return `<div class="need"><div class="t">Needs you${when ? ', ' + esc(when) : ''}</div><p>${esc(short)}</p>${extra ? `<details><summary>${sum}</summary>${extra}</details>` : ''}</div>`;
+  }).join('');
+  const badge = document.getElementById('mgrBadge');
+  qMgr.querySelector('.qh').innerHTML = 'Manager';
+  qMgr.querySelector('.qb').htmlIfChanged = groups.length ? `<span class="need1"><svg><use href="#i-alert"/></svg>${groups.length === 1 ? '1 needs you' : groups.length + ' need you'}</span>` : '<span class="none">Nothing needs you</span>';
+  const qs = qMgr.querySelector('.qs'); qs.className = 'qs ' + (MGR_DOT[st] === 'ok' ? 'ok' : MGR_DOT[st]); qs.textContent = MGR_WORD[st] + (last ? ` · checked ${last}` : '');
+  badge.hidden = !groups.length; document.getElementById('mgrBadgeTxt').textContent = groups.length === 1 ? '1 needs you' : `${groups.length} need you`;
+  // history: repeats of the same fix collapse into one line with a count
+  const hist = [];
+  ((m && m.history) || []).forEach(r => { const p = hist[hist.length - 1]; if (p && p.text === r.text && p.target === r.target) { p.n++; p.first = r.at; } else hist.push({ ...r, n:1, first:r.at }); });
+  const tag = k => { const i = ST.findIndex(x => x.key === k); return i >= 0 ? `<span class="st">${ST[i].lab}</span>` : ''; };
+  const fmt = txt => esc(cap1(plural(txt))).replace(/^FIXED:\s*/, '<b>Fixed:</b> ').replace(/^looking into:\s*/i, '<b>Looking into:</b> ');
+  document.getElementById('mgrLog').htmlIfChanged = hist.slice(0, 6).map(r =>
+    `<li><time>${esc(r.at || '')}</time><span class="tx">${tag(r.target)}${fmt(r.text || '')}${r.n > 1 ? `<span class="n">${r.n} times since ${esc(r.first)}</span>` : ''}</span></li>`).join('')
+    || '<li class="none">Nothing has gone wrong yet.</li>';
+}
+
+function setMgr(m){ MGR = m || null; renderMgrPanel(); }
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function dayLabel(at){   // "2026-10-19 21:00 IST" → "Today 21:00" / "Tomorrow 08:30" / "Mon 08:30" / "12 Oct 21:00"
+  const m = String(at || '').match(/(\d{4}-\d\d-\d\d) (\d\d:\d\d)/); if (!m) return String(at || '');
+  const today = new Date(), d = new Date(m[1] + 'T12:00:00'), diff = Math.round((d - new Date(ymd(today) + 'T12:00:00')) / 864e5);
+  const day = diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow' : diff === -1 ? 'Yesterday' : (diff > 1 && diff < 7) ? d.toLocaleDateString('en-GB', { weekday:'short' }) : d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+  return day + ' ' + m[2];
+}
+function counts(){
+  const reels = DATA.reels || [], q = DATA.queue || [];
+  const held = reels.filter(r => isHold(parkedFor({ reel:r })));
+  const rendered = reels.filter(r => r.video === 'done');
+  const unbooked = rendered.filter(r => !r.queued && !/^posted/.test(r.posted || ''));
+  return { reels, held, rendered, unbooked, booked:q.filter(x => x.status === 'queued'), posted:q.filter(x => x.status === 'posted') };
+}
+function renderSched(){
+  const c = counts(), q = queuedList();
+  document.getElementById('schedAux').textContent = q.length ? `${q.length} booked` : '';
+  const row = (x, past) => `<div class="row${past ? ' past' : ''}"><time>${esc(dayLabel(x.at))}</time><span title="${esc(slugTitle(x.title))}">${esc(slugTitle(x.title))}</span></div>`;
+  let h = '';
+  if (q.length) { h += q.slice(0, 6).map(x => row(x)).join(''); if (q.length > 6) h += `<div class="row past"><time></time><span>and ${q.length - 6} more</span></div>`; }
+  else {
+    const nU = c.unbooked.length, nUH = c.unbooked.filter(r => c.held.includes(r)).length;
+    const why = nU && nUH === nU ? `${nU} rendered reel${nU > 1 ? 's are' : ' is'} on hold, so nothing is booked yet.`
+      : nU ? `${nU} rendered reel${nU > 1 ? 's are' : ' is'} waiting to be booked.` : 'Reels are booked automatically when they finish rendering.';
+    h += `<p class="empty"><b>Nothing booked to post</b>${why}</p>`;
+  }
+  const past = c.posted.slice().sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 2);
+  if (past.length) h += `<p class="sub">Last posted</p>` + past.map(x => row(x, true)).join('');
+  if (DATA.queueStale) { const at = DATA.queueAt ? new Date(DATA.queueAt) : null;   // F16: the relay could not be read this time
+    h += `<p class="stale">Posting data may be stale${at && !isNaN(at) ? ' (' + at.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) + ')' : ''}</p>`; }
+  setHTML(sched, h);
+}
+
+function renderCrew(){
+  const el = document.getElementById('crew'); if (!el) return;
+  el.innerHTML = ST.map((s,i) => `<li class="${s.active?'on':''}"><b>${esc(s.full)}</b><span>${esc(bubbleText(i))}</span></li>`).join('');
+}
+window.addEventListener('resize', layout);
+if (window.ResizeObserver) new ResizeObserver(() => layout()).observe(stage);
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById('tip');
+function pick(ev){
+  const rc = view.getBoundingClientRect();
+  const lx = (ev.clientX - rc.left) / rc.width * cv.width - CAMX, ly = (ev.clientY - rc.top) / rc.height * cv.height - CAMY;
+  let best = null;
+  drawn.forEach(d => { if (lx >= d.x-1 && lx <= d.x+8 && ly >= d.y-1 && ly <= d.y+7) best = d.tk; });
+  return best;
+}
+Object.defineProperty(HTMLElement.prototype, 'htmlIfChanged', { configurable:true, set(h){ if (this._h !== h) { this._h = h; this.innerHTML = h; } } });
+const setHTML = (el, h) => { if (el && el._h !== h) { el._h = h; el.innerHTML = h; } };   // F15: unchanged HTML is not rewritten
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function showTip(tk, ev){
+  hover = tk;
+  if (!tk) { tip.style.display = 'none'; view.style.cursor = 'default'; return; }
+  view.style.cursor = 'pointer';
+  const r = tk.reel;
+  const status = (tk.deskSt >= 0 ? 'Being worked on at the ' + ST[tk.deskSt].full.toLowerCase() : tk.wall ? 'Posted to Instagram' : tk.kept === 4 ? (r.queued ? 'Booked to post ' + slotLabel(r) : 'Rendered, not booked yet') : 'In line for the ' + ST[LINE_ST[tk.kept]].full.toLowerCase()) + (tk.redo ? ' (sent back for a redo)' : '');
+  const pips = STAGES.map(s => {
+    const v = r[s]; const cls = !v ? '' : (v === 'done' || s === 'posted' ? 'done' : 'part');
+    const txt = (v && v !== 'done' && s !== 'posted') ? `${s} ${v}` : s;
+    return `<span class="pip ${cls}"><i></i>${esc(txt)}</span>`;
+  }).join('');
+  const pk = parkedFor(tk);
+  tip.innerHTML = `<div class="t">${esc(r.title)}</div><div class="s">${esc(status)}</div><div class="pips">${pips}</div>` + (pk ? (isHold(pk) ? `<div class="park">On hold: ${esc(pk.replace(/^owner [\d-]+:\s*/i, ''))}</div>` : `<div class="park bad">Stuck: ${esc(pk)}</div>`) : '') +
+    (r.posted ? `<div class="meta">${esc(r.posted)}</div>` : '');
+  tip.style.display = 'block';
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = ev.clientX + 14, y = ev.clientY + 16;
+  if (x + tw > innerWidth - 8) x = ev.clientX - tw - 14;
+  if (y + th > innerHeight - 8) y = ev.clientY - th - 12;
+  tip.style.left = Math.max(8,x) + 'px'; tip.style.top = Math.max(8,y) + 'px';
+}
+view.addEventListener('mousemove', ev => showTip(pick(ev), ev));
+view.addEventListener('mouseleave', () => showTip(null));
+view.addEventListener('click', ev => showTip(pick(ev), ev));
+
+/* ---------- header / strip ---------- */
+const humanize = s => String(s || '').replace(/\bw\d+-\d+-[\w-]+/g, x => slugTitle(x)).replace(/\b\d+-(?:[A-Za-z]{3}|W\d+)-[\w-]+/g, x => slugTitle(x)).replace(/ ?(\d{4}-\d\d-\d\d \d\d:\d\d) IST/g, (_, a) => ' ' + dayLabel(a));
+function renderStrip(){
+  const c = counts(), run = DATA.running || [];
+  let head, sub = '';
+  if (run.length) {
+    head = run.map(l => { const [a, ...rest] = String(l).split(' · '); return cap1(a) + (rest.length ? ': ' + rest.join(', ') : ''); }).join('; ');
+    sub = `${run.length} job${run.length > 1 ? 's' : ''} running`;
+  } else if (c.held.length) {
+    head = `Line paused. ${c.held.length} of ${c.reels.length} reels are on hold.`;
+    const reasons = {}; Object.values(FACT.parked || {}).forEach(v => { const r = String(v).replace(/^owner [\d-]+:\s*/i, ''); reasons[r] = (reasons[r] || 0) + 1; });
+    const top = Object.entries(reasons).sort((a, b) => b[1] - a[1])[0];
+    sub = top ? `Your note: “${top[0]}”` : '';
+  } else head = 'Quiet. Waiting for the next job.';
+  document.getElementById('nowHead').textContent = head;
+  document.getElementById('nowbar').classList.toggle('run', !!run.length);
+  document.querySelector('#nowIc use').setAttribute('href', run.length ? '#i-run' : '#i-pause');
+  document.getElementById('nowSub').textContent = sub;
+  // activity: newest first, slugs shown as reel titles, back-to-back repeats folded into one line
+  const rows = [];
+  (DATA.activity || []).forEach(l => { const m = String(l).match(/^(\d\d:\d\d:\d\d)\s+(.*)$/); const time = m ? m[1].slice(0, 5) : '', text = humanize(m ? m[2] : l);
+    const p = rows[rows.length - 1]; if (p && p.text === text) p.n++; else rows.push({ time, text, n:1 }); });
+  const actTxt = t => { const i = t.indexOf(' · '); return i > 0 && i < 28 ? `<b>${esc(t.slice(0, i))}</b>${esc(t.slice(i))}` : esc(t); };
+  document.getElementById('act').htmlIfChanged = rows.slice(0, 26).map(r => `<li><time>${esc(r.time)}</time><span title="${esc(r.text)}">${actTxt(r.text)}${r.n > 1 ? `<em>${r.n}×</em>` : ''}</span></li>`).join('')
+    || '<li><time></time><span>No activity yet.</span></li>';
+}
+
+/* ---------- camera ---------- */
+const cam = document.getElementById('cam');
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let camZ = 1, camApplied = 1, camUntil = 0;
+function focusOn(i){
+  if (reduceMotion || document.body.classList.contains('compact')) return;
+  cam.style.transformOrigin = Math.round((M+ox+ST[i].cx)*scale) + 'px ' + Math.round((M+oy+OFF+78)*scale) + 'px';
+  camUntil = now + 6;
+}
+function updateCamera(dt, t){
+  mx += (mxT - mx) * .05;
+  if (reduceMotion) return;
+  const compact = document.body.classList.contains('compact');
+  const target = (!compact && now < camUntil) ? 1.12 : 1;
+  camZ += (target - camZ) * (1 - Math.exp(-dt*2.2));
+  // the room holds still (owner 10-15: only workers, reels and one lamp flicker move)
+}
+stage.addEventListener('mousemove', ev => { mxT = (ev.clientX / innerWidth - .5) * 2; });
+
+/* ---------- media (real work on screen) ---------- */
+function mkMon(cls){ const m = document.createElement('div'); m.className = 'mon ' + cls; const im = document.createElement('img'); im.alt = ''; im.decoding = 'async'; m.appendChild(im); worldEl.appendChild(m); return { m, im }; }
+const monSheet = mkMon('sheet'), monFrames = mkMon('frames');
+const lr = document.getElementById('lr');
+const lrImg = lr.querySelector('img'), lrHead = lr.querySelector('.h'), lrMon = lr.querySelector('.mon');
+const hhmm = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); };
+function setSrc(im, m){
+  const key = m.url + '|' + m.at;
+  if (im.dataset.k !== key) { im.dataset.k = key; im.src = m.url + (m.url.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(m.at || ''); im.parentNode.classList.remove('flash'); void im.offsetWidth; im.parentNode.classList.add('flash'); }
+}
+// cloud: the local board's /media/... files do not exist here. Only absolute URLs the snapshot provides are shown; anything else
+// is hidden (the "Latest render" strip simply does not appear), and an image that fails to load hides itself too.
+const cloudMedia = m => (m && typeof m.url === 'string' && /^https:\/\//.test(m.url) && !mediaBad.has(m.url)) ? m : null;
+const mediaBad = new Set();
+function updateMedia(md){
+  MEDIA.sheet = cloudMedia(md.sheet); MEDIA.frames = cloudMedia(md.frames);
+  monSheet.m.style.display = 'none';   // the floor stays clean: real images live in the side panel
+  if (MEDIA.sheet) { setSrc(monSheet.im, MEDIA.sheet); monSheet.m.dataset.cap = 'Contact sheet · ' + slugTitle(MEDIA.sheet.reel) + ' · ' + (MEDIA.sheet.name||'') + ' · ' + hhmm(MEDIA.sheet.at); monSheet.m.dataset.src = MEDIA.sheet.url; }
+  monFrames.m.style.display = 'none';
+  lr.style.display = MEDIA.frames ? 'block' : 'none';
+  if (MEDIA.frames) {
+    setSrc(monFrames.im, MEDIA.frames); setSrc(lrImg, MEDIA.frames);
+    const cap = 'Latest render · ' + slugTitle(MEDIA.frames.reel) + ' · ' + hhmm(MEDIA.frames.at);
+    monFrames.m.dataset.cap = cap; monFrames.m.dataset.src = MEDIA.frames.url; lrMon.dataset.cap = cap; lrMon.dataset.src = MEDIA.frames.url;
+    lrHead.innerHTML = 'Latest render <em>• ' + esc(slugTitle(MEDIA.frames.reel)) + '</em>';
+    const fu = MEDIA.frames.url + (MEDIA.frames.url.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(MEDIA.frames.at || '');
+    lr.querySelectorAll('.thumbs i').forEach(i => { i.style.backgroundImage = `url("${fu}")`; });
+  }
+}
+lrImg.addEventListener('error', () => { if (MEDIA.frames) mediaBad.add(MEDIA.frames.url); lr.style.display = 'none'; });
+const lb = document.getElementById('lb'), lbImg = lb.querySelector('img'), lbCap = lb.querySelector('.cap');
+[monSheet.m, monFrames.m, lrMon].forEach(el => el.addEventListener('click', () => {
+  if (!el.dataset.src) return; lbImg.src = el.dataset.src; lbCap.textContent = el.dataset.cap || ''; lb.classList.add('open');
+}));
+lb.addEventListener('click', () => lb.classList.remove('open'));
+addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+/* ---------- metrics ---------- */
+function nextPostDate(){
+  const q = queuedList()[0]; if (!q) return null;
+  const m = String(q.at).match(/(\d{4}-\d\d-\d\d) (\d\d:\d\d)/); if (!m) return null;
+  return { d:new Date(`${m[1]}T${m[2]}:00+05:30`), hm:m[2], title:slugTitle(q.title) };
+}
+function nextPostDate(){
+  const q = queuedList()[0]; if (!q) return null;
+  const m = String(q.at).match(/(\d{4}-\d\d-\d\d) (\d\d:\d\d)/); if (!m) return null;
+  return { d:new Date(`${m[1]}T${m[2]}:00+05:30`), at:q.at, title:slugTitle(q.title) };
+}
+function renderMetrics(){
+  const c = counts(), total = c.reels.length;
+  setHTML(document.getElementById('mRend'), !total ? '\u2013' : `${c.rendered.length}<small>of ${total}</small>`);
+  setHTML(document.getElementById('mHold'), !total ? '\u2013' : c.held.length ? `${c.held.length}<small>reels</small>` : '0');
+  document.getElementById('mBooked').textContent = c.booked.length;
+  document.getElementById('mPosted').textContent = c.posted.length;
+  tickNext();
+}
+function tickNext(){
+  const n = nextPostDate(), el = document.getElementById('mNext');
+  if (!n) { setHTML(el, '<small>Nothing booked</small>'); return; }
+  const mins = Math.round((n.d - Date.now()) / 60000);
+  const w = mins < -1 ? 'due now' : mins < 1 ? 'in under a minute' : mins < 60 ? `in ${mins} min` : `in ${Math.floor(mins/60)} h ${String(mins%60).padStart(2,'0')} min`;
+  setHTML(el, `${esc(dayLabel(n.at))}<small>·&nbsp; ${w}</small>`);
+}
+
+/* ---------- cloud data: GET /api/state every 3 s ----------
+   The HQ worker answers with the factory's last snapshot (reels, running, activity, stations, factory, ver, now…) plus
+   relay {queue, log} (fresh from the posting relay), manager (recent manager messages) and stale flags.
+   ?api=<url> points the page at another endpoint (testing). No version auto-reload: the cloud page is static. */
+const conn = document.getElementById('conn'), connTxt = document.getElementById('connTxt');
+const API = (() => { try { const u = new URLSearchParams(location.search).get('api'); if (u) return u; } catch (_) {} return '/api/state'; })();
+let fails = 0, lastNow = '', lastOk = 0, snapAt = 0;
+const ASLEEP_MS = 30 * 60e3;
+function setConn(ok){
+  conn.classList.toggle('bad', !ok);
+  const fresh = snapAt && Date.now() - snapAt < ASLEEP_MS;
+  connTxt.textContent = !ok ? 'Reconnecting…' : fresh || !snapAt ? 'Live' : 'Updated ' + hhmm(new Date(snapAt).toISOString());
+  conn.title = !ok ? 'Cannot reach HQ right now, showing the last known state' : snapAt ? 'Factory snapshot from ' + new Date(snapAt).toLocaleString('en-GB') : '';
+}
+const IST_MS = 330 * 60e3;
+const fmtIST = ms => new Date(ms + IST_MS).toISOString().replace('T', ' ').slice(0, 16) + ' IST';
+// relay items carry `at` as epoch ms; the board speaks "YYYY-MM-DD HH:MM IST" (what ig_queue.js ids prints)
+function relayQueue(rq){
+  return (rq || []).map(x => {
+    const at = typeof x.at === 'number' ? fmtIST(x.at) : /^\d{4}-\d\d-\d\dT/.test(String(x.at || '')) ? fmtIST(Date.parse(x.at)) : String(x.at || '');
+    return { id:x.id || '', status:String(x.status || ''), at, title:String(x.title || ''), slug:String(x.slug || '') };
+  });
+}
+// the snapshot's reel rows were matched to the queue when the factory last ran; re-match them to the fresh relay queue
+// (same rule as dashboard.js reelRow) so Booked / Posted move the moment the relay posts
+function rematch(reels, queue){
+  return (reels || []).map(r => {
+    const q = queue.find(x => x.slug === r.dir) || queue.find(x => x.title.includes(r.dir.split('-').slice(2).join('-').slice(0, 20)) || x.title.includes(r.dir.slice(6, 26)));
+    if (!q) return r;
+    const posted = q.status === 'posted', queued = q.status === 'queued';
+    const out = Object.assign({}, r, { queued, posted:`${posted ? 'posted' : 'queued'} · ${q.at.slice(5, 16)}` });
+    if (posted) out.next = 'posted';
+    return out;
+  });
+}
+function postStation(queue, prev){
+  const booked = queue.filter(q => q.status === 'queued').sort((a, b) => a.at.localeCompare(b.at)), next = booked[0];
+  if (queue.some(q => /processing|container|publishing/i.test(q.status))) return { busy:true, text:'Posting now · ' + ((queue.find(q => /processing/i.test(q.status)) || {}).title || ''), at:'' };
+  if (prev && prev.busy && /^Queuing post/.test(prev.text || '')) return prev;
+  return { busy:false, text: booked.length ? `${booked.length} booked · next ${next.at.slice(11, 16)}` : 'Nothing booked', at:'' };
+}
+// relay log lines ("<ISO>  POSTED title → link") newer than the snapshot go on top of the activity list, in IST
+function relayActivity(log, since){
+  return (log || []).map(String).map(l => { const m = l.match(/^(\S+)\s+(.*)$/); if (!m) return null; const t = Date.parse(m[1]); if (isNaN(t) || t <= since) return null;
+    const msg = m[2].replace(/^POSTED (.*?) →.*$/, 'Posted · $1').replace(/^FAILED /, 'Post failed · ').replace(/^SKIPPED /, 'Post skipped · ').replace(/^container \S+ for (.*)$/, 'Posting started · $1').replace(/^token refreshed$/, 'Instagram login refreshed');
+    return { t, line: fmtIST(t).slice(11, 16) + ':00  ' + msg }; }).filter(Boolean).sort((a, b) => b.t - a.t).map(x => x.line);
+}
+// `manager` is either the factory's manager status object (status/text/history/needsOwner) or HQ's list of recent manager
+// messages; a list becomes the drawer's history, newest first
+function managerFrom(d, snapMgr){
+  const m = d.manager;
+  const hm = v => { const t = typeof v === 'number' ? v : Date.parse(v || ''); return isNaN(t) ? String(v || '').slice(11, 16) : fmtIST(t).slice(11, 16); };
+  if (Array.isArray(m)) {
+    const base = (snapMgr && typeof snapMgr === 'object' && !Array.isArray(snapMgr)) ? snapMgr : { status:'ok', text:'', history:[], needsOwner:[] };
+    const msgs = m.slice().sort((a, b) => (Date.parse(b.at || b.time || 0) || +b.at || 0) - (Date.parse(a.at || a.time || 0) || +a.at || 0));
+    const hist = msgs.slice(0, 12).map(x => typeof x === 'string' ? { at:'', text:x, target:'' }
+      : { at:hm(x.at || x.time), text:(x.from === 'owner' || x.role === 'owner' ? 'You: ' : '') + String(x.text || x.msg || ''), target:x.target || '' });
+    const needs = (Array.isArray(d.pending) ? d.pending : []).slice(0, 3).map(x => ({ at:x.at ? fmtIST(typeof x.at === 'number' ? x.at : Date.parse(x.at)).slice(0, 16) : '', text:'Waiting for your OK on Telegram: ' + String(x.text || x.title || x.reel || 'a preview') }));
+    const lastAt = msgs[0] ? hm(msgs[0].at || msgs[0].time) : '';
+    return Object.assign({}, base, { history: hist.length ? hist : (base.history || []), needsOwner: needs.length ? needs : (base.needsOwner || []), status: base.status || 'ok', at: base.at || (msgs[0] ? fmtIST(Date.parse(msgs[0].at) || 0) : ''), text: base.text || '' });
+  }
+  return m && typeof m === 'object' ? m : null;
+}
+let snapMgr = null, OFFLINE = false;
+function handle(d){
+  if (!d || typeof d !== 'object') throw new Error('bad state');
+  const s = (d.snapshot && typeof d.snapshot === 'object') ? Object.assign({}, d.snapshot, d) : d;   // tolerate {snapshot:{…}, relay, …}
+  const stamp = s.snapshotAt || s.now || '';
+  if (stamp && lastNow && String(stamp) < String(lastNow)) return;   // F5: an older snapshot arriving late never overwrites a newer one
+  if (stamp && (!lastNow || String(stamp) >= String(lastNow))) lastNow = String(stamp);
+  const t = Date.parse(lastNow); snapAt = isNaN(t) ? (typeof s.snapshotAt === 'number' ? s.snapshotAt : 0) : t;
+  fails = 0; lastOk = Date.now();
+  const relay = s.relay && typeof s.relay === 'object' ? s.relay : null;
+  const queue = relay && Array.isArray(relay.queue) ? relayQueue(relay.queue) : (s.queue || []);
+  const data = Object.assign({}, s, { queue, reels: rematch(s.reels, queue), stations: Object.assign({}, s.stations || {}) });
+  if (relay) data.stations.post = postStation(queue, (s.stations || {}).post);
+  if (relay && relay.log) data.activity = relayActivity(relay.log, snapAt).concat(s.activity || []);
+  if (relay) { data.queueStale = !!(s.stale && (s.stale === true || s.stale.relay)); data.queueAt = ''; }
+  const f = s.factory || {}; FACT = { reels:f.reels || {}, running:f.running || {}, lanes:f.lanes || {}, parked:f.parked || {} };
+  if (!Array.isArray(s.manager) && s.manager) snapMgr = s.manager;
+  // the factory runs on GitHub at night; between runs the snapshot simply ages. Calm note, not an error.
+  //   no snapshot yet      -> "Factory offline · waiting for the next run"
+  //   snapshot > 30 min old (or HQ says stale.factory) and nothing running -> "Factory is asleep"
+  const idle = !(s.running || []).length, staleF = !!(s.stale && (s.stale.factory === true || s.stale.snapshot === true));
+  const noSnap = !snapAt && !(s.reels || []).length;
+  const asleep = !noSnap && idle && ((!!snapAt && Date.now() - snapAt > ASLEEP_MS) || staleF);
+  OFFLINE = noSnap || asleep;
+  document.body.classList.toggle('offline', OFFLINE);
+  sleepEl.hidden = !OFFLINE;
+  setHTML(document.getElementById('sleepTx'), noSnap
+    ? '<b>Factory offline</b> · waiting for the next run. The posting schedule below is live.'
+    : asleep ? `<b>Factory is asleep</b> · next run tonight, or ask the manager on Telegram.${snapAt ? ' Last report ' + esc(dayLabel(fmtIST(snapAt))) + '.' : ''}` : '');
+  setConn(true);
+  applyData(data); setMgr(DEMO ? demoMgr() : managerFrom(s, snapMgr));
+  autoScroll();
+}
+const sleepEl = document.getElementById('sleep');
+let polling = false;
+async function poll(){
+  if (polling) return; polling = true;   // F5: never two polls at once
+  const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 8000);
+  try { const res = await fetch(API, { cache:'no-store', signal:ac.signal }); if (!res.ok) throw new Error(res.status); handle(await res.json()); }
+  catch (e) { fails++; setConn(false); if (fails === 1 || fails % 20 === 0) console.warn('HQ state failed:', e && (e.stack || e.message || e)); }   // keep the last state on screen
+  finally { clearTimeout(to); polling = false; }
+}
+function startLive(){
+  poll(); setInterval(() => { if (document.visibilityState !== 'hidden') poll(); }, 3000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') poll(); });
+}
+// narrow screens: the floor scrolls sideways; bring the working station into view until the viewer scrolls themselves
+let userScrolled = false, autoKey = '';
+['pointerdown', 'touchstart', 'wheel'].forEach(ev => stage.addEventListener(ev, () => { userScrolled = true; }, { passive:true }));
+function autoScroll(){
+  if (!SCROLLMODE || userScrolled) return;
+  let i = ST.findIndex(s => s.raw); if (i < 0) i = 0;   // the working station, else the start of the line
+  const key = i + '|' + scale; if (key === autoKey) return; autoKey = key;
+  const x = (ox + ST[i].cx) * scale - stage.clientWidth / 2;
+  stage.scrollTo({ left: Math.max(0, x), behavior: reduceMotion || !dataReady ? 'auto' : 'smooth' });
+}
+
+function tick(){ document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB'); tickNext(); }
+
+/* ---------- factory (conductor) ---------- */
+let FACT = { reels:{}, running:{}, lanes:{}, parked:{} };
+function parkedFor(tk){
+  if (!tk || !tk.reel || !FACT.parked) return null;
+  const d = tk.reel.dir, tail = d.replace(/^w\d+-\d+-/, '');
+  if (FACT.parked[d]) return FACT.parked[d];
+  if (FACT.parked[tail]) return FACT.parked[tail];
+  const k = Object.keys(FACT.parked).find(x => x.endsWith(tail) || d.endsWith(x));
+  return k ? FACT.parked[k] : null;
+}
+/* ---------- sound (off by default) ---------- */
+const Snd = {
+  on:false, ctx:null, timers:[],
+  start(){
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    const c = this.ctx = new AC(); const master = this.master = c.createGain(); master.gain.value = .6; master.connect(c.destination);
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.connect(master);
+    const chords = [[220,261.6,329.6,392],[174.6,220,261.6,329.6],[261.6,329.6,392,493.9],[196,246.9,293.7,392]]; let ci = 0;
+    const play = () => { const now = c.currentTime; chords[ci++ % 4].forEach((f,k) => { const o = c.createOscillator(), gn = c.createGain();
+      o.type = 'triangle'; o.frequency.value = f; o.detune.value = (k-1.5)*4; gn.gain.setValueAtTime(0,now); gn.gain.linearRampToValueAtTime(.035,now+2.2); gn.gain.linearRampToValueAtTime(0,now+8.5);
+      o.connect(gn); gn.connect(lp); o.start(now); o.stop(now+8.6); }); };
+    play(); this.timers.push(setInterval(play, 8000));
+    const len = c.sampleRate*2, buf = c.createBuffer(1,len,c.sampleRate), d = buf.getChannelData(0); for (let i=0;i<len;i++) d[i] = (Math.random()*2-1);
+    const nz = c.createBufferSource(); nz.buffer = buf; nz.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; const ng = c.createGain(); ng.gain.value = .006;
+    nz.connect(bp); bp.connect(ng); ng.connect(master); nz.start();
+    this.timers.push(setInterval(() => { const o = c.createBufferSource(); o.buffer = buf; const gn = c.createGain(); gn.gain.value = .02; o.connect(gn); gn.connect(master); o.start(c.currentTime, Math.random()*1.9, .012); }, 700));
+    return true;
+  },
+  stop(){ this.timers.forEach(clearInterval); this.timers = []; if (this.ctx) { this.ctx.close(); this.ctx = null; } },
+  blip(){ if (!this.on || !this.ctx) return; const c = this.ctx, o = c.createOscillator(), gn = c.createGain(), t = c.currentTime;
+    o.type = 'sine'; o.frequency.setValueAtTime(523,t); o.frequency.linearRampToValueAtTime(784,t+.12); gn.gain.setValueAtTime(.001,t); gn.gain.linearRampToValueAtTime(.06,t+.02); gn.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.connect(gn); gn.connect(this.master); o.start(t); o.stop(t+.3); }
+};
+const sndBtn = document.getElementById('snd');
+sndBtn.addEventListener('click', () => {
+  if (Snd.on) { Snd.on = false; Snd.stop(); } else { Snd.on = Snd.start(); }
+  sndBtn.innerHTML = `<svg class="ic"><use href="#i-sound-${Snd.on ? 'on' : 'off'}"/></svg><span>Sound ${Snd.on ? 'on' : 'off'}</span>`; sndBtn.classList.toggle('on', Snd.on); sndBtn.setAttribute('aria-pressed', Snd.on);
+});
+
+/* ---------- manager drawer ---------- */
+const drawer = document.getElementById('drawer'), mgrBtn = document.getElementById('mgrBtn');
+const scrim = document.getElementById('scrim');
+scrim.addEventListener('click', () => openDrawer(false));
+function openDrawer(on){
+  drawerOpen = on; drawer.classList.toggle('open', on); drawer.setAttribute('aria-hidden', !on); scrim.classList.toggle('on', on);
+  mgrBtn.setAttribute('aria-expanded', on); mgrBtn.classList.toggle('on', on);
+  if (on) document.getElementById('drawerX').focus({ preventScroll:true });
+}
+mgrBtn.addEventListener('click', () => openDrawer(!drawerOpen));
+document.getElementById('mgrBadge').addEventListener('click', () => openDrawer(true));
+document.getElementById('drawerX').addEventListener('click', () => { openDrawer(false); mgrBtn.focus(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && drawerOpen) openDrawer(false); });
+if (/manager/.test(location.hash) || DEMO_Q.get('drawer') === 'open') openDrawer(true);
+
+const intro = document.getElementById('intro');
+if (reduceMotion || DEMO_HO) { document.body.classList.add('ready'); intro.remove(); }
+else { setTimeout(() => document.body.classList.add('ready'), 1500); intro.addEventListener('animationend', e => { if (e.target === intro) intro.remove(); }); }
+
+layout(); tick(); setInterval(tick, 1000);
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => { mgrKey = ''; layoutOverlays(); }).catch(()=>{});
+if (!DEMO_PL) startLive();
+if (DEMO) setInterval(() => setMgr(demoMgr()), 1000);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

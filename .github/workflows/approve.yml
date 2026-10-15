@@ -1,0 +1,73 @@
+# The owner tapped Approve on a preview (HQ dispatches "approve" with {request_id, reel}): the preview video replaces the
+# reel's video in its EXISTING post slot (tools/cloud/approve.sh → tools/queue_reel.sh requeue path; same caption, same time).
+name: approve
+
+on:
+  repository_dispatch:
+    types: [approve]
+
+concurrency:
+  group: approve-${{ github.event.client_payload.reel || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  approve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TZ: Asia/Kolkata
+      REEL: ${{ github.event.client_payload.reel }}
+      REQUEST_ID: ${{ github.event.client_payload.request_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check the payload
+        run: |
+          [[ "$REEL" =~ ^[a-z0-9][a-z0-9-]{2,80}$ ]] || { echo "bad reel name"; exit 1; }
+          [[ -z "$REQUEST_ID" || "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad request_id"; exit 1; }
+
+      - uses: ./.github/actions/prepare
+
+      - name: Pull this reel from Drive
+        id: pull
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+          # only what queue_reel.sh reads: the reel, its preview, the queue folders (post numbering), covers, markers, captions
+          SYNC_PATHS: reels/${{ github.event.client_payload.reel }} deliverables/preview deliverables/queue deliverables/covers-royal logs brain/content/captions
+        run: bash tools/cloud/sync.sh pull
+
+      - name: Swap the preview into the post's slot
+        id: swap
+        env:
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+        run: bash tools/cloud/approve.sh "$REEL"
+
+      - name: Push to Drive
+        if: always() && steps.pull.outcome == 'success'
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+          SYNC_PATHS: reels/${{ github.event.client_payload.reel }} deliverables/preview deliverables/queue deliverables/covers-royal logs brain/content/captions
+        run: bash tools/cloud/sync.sh push
+
+      - name: Report to HQ
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          SWAP: ${{ steps.swap.outcome }}
+        run: |
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ "$SWAP" = success ]; then
+            python3 tools/cloud/report.py event "done" "Approved: the new video of $REEL is in its post slot" --reel "$REEL" ${REQUEST_ID:+--request-id "$REQUEST_ID"}
+          else
+            python3 tools/cloud/report.py event error "Approve of $REEL did not go through (maybe it already posted): $RUN_URL" --reel "$REEL" ${REQUEST_ID:+--request-id "$REQUEST_ID"}
+          fi

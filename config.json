@@ -1,0 +1,25 @@
+{
+ "reels": {
+  "voice": "c661d74eb3c64453883eee869f630f47",
+  "voiceName": "Fish Audio voice c661d74eb3c64453883eee869f630f47 (owner pick 2026-10-15), s2.1-pro-free, no pitch shift, small room in the mix (rt 0.35 s, 7 % wet); pace: Fish prosody speed 1.12 x reel speed (1.07 typical) ≈ 1.2 → ~179 wpm, no Rubber Band",
+  "ttsModel": "s2.1-pro-free",
+  "speed": 1.12,
+  "voiceFish": "c661d74eb3c64453883eee869f630f47",
+  "voiceChain": 2,
+  "look": "bw",
+  "captionFont": "Rosarivo",
+  "semis": 0,
+  "voiceRoom": {
+   "rt": 0.35,
+   "wet": 0.07
+  },
+  "tagline": "Decode her… before she decodes you.",
+  "outroSound": "library/sfx-brand/signature/outro-piano.wav"
+ },
+ "factory": {
+  "batches": [
+   "reels/w2-batch.json",
+   "reels/w3-batch.json"
+  ]
+ }
+}

@@ -1,0 +1,107 @@
+# The factory, in the cloud (brain/cloud-architecture.md): pull Drive → run every reel as far as it goes → push Drive → report to HQ.
+# Nightly at 19:30 UTC (01:00 IST, after Claude's usage limit resets), on /make from Telegram (HQ dispatches "factory"), or by hand.
+name: factory
+
+on:
+  schedule:
+    - cron: "30 19 * * *"
+  repository_dispatch:
+    types: [factory]
+  workflow_dispatch:
+    inputs:
+      max_minutes:
+        description: "Stop starting new jobs after this many minutes (running jobs always finish)"
+        default: "300"
+
+concurrency:
+  group: factory
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  factory:
+    runs-on: ubuntu-24.04
+    # 300 min of work + a render/queue job that started just before the limit (≤ 25 min) + setup and sync; GitHub's cap is 360
+    timeout-minutes: 355
+    env:
+      TZ: Asia/Kolkata
+      MAX_MINUTES: ${{ github.event.inputs.max_minutes || github.event.client_payload.max_minutes || '300' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/prepare
+
+      - name: Pull from Drive
+        id: pull
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh pull
+
+      - name: Tell HQ the run started
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+        run: python3 tools/cloud/report.py event activity "Factory run started on GitHub"
+
+      - name: Pinterest login (optional secret PINTEREST_COOKIES, a cookies.txt)
+        env:
+          PINTEREST_COOKIES: ${{ secrets.PINTEREST_COOKIES }}
+        run: |
+          if [ -n "$PINTEREST_COOKIES" ]; then
+            ( umask 077; printf '%s\n' "$PINTEREST_COOKIES" > "$RUNNER_TEMP/pinterest-cookies.txt" )
+            echo "PINTEREST_COOKIES_FILE=$RUNNER_TEMP/pinterest-cookies.txt" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No PINTEREST_COOKIES secret: reels that need a clip search will fail at that step"
+          fi
+
+      - name: Run the factory
+        id: run
+        env:
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          [[ "$MAX_MINUTES" =~ ^[0-9]{1,3}$ ]] || MAX_MINUTES=300
+          python3 tools/factory.py --once --max-minutes "$MAX_MINUTES"
+
+      - name: Push to Drive
+        if: always() && steps.pull.outcome == 'success'
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh push
+
+      - name: Report to HQ
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          RUN_OUTCOME: ${{ steps.run.outcome }}
+        run: |
+          python3 tools/cloud/report.py || true
+          last=$(grep -h "Factory run ends" logs/activity.log 2>/dev/null | tail -1 | cut -c11- || true)
+          if [ "$RUN_OUTCOME" = success ]; then
+            python3 tools/cloud/report.py event "done" "${last:-Factory run finished}"
+          else
+            python3 tools/cloud/report.py event error "Factory run did not finish cleanly ($RUN_OUTCOME): $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+
+      - name: Keep the reel logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: factory-logs-${{ github.run_id }}
+          path: |
+            logs/activity.log
+            logs/factory.json
+            logs/reels/
+          retention-days: 7
+          if-no-files-found: ignore

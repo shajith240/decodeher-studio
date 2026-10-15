@@ -1,0 +1,44 @@
+.secrets/
+
+# secrets: never committed (GitHub Actions gets them as repository secrets; see docs/cloud-setup.md)
+.env
+.env.*
+.relay.json
+.dev.vars
+**/.dev.vars
+rclone.conf
+*.pem
+*cookies*.txt
+
+# big files live on Google Drive (gdrive:decodeher/, tools/cloud/sync.sh), not in git
+reels/
+library/
+deliverables/
+logs/
+.sync/
+
+# caches and local tool state
+node_modules/
+__pycache__/
+*.pyc
+.cache/
+.wrangler/
+**/.wrangler/
+.obsidian/
+.claude/settings.local.json
+
+# media and temp files anywhere (tiny test fixtures are the exception)
+*.mp4
+*.mov
+*.webm
+*.wav
+*.m4a
+*.mp3
+*.flac
+*.part
+!**/fixtures/**/*.mp4
+!**/fixtures/**/*.wav
+
+# old copies kept next to the live files on the laptop (*.pre-audit.js, config.pre-fish-1015.json, …)
+*.pre-*
+*-pre-audit-*

@@ -1,0 +1,8 @@
+{
+  "name": "dark-psychology-reels",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Faceless dating-psychology Reels: script, voice, HyperFrames motion edit, auto-post",
+  "engines": { "node": ">=22" },
+  "dependencies": { "puppeteer": "^24.39.1" }
+}

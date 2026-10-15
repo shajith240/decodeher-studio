@@ -1,0 +1,15 @@
+name = "decodeher-relay"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+[[durable_objects.bindings]]
+name = "STORE"
+class_name = "Store"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Store"]
+
+
+[vars]
+PUBLIC_URL = "https://decodeher-relay.shajith240.workers.dev"

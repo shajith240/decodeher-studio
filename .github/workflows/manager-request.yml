@@ -1,0 +1,117 @@
+# An owner change request from Telegram (HQ dispatches "manager-request" with {request_id, text}):
+# a restricted Claude agent edits one reel → a preview is rendered (never queued) → sent to the owner on Telegram →
+# HQ gets a "preview" event and asks Approve / Reject. Approve dispatches approve.yml.
+name: manager-request
+
+on:
+  repository_dispatch:
+    types: [manager-request]
+
+# one run per request (a shared group would CANCEL a waiting request when a third one arrives)
+concurrency:
+  group: manager-request-${{ github.event.client_payload.request_id || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  request:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      TZ: Asia/Kolkata
+      # payload values only ever travel as env (never pasted into a shell line)
+      REQUEST_ID: ${{ github.event.client_payload.request_id }}
+      REQUEST_TEXT: ${{ github.event.client_payload.text }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check the request
+        run: |
+          [[ "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad request_id"; exit 1; }
+          [ -n "$REQUEST_TEXT" ] || { echo "empty request"; exit 1; }
+
+      - uses: ./.github/actions/prepare
+
+      - name: Pull from Drive
+        id: pull
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh pull
+
+      - name: Claude makes the change (restricted tools)
+        id: agent
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: bash tools/cloud/manager_request.sh
+
+      - name: Render the preview
+        id: preview
+        if: steps.agent.outputs.reel != ''
+        env:
+          REEL: ${{ steps.agent.outputs.reel }}
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+        run: python3 tools/cloud/preview.py "$REEL"
+
+      - name: Send the preview to the owner
+        id: telegram
+        if: steps.preview.outcome == 'success'
+        env:
+          REEL: ${{ steps.agent.outputs.reel }}
+          SUMMARY: ${{ steps.agent.outputs.summary }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OWNER_CHAT_ID: ${{ secrets.OWNER_CHAT_ID }}
+        run: |
+          bash tools/cloud/tg_send.sh "deliverables/preview/$REEL-tg.mp4" "$(printf 'Preview · %s\n%s\n\nRequest %s — Approve or Reject below.' "$REEL" "$SUMMARY" "$REQUEST_ID")"
+
+      - name: Tell the owner nothing was changed
+        if: steps.agent.outcome == 'success' && steps.agent.outputs.reel == ''
+        env:
+          SUMMARY: ${{ steps.agent.outputs.summary }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OWNER_CHAT_ID: ${{ secrets.OWNER_CHAT_ID }}
+        run: |
+          bash tools/cloud/tg_send.sh - "$(printf 'Request %s: nothing changed.\n%s' "$REQUEST_ID" "$SUMMARY")"
+
+      - name: Push to Drive
+        if: always() && steps.pull.outcome == 'success'
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh push
+
+      - name: Report to HQ
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          REEL: ${{ steps.agent.outputs.reel }}
+          SUMMARY: ${{ steps.agent.outputs.summary }}
+          AGENT: ${{ steps.agent.outcome }}
+          TG: ${{ steps.telegram.outcome }}
+        run: |
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ "$TG" = success ]; then
+            python3 tools/cloud/report.py event preview "${SUMMARY:-Preview ready}" --reel "$REEL" --request-id "$REQUEST_ID" --preview-url "$RUN_URL"
+          elif [ "$AGENT" = success ] && [ -z "$REEL" ]; then
+            python3 tools/cloud/report.py event "done" "Request $REQUEST_ID: nothing changed. ${SUMMARY}" --request-id "$REQUEST_ID"
+          else
+            python3 tools/cloud/report.py event error "Request $REQUEST_ID failed (no preview sent): $RUN_URL" --request-id "$REQUEST_ID" ${REEL:+--reel "$REEL"}
+          fi
+          python3 tools/cloud/report.py || true
+
+      - name: Keep the logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: request-${{ github.run_id }}
+          path: |
+            logs/manager/
+            logs/reels/
+          retention-days: 7
+          if-no-files-found: ignore

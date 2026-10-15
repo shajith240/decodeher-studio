@@ -1,0 +1,14 @@
+[Unit]
+Description=DecodeHer factory — script to scheduled post, automatically (tools/factory.py)
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/Projects/dark-psycology
+ExecStart=/usr/bin/python3 %h/Projects/dark-psycology/tools/factory.py
+Restart=always
+RestartSec=20
+Environment=PATH=/home/shajith/.local/share/mise/installs/claude/latest:/home/shajith/.local/share/mise/installs/codex/latest/bin:/home/shajith/.local/share/mise/installs/gh/latest/gh_2.101.0_linux_amd64/bin:/home/shajith/.local/share/mise/installs/node/26.8.2/bin:/home/shajith/.local/share/mise/shims:/usr/share/omarchy/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/home/shajith/.local/bin:/opt/cuda/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+Environment=HF_HUB_OFFLINE=1
+
+[Install]
+WantedBy=default.target
