@@ -112,22 +112,22 @@ def run():
     reg = load_reg(); index(reg)
     for it in box["items"]:
         kind = it.get("kind") or "dark"; added, dups, bad, photo = [], [], [], None; total_n = len(it["urls"]); done_lines = []
-        def progress(i, step):   # 10-16: live progress — HQ edits the bot's first reply
-            pct = int(100 * i / max(1, total_n)); bar = "▓" * (pct // 10) + "░" * (10 - pct // 10)
+        def progress(i, step, frac=0.0):   # 10-16: live progress — HQ edits the bot's first reply; moves per STEP, not per link
+            pct = min(100, int(100 * (i + frac) / max(1, total_n))); bar = "▓" * (pct // 10) + "░" * (10 - pct // 10)
             hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": "\n".join(
                 [f"⏳ <b>Working on your {total_n} link{'s' if total_n > 1 else ''}</b> ({NAME[kind]}s)", f"{bar} {pct}%", ""] + done_lines + ([f"{i + 1}/{total_n} {step}"] if i < total_n else []))})
         for ui, url in enumerate(it["urls"]):
-            progress(ui, "⬇️ downloading…")
+            progress(ui, "⬇️ downloading…", 0.1)
             with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "library")) as tmp:
                 try: vid, img, meta = fetch(url, tmp)
                 except Exception: vid, img, meta = None, False, {}
                 if not vid: bad.append(f"{url} ({'a photo, not a video' if img else 'could not download'})"); done_lines.append(f"{ui + 1}/{total_n} ⚠️ skipped"); continue
-                progress(ui, "🔍 checking we don't already have it…")
+                progress(ui, "🔍 checking we don't already have it…", 0.4)
                 pin = str(meta.get("id") or pin_of(vid) or ""); fp = prints(vid); d = dup_of(reg, pin, fp)
                 if d: dups.append(f"{url} (already have it: {os.path.basename(d['file'])}, since {d.get('at', '?')})"); done_lines.append(f"{ui + 1}/{total_n} ♻️ already in the library"); continue
                 w, h = size(vid)
                 if fp["dur"] < 2 or min(w, h) < 240: bad.append(f"{url} (too short or too small: {fp['dur']} s, {w}x{h})"); continue
-                progress(ui, "🏷 the AI is looking at it and naming it…")
+                progress(ui, "🏷 the AI is looking at it and naming it…", 0.7)
                 os.makedirs(DEST[kind], exist_ok=True); ds = describe(vid, kind); pre = "ai" if kind == "hook" else "dark"
                 name = f"{pre}-{ds['slug']}-{(pin or fp['sha'])[-6:]}" if ds else f"{pre}-{pin or fp['sha'][:12]}"
                 out = f"{DEST[kind]}/{name}.mp4"; shutil.copy(vid, out)
