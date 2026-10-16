@@ -6,7 +6,8 @@ caption hook=…, caption body=…, caption prompt=…, caption tags=… -->) be
   reel.json — format v3 (tools/fill_page.py + clipcut.py: chat-bubble opener, big title, bright first 3 s, re-hook punch),
     bubble, titleCard, rehookAt (the "But…" line at ~8-10 s), drops (the WHY line), short gaps, tail 0.6, cover kicker/headline
   brain/content/captions/<slug>.txt — the keyword-first caption (≤ 5 hashtags), used by tools/queue_reel.sh when it books
-The v2 tool (tools/new_reels.py) is left as it was. Refuses a script that would run over 30 s (hard cap of the v3 format)."""
+The v2 tool (tools/new_reels.py) is left as it was. 10-16 owner: NO 30 s cap — a reel is as long as the value needs; never rush the
+narrator. Refuses only a script over 90 s; lines get real breathing pauses (0.3 s, 0.6 s after the hook and the re-hook)."""
 import json, os, re, shutil, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")); REF = os.path.join(ROOT, "reels/p1c-hookb")
@@ -14,7 +15,7 @@ args = [a for a in sys.argv[1:] if not a.startswith("--")]; DRY = "--dry" in sys
 src, prefix = args[0], args[1]
 text = open(os.path.join(ROOT, src)).read()
 RC = json.load(open(os.path.join(ROOT, "config.json"))).get("reels", {})
-TAGLINE = RC.get("tagline", "Decode her… before she decodes you.")
+TAGLINE = RC.get("tagline", "")
 WPS = 175 / 60   # our narrator's pace (Fish prosody ≈1.2 → ~175 wpm)
 
 metas = {}
@@ -27,26 +28,33 @@ made = []
 for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z)", text, re.S | re.M):
     num, series, title, body = m.group(1), m.group(2).strip(), m.group(3), m.group(4)
     lines = [l.strip() for l in body.strip().splitlines() if l.strip() and not l.startswith(("---", "<!--", "|"))]
-    if lines and lines[-1] in ("Follow for more.", "Follow for more", "फॉलो करो।"): lines = lines[:-1]
-    lines.append(TAGLINE)
+    TAG = re.compile(r"\[[^\]]*\]\s*")   # inline delivery directions ([pause], [lower voice]…) — voice directions, never words
+    clean = lambda l: TAG.sub("", l).strip()
+    while lines and clean(lines[-1]).rstrip(".…। ").lower() in ("follow for more", "फॉलो करो", "decode her", clean(TAGLINE).rstrip(".… ").lower()):
+        lines = lines[:-1]   # the brand line is added once, below (a script ending in it was spoken twice)
+    if TAGLINE: lines.append(TAGLINE)   # 10-15: no fixed slogan — each script ends on its own natural closing line
     meta = metas.get(num, {})
-    words = sum(len(l.split()) for l in lines)
-    est = words / WPS + 0.15 * (len(lines) - 1) + 0.6
-    if est > 30: sys.exit(f"{num}: ~{est:.1f} s > 30 s cap — shorten the script")
+    words = sum(len(clean(l).split()) for l in lines)
+    est = words / WPS + 0.35 * (len(lines) - 1) + 0.6
+    if est > 90: sys.exit(f"{num}: ~{est:.1f} s > 90 s — split it into two reels")
     n = len(lines)
-    rehook = next((i for i, l in enumerate(lines) if i >= 2 and re.match(r"^(but|and|so here|wait|पर|लेकिन|मगर|और)(?![\u0900-\u097F\w])", l, re.I)), 3)
+    rehook = next((i for i, l in enumerate(lines) if i >= 2 and re.match(r"^(but|and|so here|here'?s why|wait|पर|लेकिन|मगर|और)(?![\u0900-\u097F\w])", clean(l), re.I)), 3)
     why = next((i for i, l in enumerate(lines) if i > rehook and re.search(r"\bbecause\b|क्योंकि", l, re.I)), min(rehook + 1, n - 3))
-    prompt = next((i for i, l in enumerate(lines) if re.match(r"^(comment|send|save|screenshot|drop|कमेंट|भेज|सेव|स्क्रीनशॉट)(?![\u0900-\u097F\w])", l, re.I)), n - 2)
+    prompt = next((i for i, l in enumerate(lines) if re.search(r"(^|[.?!]\s)(comment|send this|save this|screenshot|drop|कमेंट|भेज|सेव|स्क्रीनशॉट)(?![\u0900-\u097F\w])", clean(l), re.I)), n - 2)
     script = [{"text": l, "ex": 0.62, "cfg": 0.42} if i == 0 else l for i, l in enumerate(lines)]
-    gaps = [0.12] * n
-    gaps[rehook - 1] = 0.3; gaps[prompt - 1] = max(gaps[prompt - 1], 0.25); gaps[n - 2] = 0.45; gaps[n - 1] = 0
+    gaps = [0.3] * n   # 10-16 owner: the narrator explains — let each line land, no rushing
+    gaps[0] = 0.6; gaps[rehook - 1] = 0.6; gaps[prompt - 1] = max(gaps[prompt - 1], 0.25); gaps[n - 2] = 0.45; gaps[n - 1] = 0
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:24]
     R = os.path.join(ROOT, "reels", f"{prefix}-{num}-{slug}")
     cfg = {"format": "v3", "series": meta.get("series", series), "title": title, "topic": series,
            "titleCard": meta.get("titleCard", title), "bubble": meta.get("bubble", ""), "rehookAt": rehook,
-           "gaps": gaps, "tail": 0.6, "lead": 0.08, "music": "auto", "drops": [why], "ctaLine": n - 1, "speed": 1.07,
+           "gaps": gaps, "tail": 0.6, "lead": 0.08, "music": "auto", "drops": [why], "ctaLine": n - 1, "speed": 1.0,
            "accent": [], "voice_chain": 2,
            "coverKicker": meta.get("series", series), "coverHeadline": meta.get("titleCard", title)}
+    if RC.get("frame") == "lens":   # 10-16 owner-approved format (sample w6-01): colour + soft lens edges + paper texture, no re-hook flash,
+        # the hook-end riser/impact on line 1 and on the "Here's how…" turn; snaps are chosen later by tools/peak_points.py
+        how = next((i for i, l in enumerate(lines) if re.match(r"^(here'?s how|so here'?s what|here'?s what)", clean(l), re.I)), min(5, n - 3))
+        cfg.update({"frame": "lens", "colour": True, "rehookAt": None, "drops": sorted({1, how})})
     if meta.get("lang", "en").lower() == "hi": cfg["lang"] = "hi"   # Hinglish reel: Devanagari script + English loanwords; tagline stays English
     tags = " ".join(re.findall(r"#\w+", meta.get("caption tags", "#datingadviceformen #datingtips"))[:5])
     caption = "\n".join(x for x in [meta.get("caption hook", ""), meta.get("caption body", ""), "", meta.get("caption prompt", ""),

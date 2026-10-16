@@ -20,9 +20,11 @@ for c in [c for c in plan if "at" in c]:
         print(f"  skipped cue: {c['at']!r} (n={n}) is not spoken in this reel", file=sys.stderr); continue
     k = hits[n]; t = W[k + len(want) - 1][2] if c.get("end") else W[k][1]
     cues.append({"type": c["type"], "t": round(t + c.get("offset", 0), 3), "gain": c.get("gain", 0), "at": c["at"]})
-for c in [c for c in plan if "every_cut" in c]:   # {"every_cut": "whoosh", "gain": -4}: a sound on every picture change (Zoltium's zooms)
+CUT = (json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.json"))).get("reels", {}).get("cutSound"))   # 10-15 owner: Zoltium's SNAP on every cut, not a whoosh
+SFXSET = (json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.json"))).get("reels", {}).get("sfxSet"))
+for c in [c for c in plan if "every_cut" in c and not SFXSET]:   # 10-16 owner: no snap on every cut — snaps only at the peak lines (reel.json "snaps")   # {"every_cut": "whoosh", "gain": -4}: a sound on every picture change (Zoltium's zooms)
     for sh in json.load(open(f"{R}/shots.json"))[1:]:
-        if not any(abs(x["t"] - sh["t"]) < 0.3 for x in cues): cues.append({"type": c["every_cut"], "t": round(sh["t"] - 0.02, 3), "gain": c.get("gain", 0), "at": "cut"})
+        if not any(abs(x["t"] - sh["t"]) < 0.3 for x in cues): cues.append({"type": CUT or c["every_cut"], "t": round(sh["t"] - 0.02, 3), "gain": c.get("gain", 0), "at": "cut"})
 cues.sort(key=lambda c: c["t"])
 json.dump(cues, open(f"{R}/assets/audio/cues.json", "w"), indent=1)
 print(f"{len(cues)} cues: " + ", ".join(f"{c['type']}@{c['t']}({c['at']})" for c in cues))

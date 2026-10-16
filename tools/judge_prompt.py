@@ -2,7 +2,7 @@
 Usage: python3 tools/judge_prompt.py reels/<reel>   → prints the prompt (narration + every shot with its sheet letters)"""
 import json, os, sys
 R = os.path.abspath(sys.argv[1]); S = json.load(open(f"{R}/shots.json")); idx = json.load(open(f"{R}/clips/sheets/index.json"))
-text = " ".join(l["text"] if isinstance(l, dict) else l for l in json.load(open(f"{R}/assets/vo/script.json")))
+text = " ".join(__import__("re").sub(r"\s+", " ", __import__("re").sub(r"\[[^\]]*\]", " ", l["text"] if isinstance(l, dict) else l)).strip() for l in json.load(open(f"{R}/assets/vo/script.json")))
 rows = "\n".join(f"{k} | {S[int(k)]['say']} | {S[int(k)]['q']} | letters {''.join(idx[k]['clips'])}" for k in sorted(idx) if idx[k]["clips"])
 print(f"""You are a strict, premium-minded video editor picking B-roll for an Instagram Reel (dating psychology for men) narrated over 2D animated clips. Judge every contact sheet below and write JSON verdicts. Do NOT modify anything else.
 

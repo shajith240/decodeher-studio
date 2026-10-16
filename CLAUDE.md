@@ -1,18 +1,19 @@
 # DecodeHer: project handoff (read first)
 
-Last updated 2026-10-15 03:20 IST, at the end of a very long session. The owner opened a new chat on purpose, so this file is the
-starting point. Use `brain/` (rules, pipeline, research) and the memory notes for depth.
+Last updated 2026-10-16 06:45 IST. This file is the starting point for every new session. Use `brain/` (rules, pipeline, research) and the memory notes for depth.
+
+**10-16 RESUME POINT: read `brain/NEXT-SESSION.md` first** (live hand-off plan; auto-resume after a Claude limit = `tools/resume_after_limit.sh at "YYYY-MM-DD HH:MM"`, a one-shot systemd timer that runs a headless Sonnet session on that plan).
 
 ## The project in one paragraph
 @thedecodeher is a faceless Instagram Reels page about dating psychology for men: decoding women's behaviour and texting.
-Reels are ~32–40 s. An AI narrator voice runs over 2D illustrated clips taken from Pinterest, one new image per 2–4-word caption group,
-in the Zoltium style. Everything runs unattended on this laptop as three systemd **user** services:
+Reels are ~45–60 s (no length cap; value first). An AI narrator (Fish 86ac) runs over colour clips from Pinterest ("dark psychology"
+searches), one new image per 2–4-word caption group, opening on a realistic AI-woman hook clip (format: see Current state). Everything runs unattended on this laptop as three systemd **user** services:
 - `decodeher-factory` (`tools/factory.py`) moves each reel through voice → plan → clips → mix → sheets → judge → (research) → render → queue.
 - `decodeher-manager` (`tools/manager.py`) checks the line every 2 min. It fixes routine faults and runs a `claude -p` agent for real
   incidents (`tools/manager_prompt.txt`).
-- `decodeher-board` (`tools/dashboard.js`) is the live studio board at http://localhost:4317 (`/v2` is the isometric version, `/table` a plain table).
+- `decodeher-board` (`tools/dashboard.js`) is the live studio board at http://localhost:4317 (cloud copy at https://decodeher-hq.shajith240.workers.dev; Telegram bot = the manager you talk to).
 
-Posting goes through our own Cloudflare relay (`relay/worker.js`) at 2 posts a day, 08:30 and 21:00 IST. `node tools/ig_queue.js ids|status|captions`
+Posting goes through our own Cloudflare relay (`relay/worker.js`) at 3 posts a day, 08:30, 18:30 and 22:00 IST (changed 10-16 to reach US mornings/lunch; brain/research/audience-location.md). `node tools/ig_queue.js ids|status|captions`
 shows the queue. Never read or print `.env` or `.relay.json`.
 
 ## How to work with this owner
@@ -21,80 +22,50 @@ shows the queue. Never read or print `.env` or `.relay.json`.
 - **Show before you ship.** Never attach anything visual to a live post (covers, outros, new styles) before the owner has seen it.
   A generated cover went onto a post unseen on 10-15 and they were furious.
 - **Codex image generation is rationed.** Use it only when the owner explicitly asks. Generated covers were rejected outright.
-- They watch the competitor **Zoltium** closely and want to match that level. When in doubt, copy Zoltium's craft and keep our
-  signature only in the outro.
+- They watch the competitor **Zoltium** and the Rebelvids "viral dark psychology reels" course closely (transcript:
+  brain/research/rebelvids-dark-psych-course-transcript.txt). Match that craft; our signature lives only in the outro.
+- Every message you send: short, plain words, clickable links to files, no jargon. They hate repeated bugs — verify the WHOLE
+  result (frame grid of the full reel, levels, ending) before showing anything.
 - Plan first and confirm the plan, then execute. Batch the work, use cheap subagents for research, and verify results
   (frames, transcripts, ffprobe) before saying anything is done.
 
-## Current state (10-15, 03:20)
-- **Queue:** 10 reels booked, 10-15 08:30 → 10-19 21:00, no duplicates (`ig_queue.js ids`). 2 already posted. Views are stuck at ~120–130 per reel.
-- **Remake in progress** (`tools/remake_reel.py`). All week-2 reels are being re-voiced with voice v2, end on the spoken line
-  **"Decode her."** instead of "Follow for more.", lose the "FOLLOW FOR MORE" text, and gain a 0–2 s **title card**
-  (reel.json `titleCard`, drawn by `tools/fill_page.py`). The factory does this on its own: `tools/queue_reel.sh` sees
-  reel.json `"requeue": true` and swaps the new video into the reel's **existing** slot. Done: w2-01, w2-03, w2-04, w2-05.
-  Still running: w2-07, 08, 09, 10, 16, 17. Not booked yet: w2-11, 13, 15, which get booked normally when finished.
-  Check progress with `grep "Re-made video swapped" logs/activity.log`.
-- **Captions on all booked posts were rewritten 10-15** in a keyword-first format with ≤ 5 hashtags (`ig_queue.js recaption`).
-  Old ones are in `deliverables/queue/old-captions-1014/`.
-- **Covers:** booked posts currently use the frame at 600 ms (the title card) as the cover. Two sample covers in the new style
-  are in `deliverables/covers/` and are **not attached**. The owner said the font is good but too cramped to read (see Plan, step 3).
-- Disk is tight (~6 GB free on 98 GB). The factory pauses new jobs below 4 GB and the manager cleans up below 6 GB.
-
-## Decisions already made (don't reopen them)
-- **No spoken "follow for more"** (10-15, it sounds like begging). Reels end on "Decode her." over the existing logo-bust outro.
-  The owner LIKES the current ending and doesn't want a new Flow outro for now. Zoltium sometimes closes with
-  "Join Zoltium and become a powerful man" and sometimes has no outro at all. A similar line for us is an option to propose, not a decision.
-- **No AI-generated covers.** A cover is a frame of OUR OWN clip, given a single-colour tint, paper grain and a vignette, plus one centred italic
-  serif line in sentence case ("Is she testing you?"), like Zoltium's grid (`tools/make_cover.sh`).
-- **Views rules** (approved 10-15, top of `brain/rules/script-and-hooks.md`): line 1 names her behaviour plus a verdict in ≤ 10 words;
-  topics come from the search bank; title card 0–2 s; one send or comment prompt; keyword-first caption; at most 5 hashtags.
-  Full diagnosis: `brain/growth/views-diagnosis-2026-10-15.md`.
-- **Studio board:** the owner picked the **32-bit pixel style** (`deliverables/studio-concepts/board-redesign/1-pixel32.png`). They want
-  the characters to MOVE like real people (typing, working, walking), as in v1, which is the live `studio.html`. `/v2` (isometric static plate)
-  was rejected for having no motion. Portraits must be visibly different people, each generated in its own call.
-
-## THE PLAN (owner asked for these, 10-15; confirm order with them, then do it)
-1. **Captions → Zoltium's exact style.** The owner finds our purple accent words, glow and shadows cheap and wants them gone.
-   - Zoltium (`brain/research/zoltium-story-visuals.md` l.122): a **small white serif (Times-like), ~40 px cap height on 1080 wide,
-     dead centre (y ≈ 50 %), sentence case, punctuation kept, 2–4 words per card, hard swaps, no colour, no glow**.
-   - Identify the font as exactly as possible. Pull frames from a Zoltium reel (watch skill or yt-dlp) and compare against
-     Times New Roman / Tinos / Liberation Serif / Libre Caslon / EB Garamond at the same size, then show the owner a side-by-side.
-   - Change the caption block in the reel template (`reels/p1c-hookb/index.html`, copied by `tools/new_reels.py`; each reel's
-     own `index.html`; `.cap`/`.a`/`#haze` CSS and the GSAP entrance), and make `fill_page.py` apply it to existing reels.
-   - Our signature (purple, the bust) stays ONLY in the outro.
-   - Render ONE reel and show the owner before re-rendering the rest.
-2. **New narrator voice: seductive, dark, horror and dark-psychology storytelling.** The owner says the current one doesn't fit.
-   - Today's voice: local Chatterbox, cloned from `library/voice/narrator-ref.wav`, -1.5 st, chain v2 (see the narrator-voice memory, `tools/reel_vo.py`,
-     `tools/vo_chatterbox.py`, `config.json` reels.voice/voiceChain).
-   - Research first: `brain/research/voices.md`, `open-source-tts-2026.md`, `narrator-voice-analysis.md`, `zoltium-sound.md`.
-   - Build 3–4 short previews of the SAME script line (new reference clips for Chatterbox, Fish Audio voices; Fish's commercial
-     terms are unclear, see the voice-licensing memory). Make them MP3, because the owner can't play m4a.
-   - The owner picks one, then it gets wired in through config.json and every queued reel is re-voiced. Do this together with step 1, so the reels render only once.
-3. **Covers, readable and premium.** The owner likes the look and the font (Playfair Display Bold Italic in `tools/make_cover.sh`)
-   but says there's "no spacing, not readable".
-   - Add line height (≈1.15–1.2), letter spacing, a larger size, a stronger dark band behind the text, and a max of ~16 characters per line.
-   - Consider a more readable premium face, and A/B two fonts on one cover for the owner.
-   - Pick the strongest single-subject frame per reel from `reels/<r>/clips/seg/NN.mp4`: make a contact grid and choose by eye.
-   - Rotate tints (navy #2a3f7a, maroon #6b1f33, purple, B&W).
-   - Show all covers as one grid, then attach with `node tools/ig_queue.js cover <id> deliverables/covers/<slug>.jpg` (or `frame=600` to revert).
-4. **"Save the workflow as a bundle."** Package the current reusable workflow as a skill or one documented script:
-   remake a reel → title card → cover → caption → swap into its slot. Use `tools/remake_reel.py`, `make_cover.sh`, `queue_reel.sh`, and
-   `ig_queue.js recaption|cover|replace`. Write it up in `brain/pipeline.md`.
-5. **Studio board v3 (pixel art with motion)**, only after the owner OKs a few Codex images for character sprite sheets (they
-   rationed Codex). Keep v1's behaviour and engine (`tools/board/studio.html`), swap in 32-bit art, and keep the
-   SSE live push (`/events` in dashboard.js, ~80 ms). Generated art from earlier is in `tools/board/art/` (plate.webp, manager.png,
-   box.png, faces/*.png).
-6. Then the next batch of scripts, following the VIEWS RULES and the new voice and captions. The owner approves scripts before voicing.
-
-## Tools added on 10-15 (all documented in their headers)
-- `tools/remake_reel.py <reel> "TITLE CARD"`: re-voice plus brand ending for an already-made reel. It keeps the clips (clip_round 2).
-- `tools/make_cover.sh <reel> <shot> <pos> "<line>" <tint>`: a cover made from our own clip frame. No AI.
-- `tools/ig_queue.js`: new commands `recaption <dir>`, `captions`, `cover <id> <jpg>|frame=<ms>`. Captions are now matched by reel
-  name, not by number; two reels numbered 08 exist.
-- `tools/queue_reel.sh`: the requeue path (swaps into the same slot), the new caption builder (≤ 5 tags), and the THUMB_MS cover.
-- `tools/manager.py`: bundled incidents, backs off on Claude's usage limit and on API errors, checks that every queued video decodes,
-  `python3 tools/manager.py dry` to look only.
-- `tools/fill_page.py`: title card injection (idempotent) and strips FOLLOW FOR MORE.
+## Current state (10-16, 06:45) — supersedes everything written on 10-15
+- **Owner gave Claude full control** to run and grow the channel — DECIDE, don't ask for advice or permission on growth/content
+  choices (10-16: "this is your responsibility"); just report what changed and why. Still ask only for things that need the
+  owner's hands (logins, Instagram app actions like archiving). Target: **1,000 followers by 2026-10-26**. 3 posts/day
+  (08:30, 14:00, 21:00 IST) via the Cloudflare relay (posts with the PC off). Baseline: ~6 followers, ~120 views/reel.
+- **Queue:** the old w2/w3/w4 reels were removed (owner) and their folders deleted. Booked: w6-01 "Hot and cold" (10-16 08:30).
+  Batch **w7** (6 reels, scripts approved, `brain/content/drafts/week7-rebel-scripts.md`) is in the factory and books itself
+  into the next free slots. Factory batches: reels/w6-batch.json, reels/w7-batch.json.
+- **Approved reel format** (owner, 10-16, after many corrections; memory rebel-format.md):
+  - Script shape from the Rebelvids course: hook (her specific behaviour + tension, `brain/research/hooks-2026.md`) → "Listen"
+    → named psychology → numbered moves → why → a natural closing line (a reason to follow/send/save; never begging).
+    English only. No length cap; never rush the voice (memory value-over-length). Ethics: decode/defend/honest attraction,
+    never coach making her insecure or dependent.
+  - Voice: Fish **86ac939163784775a38c14912a8de9d9** (config reels.voice), whole take, 80 ms lead silence.
+  - Look: **colour** clips full-screen with the cinematic grade, black paper as a soft-light **texture**, corners fading out
+    (feathered vignette, `library/rebel-pack/edge-mask-soft.png`), small white serif captions, title card with NO box.
+    reel.json `frame: "lens"`, `colour: true` (new_reels_v3.py sets these when config reels.frame = "lens").
+  - Opening shot: a realistic **AI woman** clip (reel.json `hookClip`; pool `library/hook-pool/ai/`, only pins labelled AI,
+    adult, no nudity, no real/famous faces). Clips from Pinterest with the suffix "dark psychology"; clips with baked-in text
+    are banned (clippick.py).
+  - Sound: ONLY the owner's pack `library/rebel-pack` (config reels.sfxSet). Snaps RARE, only at narration peaks, laughs only
+    after a dark/mocking line (`tools/peak_points.py` → reel.json snaps/laughs). Music: only smooth horror/piano, measured gate
+    in `brain/rules/music-rule.md` (10 approved tracks); bed always ≥ 12 dB under the voice.
+  - Outro (bronze bust) rises during the closing words and ends with the reel; the clip film runs until then.
+- **Board:** pixel studio (boxes = reels, no film-reel icons, no plants/pictures, rugs only), one-sentence summary bar,
+  "In production" progress bars by real pipeline step. Cloud copy: https://decodeher-hq.shajith240.workers.dev
+- **Claude limit:** posting/comment replies never use Claude; the factory pauses a reel 30 min on a limit. Before the owner's
+  limit runs out, write `brain/NEXT-SESSION.md` and schedule `tools/resume_after_limit.sh at "<reset + 5 min>"`.
+- **PC off:** posting continues; production needs the laptop until the GitHub factory is enabled (blocked on the owner
+  setting `gh secret set PINTEREST_COOKIES`).
+- **Growth brain** (`brain/growth/README.md`): daily 05:30 timer measures our stats (tools/growth_analyze.py), reads vetted
+  expert sources (tools/growth_fetch.py, brain/growth/expert-sources.md), then one Sonnet session updates tactics/playbook/
+  experiments and writes `brain/growth/next-batch-plan.md` — the script writer follows it. Running experiment: closing line
+  SEND vs SAVE (w8 batch, read ~10-23).
+- **Batches:** w7 (6, producing/booking), w8 (6, send/save experiment, producing). Telegram pin intake is live
+  (tools/pin_intake.py via manager; AI names each clip). Laptop-offline alert on Telegram after 15 min (campus Wi-Fi login).
+- Open work: see `brain/NEXT-SESSION.md`.
 
 ## Gotchas learned the hard way
 - Restarting the factory kills running jobs. Wait until no render or queue job is running (a killed queue job double-booked posts on 10-14).

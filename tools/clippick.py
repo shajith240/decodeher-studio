@@ -16,6 +16,7 @@ for nn, e in idx.items():
     for letter, c in e["clips"].items():
         v = j["clips"].get(letter)
         if not v or v.get("meaning", 0) < 5 or v.get("style", 0) < 5 or v.get("quality", 10) < 6: continue   # off-line, live action / 3D, or cheap-looking
+        if v.get("text") or not os.path.exists(f"{R}/clips/cand/{c['file']}"): continue   # 10-16 owner: NO clips with baked-in text, ever; a removed file can't be picked
         # on-screen text costs 3 points (watermarks lose to clean clips) but is not banned: a chat bubble can BE the line
         ok.append((v["meaning"] + 0.4 * v.get("style", 5) + 0.3 * v.get("quality", 6) + c["style"] - (3 if v.get("text") else 0), letter, c, v))
     ok.sort(key=lambda r: -r[0]); opts[nn] = ok
@@ -37,7 +38,7 @@ for nn, e in idx.items():
     if str(int(nn)) in pick: continue
     jf = f"{R}/clips/judge/{nn}.json"; j = json.load(open(jf))["clips"] if os.path.exists(jf) else {}
     rows = sorted(((v["meaning"] + 0.4 * v.get("style", 5) + 0.3 * v.get("quality", 5), c, v) for L, c in e["clips"].items() if (v := j.get(L))
-                   and v.get("meaning", 0) >= 4 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text") and c["pin"] not in used), key=lambda r: -r[0])
+                   and v.get("meaning", 0) >= 4 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text") and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
     if rows:
         sc, c, v = rows[0]; used.add(c["pin"])
         pick[str(int(nn))] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v["meaning"], "shows": v["shows"] + "  [fallback]", "q": idx[nn]["q"]}
@@ -46,7 +47,7 @@ for nn, e in idx.items():
     if int(nn) != 0 or "0" in pick: continue
     jf = f"{R}/clips/judge/{nn}.json"; j = json.load(open(jf))["clips"] if os.path.exists(jf) else {}
     rows = sorted(((v.get("meaning", 0) + 0.4 * v.get("style", 5), c, v) for L, c in e["clips"].items() if (v := j.get(L))
-                   and v.get("style", 0) >= 5 and not v.get("text") and c["pin"] not in used), key=lambda r: -r[0])
+                   and v.get("style", 0) >= 5 and not v.get("text") and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
     if rows:
         sc, c, v = rows[0]; used.add(c["pin"])
         pick["0"] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v.get("meaning", 0), "shows": v.get("shows", "") + "  [fallback]", "q": e["q"]}

@@ -46,6 +46,21 @@ def heartbeat():
     if os.path.exists(b) and time.time() - os.path.getmtime(b) > 300:
         sh(["systemctl", "--user", "restart", "decodeher-factory"]); did("factory froze (no heartbeat for 5 min) · restarted it")
 
+def pin_inbox():   # 10-16: Pinterest links the owner sends in Telegram → tools/pin_intake.py (in the background, one at a time)
+    try:
+        subprocess.Popen(["flock", "-n", f"{LOGS}/pin_intake.lock", "python3", "tools/pin_intake.py"], cwd=ROOT,
+                         stdout=open(f"{LOGS}/pin_intake.log", "a"), stderr=subprocess.STDOUT, start_new_session=True)
+    except Exception as e: log(f"pin intake could not start: {e}")
+
+def tmp_space():   # 10-16: RAM-backed /tmp filled (HyperFrames frame cache, 3.8 GB) and a render failed — keep it clear
+    free = shutil.disk_usage("/tmp").free / 1e9
+    if free >= 1.5: return
+    if any(st == "render" for st in ((jload(f"{LOGS}/factory.json", {}) or {}).get("running", {}) or {}).values()): return   # never under a running render
+    c = f"/tmp/hyperframes-extract-cache-{os.getuid()}"
+    gone = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(c) for f in fs) if os.path.isdir(c) else 0
+    shutil.rmtree(c, ignore_errors=True)
+    did(f"temp space low ({free:.1f} GB free in /tmp) · cleared the render cache ({gone / 1e9:.1f} GB) · now {shutil.disk_usage('/tmp').free / 1e9:.1f} GB")
+
 def disk():
     free = shutil.disk_usage(ROOT).free / 1e9
     if free >= DISK_LOW_GB: return
@@ -55,10 +70,27 @@ def disk():
         slug = bg.split("/")[1]; out = f"deliverables/week-2/{slug}.mp4"
         if slug not in busy and os.path.exists(out) and os.path.getmtime(out) > os.path.getmtime(bg):
             gone += os.path.getsize(bg); os.remove(bg)
+    # 10-15 (owner: "why didn't the manager resolve it?"): bg.mp4 films are no longer the big files — also clear, for reels that are
+    # BOOKED or POSTED (logs/queued marker) and not running: the 350 MB master (the posting copy stays in deliverables/queue/booked),
+    # raw Pinterest candidates + contact sheets (the cut clips/seg stay, so a redo can still re-render), and raw voice takes
+    import shutil as _sh
+    for mk in glob.glob(f"{LOGS}/queued/*"):
+        slug = os.path.basename(mk)
+        if slug in busy: continue
+        for f in [f"deliverables/week-2/{slug}.mp4"]:
+            if os.path.exists(f): gone += os.path.getsize(f); os.remove(f)
+        for d in (f"reels/{slug}/clips/cand", f"reels/{slug}/clips/sheets", f"reels/{slug}/assets/vo/raw"):
+            if os.path.isdir(d):
+                gone += sum(os.path.getsize(os.path.join(a, x)) for a, _, fs in os.walk(d) for x in fs if os.path.isfile(os.path.join(a, x)))
+                _sh.rmtree(d, ignore_errors=True)
     sh("rm -rf ~/.cache/hyperframes/history/*", timeout=120)   # not `uv cache prune`: it waits on the lock running jobs hold, and on btrfs frees ~nothing
+    now = shutil.disk_usage(ROOT).free / 1e9
+    if now < DISK_LOW_GB - 2 and time.time() - S.get("disk_told", 0) > 6 * 3600:   # still too low: tell the owner (Telegram via HQ), max every 6 h
+        S["disk_told"] = time.time()
+        sh(f"HQ_URL=$(cat .secrets/HQ_URL) HQ_KEY=$(cat .secrets/HQ_KEY) python3 tools/cloud/report.py event error 'Disk almost full on the laptop ({now:.1f} GB free) — I cleared what I safely could; the factory pauses until there is room.'", timeout=60)
     if not gone and time.time() - S.get("disk_said", 0) < 1800: return   # nothing to clear: say so at most every 30 min
     S["disk_said"] = time.time()
-    did(f"disk low ({free:.1f} GB free) · cleared {gone / 1e9:.1f} GB of old cut films + caches · now {shutil.disk_usage(ROOT).free / 1e9:.1f} GB")
+    did(f"disk low ({free:.1f} GB free) · cleared {gone / 1e9:.1f} GB (masters of booked reels, raw clips, takes, caches) · now {now:.1f} GB")
 
 def stuck():
     st = jload(f"{LOGS}/factory.json", {}) or {}
@@ -116,6 +148,7 @@ def posts(incidents):
 def thinking_problems(incidents):
     st = jload(f"{LOGS}/factory.json", {}) or {}
     parked = {k: v for k, v in (st.get("parked") or {}).items() if (jload(f"reels/{k}/reel.json", {}) or {}).get("parked")}   # the snapshot can lag
+    parked = {k: v for k, v in parked.items() if not str(v).lower().startswith("owner")}   # 10-15: held ON PURPOSE by the owner — not an incident (it burned agent runs)
     if parked:   # ONE agent for all of them (10-15: 6 reels parked by one shared cause used up all 8 agent runs by 2 am)
         rows = "\n".join(f"- reels/{slug}: {why}" for slug, why in parked.items())
         incidents.append(("parked-" + ",".join(sorted(parked)), next(iter(parked.values())).split()[0] if len(parked) == 1 else "",
@@ -191,7 +224,7 @@ def main():
         try:
             save("checking", "walking the line")
             check_agent()
-            services(); heartbeat(); disk(); stuck()
+            services(); heartbeat(); disk(); tmp_space(); pin_inbox(); stuck()
             incidents = []; posts(incidents); thinking_problems(incidents)
             S["checked"] = time.strftime("%F %T")
             fresh = [i for i in incidents if time.time() - S["seen"].get(i[0], 0) > 7200]

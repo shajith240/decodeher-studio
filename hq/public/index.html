@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DecodeHer Studio</title>
   <meta name="theme-color" content="#0f0608">
-  <meta name="build" content="20261015T141802Z">
+  <meta name="build" content="20261016T030319Z">
   <meta name="description" content="DecodeHer HQ: the live studio board">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -332,9 +332,10 @@
     [hidden] { display: none !important }
 
     .rb {
-      display: block; width: 14px; height: 14px; border-radius: 2px; background: var(--c); position: relative; cursor: pointer;
-      box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35), inset 0 -2px 0 rgba(0, 0, 0, .25)
+      display: block; width: 18px; height: 18px; position: relative; cursor: pointer;
+      background: center / contain no-repeat; image-rendering: pixelated
     }
+    .ri { display: inline-block; width: 18px; height: 18px; vertical-align: -4px; margin-right: 8px; background: center / contain no-repeat; image-rendering: pixelated; flex: none }
 
     .rb.hold::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 0 1.5px var(--panel) }
     .rb.stuck::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--alert); box-shadow: 0 0 0 1.5px var(--panel) }
@@ -625,6 +626,26 @@
       #snd { display: none }
     }
     @media (prefers-reduced-motion:reduce) { #scrim { transition: none } }
+    /* 10-16 owner: the per-station cards were unreadable — one plain sentence instead */
+    #queue, #key { display: none !important }
+    #sum { flex: none; display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding: 14px 18px; border: 1px solid var(--line2);
+      border-radius: var(--r); background: var(--panel); font-size: 15px; color: var(--dim) }
+    #sum b { color: var(--ink, #f3e6c8); font-weight: 600; font-size: 17px; margin-right: 4px }
+    #sum .ok b { color: #8fd18f } #sum .warn b { color: var(--warn) } #sum .bad b { color: var(--alert) }
+    /* 10-16 owner: progress bars instead of the activity log */
+    #prog { display: flex; flex-direction: column; gap: 14px }
+    #prog .pr0 { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--text) }
+    #prog .pr0 b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+    #prog .pr0 em { font-style: normal; font-variant-numeric: tabular-nums; color: #e0b04a; font-weight: 600 }
+    #prog .bar { height: 8px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; margin: 7px 0 6px }
+    #prog .bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #9a7838, #e0b04a); transition: width .8s ease }
+    #prog .done .bar i { background: linear-gradient(90deg, #4f8a52, #8fd18f) }
+    #prog .hold .bar i { background: #ff9f43 }
+    #prog .steps { display: flex; gap: 3px; margin-bottom: 4px }
+    #prog .steps span { flex: 1; font-size: 10.5px; text-align: center; color: var(--faint); letter-spacing: .02em }
+    #prog .steps span.on { color: #e0b04a; font-weight: 600 } #prog .steps span.ok { color: var(--dim) }
+    #prog .sub { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+    #prog .none { font-size: 13.5px; color: var(--dim) }
   </style>
 </head>
 
@@ -699,6 +720,7 @@
       <div id="key"><span><i class="w"></i>Station working</span><span><i class="h"></i>Reel on hold</span><span><i
             class="p"></i>Reel stuck</span><span class="hint">Each small box is one reel. Point at it for
           details.</span><span class="swipehint" hidden><svg><use href="#i-swipe"/></svg>Swipe the studio</span></div>
+      <div id="sum" aria-live="polite"></div>
     </main>
 
     <aside id="side">
@@ -716,10 +738,10 @@
       </section>
       <section class="panel" id="actP">
         <div class="ph">
-          <h2><svg class="ic"><use href="#i-list"/></svg>Activity</h2><span class="aux">newest first</span>
+          <h2><svg class="ic"><use href="#i-list"/></svg>In production</h2><span class="aux" id="progAux"></span>
         </div>
         <div class="pb">
-          <ul id="act"></ul>
+          <ul id="act" hidden></ul><div id="prog"></div>
         </div>
       </section>
     </aside>
@@ -1067,7 +1089,7 @@ function applyData(d){
   IGN = Math.max([...tokens.values()].filter(tk => tk.wall).length, (d.queue||[]).filter(x => x.status === 'posted').length);
   dataReady = true;
   updateMedia(d.media || {});
-  refreshOverlays(); renderStrip(); renderSched(); renderMetrics();
+  refreshOverlays(); renderStrip(); renderProg(); renderSched(); renderMetrics();
 }
 
 /* ---------- workers ---------- */
@@ -1214,9 +1236,7 @@ function mgrLampCol(st, t){
 }
 function drawOfficeBack(t){
   const x = MOX, st = mgrSt(), ti = mgrTi();
-  // olive tree in a terracotta pot, right of the desk
-  const px = x + MW - 9; R(px,90,8,8,'#a0522d'); R(px-1,89,10,2,'#c0693a'); R(px+3,78,1,11,'#5a3a22');
-  [[1,76],[5,74],[-1,79],[6,78],[3,71],[0,73],[6,72]].forEach(([a,b],q) => R(px+a,b,3,3,['#6f7f45','#8a9a52','#5a6a3a'][q%3]));
+  // 10-16 owner: no plants (the olive tree is gone)
   // chair
   R(MSEATX-9,68,18,15,C.chair); R(MSEATX-8,69,16,1,C.chairHi); R(MSEATX-9,83,18,2,'#1f0d0f');
 }
@@ -1350,6 +1370,35 @@ function buildBg(){
   // soft shadows where the desks stand on the floor
   ST.forEach(st => { fr(st.cx - 19, 98, 38, 2, 'rgba(0,0,0,.35)'); fr(st.cx - 17, 100, 34, 1, 'rgba(0,0,0,.18)'); });
   fr(MOX + 5, 98, 42, 2, 'rgba(0,0,0,.35)');
+  furnish(fr);
+}
+// 10-16 owner: "the hall is very empty" — a few warm pieces, nothing busy: a runner rug under the walkway, one patterned carpet
+// with a film projector in the open front, a palm in each front corner. All static (in the background), all below where
+// people walk, so no one ever has to step over them.
+function furnish(fr){
+  const L = FX0 - 2, Rr = FX1 + 2, gold = '#9a7838', goldD = '#6e5226';
+  // runner rug along the walkway (people walk at y 108)
+  fr(L, 102, Rr - L, 12, '#3a0c13'); fr(L, 102, Rr - L, 1, goldD); fr(L, 113, Rr - L, 1, goldD);
+  fr(L, 103, Rr - L, 1, gold); fr(L, 112, Rr - L, 1, gold);
+  for (let x = L + 4; x < Rr - 2; x += 8) { fr(x, 107, 2, 2, '#5a1a22'); fr(x + 4, 105, 1, 1, '#6b2a2a'); fr(x + 4, 110, 1, 1, '#6b2a2a'); }
+  fr(L, 114, Rr - L, 1, 'rgba(0,0,0,.35)');
+  // front carpet: a trapezoid in perspective, double gold border, a gold medallion
+  const cx = Math.round((FX0 + FX1) / 2), y0 = 126, y1 = 160;
+  for (let y = y0; y < y1; y++) {
+    const hw = Math.round(70 + (y - y0) * .45), edge = y === y0 || y === y1 - 1;
+    fr(cx - hw, y, hw * 2, 1, edge ? gold : '#33090f');
+    if (!edge) { fr(cx - hw, y, 1, 1, gold); fr(cx + hw - 1, y, 1, 1, gold);
+      if (y === y0 + 3 || y === y1 - 4) fr(cx - hw + 4, y, hw * 2 - 8, 1, goldD);
+      else if (y > y0 + 3 && y < y1 - 4) { fr(cx - hw + 4, y, 1, 1, goldD); fr(cx + hw - 5, y, 1, 1, goldD);
+        if ((y - y0) % 5 === 0) for (let x = cx - hw + 10; x < cx + hw - 10; x += 12) fr(x, y, 2, 1, '#55141c'); } }
+  }
+  fr(cx - 70, y1, 140 + 34 * .45 * 2, 1, 'rgba(0,0,0,.4)');
+  const my = Math.round((y0 + y1) / 2);
+  for (let k = 0; k < 7; k++) { fr(cx - 12 + k * 2, my - k, 24 - k * 4 > 0 ? 2 : 0, 1, gold); }
+  for (let k = 0; k <= 6; k++) { const w = 2 * (6 - k) * 2 + 2; fr(cx - w / 2, my - k, w, 1, k === 6 ? gold : '#4a1219'); fr(cx - w / 2, my + k, w, 1, k === 6 ? gold : '#4a1219');
+    fr(cx - w / 2, my - k, 1, 1, gold); fr(cx + w / 2 - 1, my - k, 1, 1, gold); fr(cx - w / 2, my + k, 1, 1, gold); fr(cx + w / 2 - 1, my + k, 1, 1, gold); }
+  fr(cx - 1, my - 1, 3, 3, '#c9a45c');
+  // 10-16 owner: no plants, projector or wall pictures — only the rugs
 }
 
 /* ---------- station art ---------- */
@@ -1459,21 +1508,60 @@ function tokenOf(tk, t, hovered){
   tk.x = x; tk.y = y;
   return [Math.round(x), Math.round(y)];
 }
-function drawToken(tk, px, py, t, hovered){
-  const nstart = false;
+/* ---------- film reels (owner 10-15: real film-reel sprites instead of boxes; approved Codex art, 12 designs) ----------
+   Each reel gets a design picked from its dir (hash); the METAL shows where it is: iron while in production, bronze once rendered
+   and not booked, gold when booked, sealed / ribboned once posted. Sprites are drawn on the full-resolution view canvas after the
+   floor (pixel-perfect: native 24 or 36 px art, integer scale, no smoothing), anchored at the old box's bottom centre. */
+const REEL_DIR = 'reels/';
+const REEL_SETS = { iron:['s1-3','s3-4','s2-3'], bronze:['s2-4'], gold:['s2-2','s3-3'], sealed:['s1-4','s3-2'] };   // owner 10-16: dark iron reels vanish on crimson (colour contrast) — warm metals only
+const REEL_IMG = {};
+Object.values(REEL_SETS).flat().forEach(n => { REEL_IMG[n] = {}; [24, 36].forEach(h => { const im = new Image(); im.decoding = 'async'; im.src = `${REEL_DIR}${n}-${h}.png`; REEL_IMG[n][h] = im; }); });
+const hashStr = x => { let h = 2166136261; for (const c of String(x || '')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+function reelTier(r){
+  if (!r) return 'iron';
+  if (/^posted/.test(r.posted || '') || r.next === 'posted') return 'sealed';
+  if (r.queued || /^queued/.test(r.posted || '')) return 'gold';
+  if (r.video === 'done' || r.next === 'post') return 'bronze';
+  return 'iron';
+}
+function reelName(r, key){ const set = REEL_SETS[reelTier(r)]; return set[hashStr((r && r.dir) || key) % set.length]; }
+const reelSrc = (r, key) => `${REEL_DIR}${reelName(r, key)}-24.png`;
+const reelDraws = []; let reelLayer = 0;   // 10-16: 0 = desks/behind, 1 = carried by people on the open floor (drawn over the desk reels)
+function drawToken(tk, px, py, t, hovered){   // 10-16 owner: back to the pixel boxes (the film-reel sprites were hard to see)
   const body = tk.col;
   if (tk.anim && tk.anim.dim) g.globalAlpha = .5;
   if (hovered) { R(px-1,py-1,9,8,'#fff'); }
   R(px,py,7,6,'#16090b');
   R(px+1,py+2,5,3,body); R(px,py+2,1,4,body); R(px+6,py+2,1,4,body); R(px,py+5,7,1,body);
-  R(px+1,py+1,5,1, nstart?'#5a3035':'#e9e3d6');
-  for (let k=0;k<7;k+=2) P(px+k,py,nstart?'#452227':'#220e11');
-  for (let k=1;k<7;k+=2) P(px+k,py,nstart?'#5a3035':'#e9e3d6');
-  if (!nstart) { R(px+2,py+3,3,1,'rgba(255,255,255,.45)'); }
+  R(px+1,py+1,5,1,'#e9e3d6');
+  for (let k=0;k<7;k+=2) P(px+k,py,'#220e11');
+  for (let k=1;k<7;k+=2) P(px+k,py,'#e9e3d6');
+  R(px+2,py+3,3,1,'rgba(255,255,255,.45)');
   if (tk.redo) R(px+5,py+4,1,1,C.warm);
-  { const pk = parkedFor(tk); if (pk && isHold(pk)) { R(px+5,py+2,2,2,'#ff9f43'); }
+  { const pk = tk.reel ? parkedFor(tk) : null; if (pk && isHold(pk)) { R(px+5,py+2,2,2,'#ff9f43'); }
     else if (pk) { R(px+5,py-6,5,7,'#220e11'); R(px+7,py-5,2,3,'#ff5b5b'); R(px+7,py-1,2,1,'#ff5b5b'); } }
   g.globalAlpha = 1;
+}
+function reelPx(){   // drawn height in view-canvas px: ~24 css px, snapped to native art x integer
+  const target = 24 * K / scale, opts = [[24,1],[36,1],[24,2],[36,2],[24,3]];
+  let best = opts[0]; opts.forEach(o => { if (Math.abs(o[0]*o[1] - target) < Math.abs(best[0]*best[1] - target)) best = o; });
+  return best;
+}
+function drawReels(layer){
+  const [h, m] = reelPx(); vg.imageSmoothingEnabled = false;
+  reelDraws.forEach(d => { if (d.layer !== layer) return;
+    const im = REEL_IMG[d.name] && REEL_IMG[d.name][h]; if (!im || !im.complete || !im.naturalWidth) return;
+    const w = im.naturalWidth * m, hh = im.naturalHeight * m;
+    const x = Math.round((d.x + CAMX) * K - w / 2), y = Math.round((d.y + CAMY) * K - hh);
+    if (d.dim) vg.globalAlpha = .5;
+    if (d.hovered) { vg.fillStyle = 'rgba(236,214,163,.85)'; vg.fillRect(x + 2*m, y + hh + m, w - 4*m, m); }
+    vg.drawImage(im, x, y, w, hh);
+    vg.globalAlpha = 1;
+    const dot = Math.max(3, Math.round(hh / 7));
+    if (d.hold) { vg.fillStyle = '#ff9f43'; vg.fillRect(x + w - dot, y, dot, dot); }
+    else if (d.stuck) { vg.fillStyle = '#220e11'; vg.fillRect(x + w - dot - 2, y - 2, dot + 4, dot * 2 + 4); vg.fillStyle = '#ff5b5b'; vg.fillRect(x + w - dot, y, dot, Math.round(dot * 1.2)); }
+    if (d.redo) { vg.fillStyle = '#FFC978'; vg.fillRect(x, y + hh - dot, dot, dot); }
+  });
 }
 let mx = 0, mxT = 0;
 function buildSky(){}
@@ -1544,7 +1632,7 @@ function frame(ms){
   workers.forEach(w => updateWorker(w, dt, tw));
 
   g.setTransform(1,0,0,1,0,0);
-  g.drawImage(bg,0,0);
+  g.drawImage(bg,0,0); reelDraws.length = 0;
   g.save(); g.translate(CAMX,CAMY);
   const mgrAt = { mgr:true, y:MG.y };
   const behind = [], front = [];
@@ -1585,9 +1673,15 @@ function frame(ms){
   drawReflection();
   g.save(); g.translate(CAMX,CAMY);
   // 4. people on the open floor, nearest last
-  front.sort((a,b) => a.y-b.y).forEach(w => { if (w.mgr) drawMgrSprite(t); else drawWalker(w,t); });
+  // 10-16 owner: desk reels were painted over people walking in front of the desks. Flush the room + desk reels first,
+  // then paint the people on the open floor on a clear layer above them, then the reels they carry.
   g.restore();
-  vg.imageSmoothingEnabled = false; vg.drawImage(cv, 0, 0, view.width, view.height);
+  vg.imageSmoothingEnabled = false; vg.drawImage(cv, 0, 0, view.width, view.height); drawReels(0);
+  g.setTransform(1,0,0,1,0,0); g.clearRect(0, 0, cv.width, cv.height);
+  g.save(); g.translate(CAMX,CAMY); reelLayer = 1;
+  front.sort((a,b) => a.y-b.y).forEach(w => { if (w.mgr) drawMgrSprite(t); else drawWalker(w,t); });
+  reelLayer = 0; g.restore();
+  vg.drawImage(cv, 0, 0, view.width, view.height); drawReels(1);
   updateCamera(dt,t);
   syncLabels();
   syncMgr();
@@ -1744,7 +1838,22 @@ const qCards = ST.map((s, i) => { const d = document.createElement('div'); d.cla
 const qMgr = document.createElement('button'); qMgr.className = 'qc qm live'; qMgr.innerHTML = '<div class="qn"><svg><use href="#i-user"/></svg>Manager</div><div class="qh"></div><div class="qb"></div><div class="qs"></div>'; qRow.appendChild(qMgr);
 qMgr.addEventListener('click', () => openDrawer(true));
 const boxHTML = tk => { const pk = parkedFor(tk); return `<i class="rb${pk ? (isHold(pk) ? ' hold' : ' stuck') : ''}" data-k="${esc(tk.reel.dir)}" style="--c:${tk.col}"></i>`; };
+function updateSum(){   // 10-16: the whole line in one sentence the owner can read
+  const el = document.getElementById('sum'); if (!el) return;
+  const R = DATA.reels || [], P = FACT.parked || {}, park = r => P[r.dir] || P[(r.dir||'').split('/').pop()];
+  const posted = (DATA.queue || []).filter(q => q.status === 'posted').length || R.filter(r => /^posted/.test(r.posted || '')).length, ql = queuedList();   // relay log is the truth (it has the first reel too)
+  const making = Object.keys(FACT.running || {}).length;
+  const ok = R.filter(r => /approval/i.test(park(r) || '')), booking = R.filter(r => !ok.includes(r) && r.video === 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')), stuck = R.filter(r => park(r) && !isHold(park(r)));   // 10-16: 'waiting for your OK' only when an approval is really pending
+  const parts = [`<span class="ok"><b>${posted}</b>posted</span>`,
+    `<span><b>${ql.length}</b>booked${ql.length ? ' · next post ' + esc(dayLabel(ql[0].at)) : ''}</span>`,
+    `<span><b>${making}</b>being made right now</span>`];
+  if (ok.length) parts.push(`<span class="warn"><b>${ok.length}</b>finished, waiting for your OK (${ok.map(r => esc(r.title || r.dir)).join(', ')})</span>`);
+  if (booking.length) parts.push(`<span><b>${booking.length}</b>finished, being booked (${booking.map(r => esc(r.title || r.dir)).join(', ')})</span>`);
+  if (stuck.length) parts.push(`<span class="bad"><b>${stuck.length}</b>stuck, the manager is on it</span>`);
+  if (el.innerHTML !== parts.join('')) el.innerHTML = parts.join('');
+}
 function refreshOverlays(){
+  updateSum();
   ST.forEach((_, i) => { const tk = deskTk[i]; const el = tagEls[i];
     if (tk && !tk.inTransit) { el.style.display = 'block'; el.textContent = tk.reel.title + (i === 6 ? ' · ' + slotLabel(tk.reel) : ''); } else el.style.display = 'none'; });
   qCards.forEach((q, i) => {
@@ -1868,7 +1977,8 @@ function counts(){
 function renderSched(){
   const c = counts(), q = queuedList();
   document.getElementById('schedAux').textContent = q.length ? `${q.length} booked` : '';
-  const row = (x, past) => `<div class="row${past ? ' past' : ''}"><time>${esc(dayLabel(x.at))}</time><span title="${esc(slugTitle(x.title))}">${esc(slugTitle(x.title))}</span></div>`;
+  const rowReel = x => { const r = (DATA.reels || []).find(q => (x.slug && q.dir === x.slug) || slugTitle(x.title) === q.title) || { dir:x.slug || x.title, queued:x.status === 'queued', posted:x.status === 'posted' ? 'posted' : '' }; return ''; };   // 10-16 owner: no film-reel icons anywhere
+  const row = (x, past) => `<div class="row${past ? ' past' : ''}"><time>${esc(dayLabel(x.at))}</time><span title="${esc(slugTitle(x.title))}">${rowReel(x)}${esc(slugTitle(x.title))}</span></div>`;
   let h = '';
   if (q.length) { h += q.slice(0, 6).map(x => row(x)).join(''); if (q.length > 6) h += `<div class="row past"><time></time><span>and ${q.length - 6} more</span></div>`; }
   else {
@@ -1897,7 +2007,7 @@ function pick(ev){
   const rc = view.getBoundingClientRect();
   const lx = (ev.clientX - rc.left) / rc.width * cv.width - CAMX, ly = (ev.clientY - rc.top) / rc.height * cv.height - CAMY;
   let best = null;
-  drawn.forEach(d => { if (lx >= d.x-1 && lx <= d.x+8 && ly >= d.y-1 && ly <= d.y+7) best = d.tk; });
+  drawn.forEach(d => { if (lx >= d.x-4 && lx <= d.x+11 && ly >= d.y-6 && ly <= d.y+7) best = d.tk; });   // a reel sprite's footprint
   return best;
 }
 Object.defineProperty(HTMLElement.prototype, 'htmlIfChanged', { configurable:true, set(h){ if (this._h !== h) { this._h = h; this.innerHTML = h; } } });
@@ -1930,6 +2040,38 @@ view.addEventListener('click', ev => showTip(pick(ev), ev));
 
 /* ---------- header / strip ---------- */
 const humanize = s => String(s || '').replace(/\bw\d+-\d+-[\w-]+/g, x => slugTitle(x)).replace(/\b\d+-(?:[A-Za-z]{3}|W\d+)-[\w-]+/g, x => slugTitle(x)).replace(/ ?(\d{4}-\d\d-\d\d \d\d:\d\d) IST/g, (_, a) => ' ' + dayLabel(a));
+function renderProg(){   // 10-16 owner: "a percentage / status bar instead of the logs"
+  const el = document.getElementById('prog'); if (!el) return;
+  const STEPS = [['voice','Voice'],['scout','Clips'],['judge','Judge'],['edit','Edit'],['mix','Mix'],['render','Render'],['post','Ready']];
+  const act = DATA.activity || [], P = FACT.parked || {}, nowS = (() => { const d = new Date(); return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds(); })();
+  const secs = l => { const m = String(l).match(/^(\d\d):(\d\d):(\d\d)/); return m ? (+m[1])*3600 + (+m[2])*60 + (+m[3]) : null; };
+  const rows = (DATA.reels || []).filter(r => !r.queued && !/^(posted|queued)/.test(r.posted || '') && r.next !== 'posted').map(r => {
+    const name = (r.dir || '').split('/').pop(), park = P[name] || P[r.dir];
+    const mine = act.filter(l => l.includes(name) || (r.title && l.includes(' · ' + r.title)));
+    // the step comes from what is ACTUALLY happening (latest action), in real pipeline order; the factory's own stage names don't match the bar
+    const ACT = [[/Recording voice|Voice ready/, 0], [/Planning shots|Clip search|Second clip|Searching clips/, 1], [/Contact sheet|Judging|Judged/, 2],
+                 [/Picking clips|Cutting clips/, 3], [/Audio mix/, 4], [/Rendering ·|Rendered ·|Rendering failed/, 5], [/Rendering done|Queuing post|Queued|Cover set/, 6]];
+    const hit = mine.length ? ACT.find(a => a[0].test(mine[0])) : null;
+    let si = hit ? hit[1] : Math.max(0, STEPS.findIndex(x => x[0] === r.next)); if (r.video === 'done') si = 6;
+    let frac = 0, sub = '';
+    const last = mine[0] || '';
+    const m = last.match(/(\d+) of (\d+)/); if (m && si < 6) frac = Math.min(.95, (+m[1]) / (+m[2]));
+    if (si === 5) { const st = mine.find(l => /Rendering · /.test(l)); const t0 = st && secs(st); if (t0 != null) frac = Math.min(.95, ((nowS - t0 + 86400) % 86400) / 100); }
+    sub = last ? last.replace(/^\d\d:\d\d:\d\d\s+/, '').replace(' · ' + name, '').replace(' · ' + r.title, '') : '';
+    const pct = si >= 6 ? 100 : Math.round((si + frac) / 6 * 100);
+    if (si >= 6) sub = /approval/i.test(park || '') ? 'Finished · waiting for your OK' : 'Finished · being booked into the next slot';
+    const hold = park && !/approval/i.test(park) && si < 6;
+    if (hold) sub = 'On hold · ' + String(park).replace(/^owner [\d-]+:\s*/i, '');
+    return { r, si, pct, sub, hold };
+  }).filter(x => !(x.hold && /retired|rewritten|waiting for approval of the first/i.test(x.sub))).slice(0, 6);
+  document.getElementById('progAux').textContent = rows.length ? rows.length + ' reel' + (rows.length > 1 ? 's' : '') : '';
+  const html = rows.length ? rows.map(x => `<div class="${x.pct >= 100 ? 'done' : x.hold ? 'hold' : ''}"><div class="pr0"><b>${esc(x.r.title || x.r.dir)}</b><em>${x.pct}%</em></div>
+    <div class="bar"><i style="width:${x.pct}%"></i></div>
+    <div class="steps">${STEPS.map((s, i) => `<span class="${i === x.si ? 'on' : i < x.si ? 'ok' : ''}">${s[1]}</span>`).join('')}</div>
+    <div class="sub">${esc(x.sub)}</div></div>`).join('') : '<div class="none">Nothing in production right now.</div>';
+  if (el.innerHTML !== html) el.innerHTML = html;
+}
+setInterval(() => { try { if (typeof DATA !== 'undefined' && DATA) renderProg(); } catch (e) {} }, 2000);   // the render bar moves between data pushes
 function renderStrip(){
   const c = counts(), run = DATA.running || [];
   // the process scan can miss short steps; the factory's own busy stations are the truth
@@ -2200,10 +2342,7 @@ const Snd = {
       o.type = 'triangle'; o.frequency.value = f; o.detune.value = (k-1.5)*4; gn.gain.setValueAtTime(0,now); gn.gain.linearRampToValueAtTime(.035,now+2.2); gn.gain.linearRampToValueAtTime(0,now+8.5);
       o.connect(gn); gn.connect(lp); o.start(now); o.stop(now+8.6); }); };
     play(); this.timers.push(setInterval(play, 8000));
-    const len = c.sampleRate*2, buf = c.createBuffer(1,len,c.sampleRate), d = buf.getChannelData(0); for (let i=0;i<len;i++) d[i] = (Math.random()*2-1);
-    const nz = c.createBufferSource(); nz.buffer = buf; nz.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; const ng = c.createGain(); ng.gain.value = .006;
-    nz.connect(bp); bp.connect(ng); ng.connect(master); nz.start();
-    this.timers.push(setInterval(() => { const o = c.createBufferSource(); o.buffer = buf; const gn = c.createGain(); gn.gain.value = .02; o.connect(gn); gn.connect(master); o.start(c.currentTime, Math.random()*1.9, .012); }, 700));
+    // 10-16 owner: the noise hiss + 12 ms static 'typing' bursts sounded like zip-zip — removed, only the soft pad + hand-off chime remain
     return true;
   },
   stop(){ this.timers.forEach(clearInterval); this.timers = []; if (this.ctx) { this.ctx.close(); this.ctx = null; } },

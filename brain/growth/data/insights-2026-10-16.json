@@ -1,0 +1,75 @@
+{
+ "account": {
+  "username": "thedecodeher",
+  "followers_count": 6,
+  "media_count": 5,
+  "id": "39815642344686105"
+ },
+ "reels": [
+  {
+   "title": "1-Mon-busy-is-an-answer",
+   "permalink": "https://www.instagram.com/reel/DecQ5eZDlx8/",
+   "postedAt": 1791909832536,
+   "reach": 135,
+   "views": 183,
+   "likes": 6,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 10451,
+   "ig_reels_video_view_total_time": 1755875
+  },
+  {
+   "title": "02-Tue-keep-yourself",
+   "permalink": "https://www.instagram.com/reel/Deet1FEDGwb/",
+   "postedAt": 1791992121803,
+   "reach": 129,
+   "views": 157,
+   "likes": 7,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 10115,
+   "ig_reels_video_view_total_time": 1456693
+  },
+  {
+   "title": "03-W2-doesn-t-move-me",
+   "permalink": "https://www.instagram.com/reel/Def8iq3j338/",
+   "postedAt": 1792033386416,
+   "reach": 118,
+   "views": 133,
+   "likes": 3,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 8749,
+   "ig_reels_video_view_total_time": 1111243
+  },
+  {
+   "title": "04-W2-your-plans-matter",
+   "permalink": "https://www.instagram.com/reel/DehSKUSjiXn/",
+   "postedAt": 1792078278236,
+   "reach": 123,
+   "views": 147,
+   "likes": 1,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 6604,
+   "ig_reels_video_view_total_time": 885062
+  },
+  {
+   "title": "16-W2-hot-and-cold",
+   "permalink": "https://www.instagram.com/reel/DeihYDykatC/",
+   "postedAt": 1792119811884,
+   "reach": 0,
+   "views": 0,
+   "likes": 0,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 0,
+   "ig_reels_video_view_total_time": 0
+  }
+ ]
+}

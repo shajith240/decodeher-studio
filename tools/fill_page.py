@@ -40,7 +40,7 @@ if RC.get("look") == "bw":
                   + '&display=block" rel="stylesheet"><!--/look-->\n<style>', 1)
     FQ = HI_FAM if HI else "'" + F + "'"
     h = h.replace("</style>", " /*look*/.cap{font-family:" + FQ + ",serif;font-weight:400;font-size:" + str(FS) + "px;line-height:1.18;letter-spacing:0;top:"
-                  + str(960 - FS * 0.6) + "px}\n .cap .w,.cap .a{color:#fff;filter:none;padding:0;text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 8px rgba(0,0,0,.7)}\n #haze{display:none}\n #wm{filter:grayscale(1);left:509px;top:1596px;height:78px}\n"
+                  + str(960 - FS * 0.6) + "px}\n .cap .w,.cap .a{color:#fff;filter:none;padding:0;text-shadow:0 0 3px rgba(0,0,0,.95),0 2px 10px rgba(0,0,0,.85),0 0 34px rgba(0,0,0,.7)}\n #haze{display:none}\n #wm{filter:grayscale(1);left:509px;top:1596px;height:78px}\n"
                   " #tcard{font-family:" + FQ + ",serif;font-weight:400;font-size:84px;line-height:1.15;letter-spacing:0;filter:none;text-shadow:0 2px 18px rgba(0,0,0,.55)}\n"
                   " #tcard::after{display:none}/*/look*/\n</style>", 1)
     # hard swap at the word (Zoltium), no blur-in, no purple bloom; keep the punctuation on the card
@@ -80,7 +80,7 @@ if V3:
            " #v3msg{display:flex;flex-direction:column;align-items:flex-start;max-width:900px}\n"
            " #v3bub{max-width:900px;box-sizing:border-box;padding:28px 46px 32px;border-radius:54px 54px 54px 14px;background:#ededf1;color:#0d0d10;"
            "font:500 " + str(bs) + "px/1.16 'Inter',sans-serif;letter-spacing:-.012em;text-align:left;box-shadow:0 18px 50px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3)}\n"
-           " #v3title{margin-top:" + ("56" if bubble else "0") + "px;width:940px;padding:22px 0 30px;border-radius:60px;background:radial-gradient(ellipse 64% 62% at 50% 50%,rgba(0,0,0,.62),rgba(0,0,0,.3) 55%,rgba(0,0,0,0) 100%);text-align:center;text-wrap:balance;color:#fff;font:400 " + str(ts) + "px/1.08 " + (HI_FAM if HI else "'" + F + "'") + ",serif;"
+           " #v3title{margin-top:" + ("56" if bubble else "0") + "px;width:940px;padding:22px 0 30px;background:none;text-align:center;text-wrap:balance;color:#fff;font:400 " + str(ts) + "px/1.08 " + (HI_FAM if HI else "'" + F + "'") + ",serif;"
            "text-shadow:0 0 3px rgba(0,0,0,.9),0 3px 14px rgba(0,0,0,.75),0 0 40px rgba(0,0,0,.55)}/*/v3*/\n")
     h = h.replace("<style>", '<!--v3--><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=block" rel="stylesheet"><!--/v3-->\n<style>', 1)
     if HI: h = h.replace("<style>", '<!--v3--><link href="https://fonts.googleapis.com/css2?' + HI_LINK + '&display=block" rel="stylesheet"><!--/v3-->\n<style>', 1)
@@ -101,7 +101,14 @@ if V3:
         #   longer than that (total - END > 2.6), the outro stays up for the tagline instead — never black under the voice
         END = float(re.search(r"END = ([\d.]+);", h).group(1)); TOT = float(re.search(r'id="root"[^>]*data-duration="([\d.]+)"', h).group(1))
         cap = round(min(od - 0.01, max(2.6, TOT - END)), 2)
+        if TOT - END > cap + 0.05:   # owner 10-16: the outro ran out before the closing words did (black gap under "Follow…") —
+            new = round(TOT - cap, 2)   # start it later so it rises during the last words and ends WITH the reel
+            h = re.sub(r"END = [\d.]+;", f"END = {new};", h, count=1)
+            h = re.sub(r'(id="outro"[^>]*data-start=")[\d.]+', rf"\g<1>{new:.2f}", h); END = new
         h = re.sub(r'(id="outro"[^>]*data-duration=")[\d.]+', rf"\g<1>{cap:.2f}", h)
+        bgd = re.search(r'id="bg"[^>]*data-duration="([\d.]+)"', h)
+        if bgd and float(bgd.group(1)) < END:   # 10-16: the clip film plays on until the outro rises (it stopped at the old outro time: 2 s of black)
+            h = re.sub(r'(id="bg"[^>]*data-duration=")[\d.]+', rf"\g<1>{END:.2f}", h)
         tl3 += f'  /*v3*/tl.to("#outro", {{ opacity: 0, duration: 0.5, ease: "sine.in" }}, END + {cap - 0.5:.2f});/*/v3*/\n'
         if TOT - END > 2.65: print(f"v3 note: the outro runs {TOT - END:.2f} s (target 2.6) — shorten the tagline or lower reel.json tail by {TOT - END - 2.6:.2f} s")
     h = h.replace("  tl.set({}, {}, ", tl3 + "  tl.set({}, {}, ", 1)

@@ -1,26 +1,30 @@
 {
- "reels": {
-  "voice": "c661d74eb3c64453883eee869f630f47",
-  "voiceName": "Fish Audio voice c661d74eb3c64453883eee869f630f47 (owner pick 2026-10-15), s2.1-pro-free, no pitch shift, small room in the mix (rt 0.35 s, 7 % wet); pace: Fish prosody speed 1.12 x reel speed (1.07 typical) ≈ 1.2 → ~179 wpm, no Rubber Band",
-  "ttsModel": "s2.1-pro-free",
-  "speed": 1.12,
-  "voiceFish": "c661d74eb3c64453883eee869f630f47",
-  "voiceChain": 2,
-  "look": "bw",
-  "captionFont": "Rosarivo",
-  "semis": 0,
-  "voiceRoom": {
-   "rt": 0.35,
-   "wet": 0.07
+  "reels": {
+    "voice": "86ac939163784775a38c14912a8de9d9",
+    "voiceName": "Fish 86ac939163784775a38c14912a8de9d9 — owner pick 10-16 (c661 before; 221c rejected: whispery/slow/horror)",
+    "ttsModel": "s2.1-pro-free",
+    "speed": 1.0,
+    "voiceFish": "86ac939163784775a38c14912a8de9d9",
+    "voiceChain": 2,
+    "look": "bw",
+    "captionFont": "Rosarivo",
+    "semis": 0,
+    "tagline": "",
+    "outroSound": "library/sfx-brand/signature/outro-piano.wav",
+    "voiceTemperature": 0.7,
+    "voiceTopP": 0.75,
+    "voiceMode": "whole",
+    "fishSpeed": 1.0,
+    "voiceStyle": "[calm, storytelling, like telling a friend]",
+    "cutSound": "snap",
+    "sfxSet": "library/rebel-pack/ranked.json",
+    "frame": "lens"
   },
-  "tagline": "Decode her… before she decodes you.",
-  "outroSound": "library/sfx-brand/signature/outro-piano.wav"
- },
- "factory": {
-  "batches": [
-   "reels/w2-batch.json",
-   "reels/w3-batch.json",
-   "reels/w3h-batch.json"
-  ]
- }
+  "factory": {
+    "batches": [
+      "reels/w6-batch.json",
+      "reels/w7-batch.json",
+      "reels/w8-batch.json"
+    ]
+  }
 }

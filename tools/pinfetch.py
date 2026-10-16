@@ -1,7 +1,7 @@
 """Zoltium-style clip finder (owner, 10-14): per spoken line, Pinterest 2D-animation clips that look like Zoltium AND show the line.
 Usage: uv run --with gallery-dl --with yt-dlp --with secretstorage \
          python tools/pinfetch.py <reel_dir> [per_line=15]
-Reads <reel>/shots.json [{t, say, q}] ("OUTRO" skipped). For each line: Pinterest search "<q> flat 2d animation" with the
+Reads <reel>/shots.json [{t, say, q}] ("OUTRO" skipped). For each line: Pinterest search "<q> dark psychology" (owner 10-16: that suffix gives the moody, on-topic look) with the
 owner's Brave login (gallery-dl; ≤ per_line results, pauses between searches) into <reel>/clips/cand/NN/.
 FETCH ONLY (10-14): picking is tools/clipsheet.py (style gate + contact sheets) → Haiku judges → tools/clippick.py.
 LINES=4,16 re-searches just those lines with their (new) q, ADDING to what is there; pins seen before are skipped."""
@@ -20,7 +20,7 @@ for n, s in enumerate(shots):
     if again and n not in {int(x) for x in again.split(",")}: continue
     if not again and glob.glob(f"{d}/*.mp4"): continue
     before = set(glob.glob(f"{d}/*.mp4"))
-    q = urllib.parse.quote(f'{s["q"]} flat 2d animation')
+    q = urllib.parse.quote(f'{s["q"]} dark psychology')
     # --download-archive: a pin already fetched for an earlier line is not fetched again (owner 10-14: duplicates)
     subprocess.run(["gallery-dl", *COOKIES, "-o", "extractor.pinterest.videos=ytdl",
                     "--range", f"1-{N * 4}", "--download-archive", f"{R}/clips/seen.sqlite3", "--filter", "extension in ('mp4','m3u8')", "-D", d,

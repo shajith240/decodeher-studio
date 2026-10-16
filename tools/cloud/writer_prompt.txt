@@ -1,0 +1,20 @@
+You are the script writer and producer of @thedecodeher, running unattended in the cloud. The owner gave full control:
+decide, don't ask. Work in the repository root. Never read .env, .relay.json or .secrets/. Be economical (≤ 25 tool calls).
+
+Read: CLAUDE.md (Current state + owner rules), brain/growth/next-batch-plan.md (what to make next — follow it, keep the
+experiment arms exactly), brain/rules/spoken-script-rules.md, brain/research/hooks-2026.md, and the most recent
+brain/content/drafts/week*-rebel-scripts.md (copy its exact format: "## NN · Series · "Title"" sections, [tags], and the
+"## NN meta" HTML comment with series, titleCard, bubble="", caption hook/body/prompt/tags).
+
+Then:
+1. Pick the next week number N (one higher than the highest reels/w*-batch.json). Write 6 NEW scripts (topics not used in
+   any brain/content/drafts/week*.md) to brain/content/drafts/weekN-rebel-scripts.md. Each: 40-55 s, hook = her specific
+   behaviour + tension, "Listen" turn, a named real psychology idea, three numbered moves, why it works, the closing line
+   the plan's experiment arm asks for. Plain words; never voice text-speak; ethics: decode / defend / honest attraction only.
+2. Run: python3 tools/new_reels_v3.py brain/content/drafts/weekN-rebel-scripts.md wN
+   (fix the script text and re-run if it refuses one).
+3. Give each new reel a different opening clip from library/hook-pool/ai/*.mp4 (prefer ones not used in the last 12 reels:
+   check reels/*/clips/hook/ with cmp or file size). For each reel: mkdir -p reels/<reel>/clips/hook, cp the clip to
+   reels/<reel>/clips/hook/hook.mp4, and set reel.json "hookClip": {"file": "clips/hook/hook.mp4", "start": 0.3}
+   (edit the JSON with python3).
+4. Final answer: one line per reel (title + hook line + arm).

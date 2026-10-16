@@ -8,7 +8,7 @@ import json, os, re, subprocess, sys
 
 R = os.path.abspath(sys.argv[1]); os.chdir(R)
 cfg = json.load(open("reel.json")) if os.path.exists("reel.json") else {}
-lines = [l["text"] if isinstance(l, dict) else l for l in json.load(open("assets/vo/script.json"))]   # lines may carry delivery marks
+lines = [re.sub(r"\s+", " ", re.sub(r"\[[^\]]*\]", " ", l["text"] if isinstance(l, dict) else l)).strip() for l in json.load(open("assets/vo/script.json"))]   # lines may carry delivery marks and inline [tags] (stripped: captions/words are clean)
 dur = lambda f: float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f]))
 n = len(lines)
 vo_len = [round(dur(f"assets/vo/l{i+1:02d}.wav"), 3) for i in range(n)]

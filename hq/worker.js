@@ -129,6 +129,19 @@ function unfinished(snap) {
   return snap.reels.filter((r) => r && !r.queued && r.next !== "posted" && !/^(posted|queued)/.test(String(r.posted || "")));
 }
 
+// owner 10-16: Pinterest links sent in Telegram go to an inbox; the laptop manager downloads, de-duplicates and files them
+const PIN_RE = /https?:\/\/(?:pin\.it\/[A-Za-z0-9]+|(?:[a-z]{2,3}\.)?(?:www\.)?pinterest\.[a-z.]+\/pin\/[A-Za-z0-9_-]+\/?)/gi;
+const pinLinks = (t) => [...new Set((String(t).match(PIN_RE) || []).map((u) => u.replace(/\/+$/, "")))].slice(0, 30);
+const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.test(t) ? "hook" : /\b(dark|psych\w*|story|clip|scene|b-?roll)\b/i.test(t) ? "dark" : null;
+const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips" };
+async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop (JPEG, base64)
+  if (!env.TELEGRAM_BOT_TOKEN || !env.OWNER_CHAT_ID) return { ok: false };
+  const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), f = new FormData();
+  f.append("chat_id", String(env.OWNER_CHAT_ID)); f.append("caption", caption.slice(0, 1000)); f.append("parse_mode", "HTML");
+  f.append("photo", new Blob([bin], { type: "image/jpeg" }), "frame.jpg");
+  try { const r = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: "POST", body: f }); return { ok: r.ok }; } catch { return { ok: false }; }
+}
+
 const HELP = `Here's what I can do:
 /status – how the factory and posting are doing
 /queue – the posts that are booked
@@ -137,6 +150,8 @@ const HELP = `Here's what I can do:
 /resume – start posting again
 /make – start the factory now
 /help – this list
+
+📌 Send me Pinterest links (pin.it/…) any time — AI-girl hooks or dark-psychology clips. Add "ai girl" or "dark" to skip my question. I download them, check we don't have them already, and add them to the library.
 
 Or just type what you want changed (for example "make the captions bigger") and I'll get to work and send you a preview to approve.`;
 
@@ -252,6 +267,8 @@ export class HQ extends DurableObject {
     const text = String(m.text || m.caption || "").trim();
     if (!text) return say(this.env, "I can only read text for now. Type what you'd like, or /help.");
     const cmd = text.startsWith("/") ? text.split(/\s+/)[0].slice(1).split("@")[0].toLowerCase() : null;
+    const pins = cmd ? [] : pinLinks(text);
+    if (pins.length) return this.onPins(text, pins);
     if (cmd === "start" || cmd === "help") return say(this.env, esc(HELP));
     if (cmd === "status") return say(this.env, await this.statusText());
     if (cmd === "queue") return say(this.env, await this.queueText());
@@ -273,6 +290,31 @@ export class HQ extends DurableObject {
     return this.onRequest(text);
   }
 
+  async onPins(text, urls) {
+    const kind = pinKind(text.replace(PIN_RE, " ")), id = newId("p"), inbox = await this.get("pinInbox", []);
+    inbox.push({ id, urls, kind, state: kind ? "queued" : "asking", at: Date.now() });
+    await this.put("pinInbox", inbox.slice(-300));
+    await this.note("activity", `Owner sent ${urls.length} Pinterest link${urls.length > 1 ? "s" : ""}${kind ? ` (${KIND_SAY[kind]})` : ""}`);
+    const n = `${urls.length} link${urls.length > 1 ? "s" : ""}`;
+    if (kind) return say(this.env, `📥 Got ${n} for <b>${KIND_SAY[kind]}</b>. I'll download, check for duplicates and tell you what I added.`);
+    return say(this.env, `📥 Got ${n}. What are they?`, { reply_markup: { inline_keyboard: [[
+      { text: "💃 AI girl hook", callback_data: `pin:hook:${id}` }, { text: "🌑 Dark-psychology clip", callback_data: `pin:dark:${id}` }]] } });
+  }
+  async pinInbox() {   // the laptop manager asks for work
+    const inbox = await this.get("pinInbox", []);
+    return { ok: true, items: inbox.filter((x) => x.state === "queued").map(({ id, urls, kind, at }) => ({ id, urls, kind, at })) };
+  }
+  async pinResult(b) {   // the laptop manager reports: {id, state: "working"|"done"|"failed", text, photo_b64?}
+    const inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === b.id);
+    if (!it) return { ok: false, error: "unknown id" };
+    it.state = ["working", "done", "failed"].includes(b.state) ? b.state : it.state; it.updatedAt = Date.now();
+    await this.put("pinInbox", inbox);
+    const text = String(b.text || "").slice(0, 3500);
+    if (text) { if (b.photo_b64 && String(b.photo_b64).length < 1.3e6) await tgPhoto(this.env, String(b.photo_b64), text); else await say(this.env, text); }
+    if (it.state === "done" || it.state === "failed") await this.note("activity", `Pinterest links ${it.id}: ${it.state}`);
+    return { ok: true };
+  }
+
   async onRequest(text) {   // free text = a change request for the manager agent on GitHub Actions
     const id = newId("r"), reqs = await this.get("requests", []);
     const r = await dispatch(this.env, "manager-request", { request_id: id, text: text.slice(0, 4000) });
@@ -285,8 +327,18 @@ export class HQ extends DurableObject {
   }
 
   async onButton(cq) {
-    const [action, id] = String(cq.data || "").split(":");
-    const answer = (text) => tg(this.env, "answerCallbackQuery", { callback_query_id: cq.id, text });
+    const parts = String(cq.data || "").split(":"), answer = (text) => tg(this.env, "answerCallbackQuery", { callback_query_id: cq.id, text });
+    if (parts[0] === "pin") {   // which library the links go to
+      const kind = parts[1] === "hook" ? "hook" : "dark", inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === parts[2]);
+      if (!it) return answer("I can't find those links any more.");
+      if (it.state !== "asking") return answer("Already on it.");
+      it.kind = kind; it.state = "queued"; await this.put("pinInbox", inbox);
+      const chat = cq.message && cq.message.chat && cq.message.chat.id, mid = cq.message && cq.message.message_id;
+      if (chat && mid) await tg(this.env, "editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } });
+      await answer(KIND_SAY[kind]);
+      return say(this.env, `👍 ${it.urls.length} link${it.urls.length > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>. Downloading when the laptop is on; I'll report back.`);
+    }
+    const [action, id] = parts;
     if (!["approve", "reject"].includes(action) || !id) return answer("I don't know that button.");
     const pending = await this.get("pending", {}), p = pending[id];
     if (!p) return answer("I can't find that preview any more.");
@@ -472,6 +524,16 @@ export class HQ extends DurableObject {
 
   async watchFactory(now) {
     const snap = await this.get("snapshot"), at = await this.get("snapshotAt");
+    // owner 10-16: the campus Wi-Fi login expired and the laptop went silent — tell the owner (once per outage) and when it's back
+    const st = await this.get("stats", {});
+    if (at && now - at > 15 * 60e3 && st.offlineFor !== at) {
+      st.offlineFor = at; st.offlineWarnedAt = now; await this.put("stats", st);
+      await say(this.env, `📴 The laptop has been offline for ${Math.round((now - at) / 60e3)} min (last check-in ${istTime(at)} IST). Most likely the campus Wi-Fi login expired (open any site on the laptop and log in) or the laptop went to sleep.\n\nPosting is NOT affected — booked reels still go out. Only new reels wait.`);
+      await this.note("error", "Laptop offline (no check-in for 15+ min)");
+    } else if (at && st.offlineWarnedAt && now - at < 5 * 60e3) {
+      const mins = Math.round((now - st.offlineWarnedAt) / 60e3) + 15; st.offlineWarnedAt = null; await this.put("stats", st);
+      await say(this.env, `✅ The laptop is back online (was out about ${mins} min). The factory carries on by itself.`);
+    }
     if (!at || now - at <= STALE_MS) return;
     const left = unfinished(snap);
     if (!left.length) return;
@@ -541,6 +603,11 @@ async function handle(req, env) {
     const b = await body(req); if (!b) return json({ ok: false, error: "send a JSON object (max 1 MB)" }, 400);
     const r = p === "/api/state" ? await hq(env).putSnapshot(b) : await hq(env).event(b);
     return json(r, r.ok ? 200 : 400);
+  }
+  if (p === "/api/inbox") {   // owner 10-16: Pinterest links from Telegram (laptop manager reads + reports)
+    if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+    if (req.method === "GET") return json(await hq(env).pinInbox());
+    if (req.method === "POST") { const b = await body(req); if (!b || !b.id) return json({ ok: false, error: "send {id, state, text}" }, 400); const r = await hq(env).pinResult(b); return json(r, r.ok ? 200 : 400); }
   }
   if (p === "/tg" && req.method === "POST") {
     if (!env.TELEGRAM_SECRET || !same(req.headers.get("X-Telegram-Bot-Api-Secret-Token"), env.TELEGRAM_SECRET)) return new Response("forbidden", { status: 403 });

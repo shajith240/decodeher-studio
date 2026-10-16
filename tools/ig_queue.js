@@ -3,6 +3,7 @@
 //   node tools/ig_queue.js add <dir>          upload every *-FINAL.mp4 in <dir> (with its *-caption.txt), in filename order,
 //                                             into the next free slots
 //   node tools/ig_queue.js status             queue, last relay log lines, token age
+//   node tools/ig_queue.js insights [days]    per-reel stats (reach, views, watch time, likes, comments, shares, saves) + followers, JSON
 //   node tools/ig_queue.js pause | resume     stop / restart posting (nothing is lost while paused; >12 h late = skipped)
 //   node tools/ig_queue.js ids                list every reel with its id
 //   node tools/ig_queue.js remove <id>        drop a queued reel (and its hosted video)
@@ -18,7 +19,7 @@ const ROOT = path.resolve(__dirname, "..");
 const R = fs.existsSync(path.join(ROOT, ".relay.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, ".relay.json"), "utf8"))
   : process.env.RELAY_URL && process.env.RELAY_KEY ? { url: process.env.RELAY_URL.replace(/\/+$/, ""), key: process.env.RELAY_KEY }
   : (() => { console.error("⛔ no relay config: .relay.json or RELAY_URL + RELAY_KEY"); process.exit(1); })();
-const SLOTS = ["08:30", "14:00", "21:00"];   // IST — 10-15 growth push (target 1,000 followers by 10-26): 3 reels a day
+const SLOTS = ["08:30", "18:30", "22:00"];   // IST — 10-16 growth brain: 08:30 India morning / US late evening, 18:30 = US morning (9 am ET), 22:00 = US lunch + India night (brain/research/audience-location.md); was 08:30/14:00/21:00
 const IST = 330;                          // minutes ahead of UTC
 const START = Date.UTC(2026, 9, 14, 3, 0);   // slots from 14 Oct 2026 08:30 IST (= 03:00 UTC); reel 1 went out 13 Oct (owner: "start today")
 
@@ -37,6 +38,10 @@ function* slots() {
 
 (async () => {
   const [cmd, arg] = process.argv.slice(2);
+  if (cmd === "insights") {   // 10-16 growth brain: per-reel stats + followers as JSON (tools/growth_analyze.py reads this)
+    const days = Math.min(30, Number(process.argv[3] || 30));
+    return console.log(JSON.stringify(await api("GET", `/insights?days=${days}`)));
+  }
   if (cmd === "status") {
     const s = await api("GET", "/status");
     console.log(`paused: ${s.paused}   token age: ${s.tokenAgeDays} days`);

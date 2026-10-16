@@ -283,7 +283,8 @@ test("stale factory warning: once a day, only while reels are unfinished", async
   const w = world();
   await w.req("/api/state", { method: "POST", headers: w.auth, body: { reels: [{ dir: "w2-30", next: "voice", queued: false, posted: "" }, { dir: "w2-31", next: "posted", queued: false, posted: "posted · 10-15 21:00" }] } });
   fakeNow += 24 * 3600e3;   // 24 h later (09:00 IST, before the digest hour)
-  await w.obj.alarm(); assert.equal(w.tgCalls("sendMessage").length, 0, "not stale yet");
+  await w.obj.alarm(); assert.equal(w.tgCalls("sendMessage").filter((c) => /hasn't checked in/.test(c.body.text)).length, 0, "not stale yet");
+  assert.equal(w.tgCalls("sendMessage").filter((c) => /laptop has been offline/i.test(c.body.text)).length, 1, "10-16: the 15-min offline alert fired once");
   fakeNow = (await w.st.get("snapshotAt")) + 27 * 3600e3;
   const before = w.tgCalls("sendMessage").length;
   await w.obj.alarm(); await w.obj.alarm();
@@ -291,6 +292,19 @@ test("stale factory warning: once a day, only while reels are unfinished", async
   assert.equal(warns.length, 1); assert.match(warns[0].body.text, /1 reel is still unfinished/);
   fakeNow += 24 * 3600e3; await w.obj.alarm();
   assert.equal(w.tgCalls("sendMessage").filter((c) => /hasn't checked in/.test(c.body.text)).length, 2, "again the next day");
+});
+
+test("laptop offline alert: once per outage, then 'back online' when it reports again", async () => {
+  fakeNow = at("2026-10-16", "09:00");
+  const w = world();
+  await w.req("/api/state", { method: "POST", headers: w.auth, body: { reels: [] } });
+  fakeNow += 10 * 60e3; await w.obj.alarm();
+  const off = () => w.tgCalls("sendMessage").filter((c) => /laptop has been offline/i.test(c.body.text)).length;
+  assert.equal(off(), 0, "10 min: no alert yet");
+  fakeNow += 10 * 60e3; await w.obj.alarm(); fakeNow += 10 * 60e3; await w.obj.alarm();
+  assert.equal(off(), 1, "one alert per outage");
+  await w.req("/api/state", { method: "POST", headers: w.auth, body: { reels: [] } }); await w.obj.alarm();
+  assert.equal(w.tgCalls("sendMessage").filter((c) => /back online/i.test(c.body.text)).length, 1, "back-online message");
 });
 
 test("no stale warning when every reel is finished", async () => {

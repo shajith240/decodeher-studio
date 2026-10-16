@@ -47,7 +47,9 @@ def stage_of(R):
     if cfg.get("parked"): return "parked"
     queued = os.path.exists(f"logs/queued/{slug}")   # written by queue_reel.sh only after the relay confirmed the post
     if queued: return "done"
-    if os.path.exists(f"deliverables/week-2/{slug}.mp4"): return "queue"
+    if os.path.exists(f"deliverables/week-2/{slug}.mp4"):
+        if cfg.get("approval") == "pending": return "parked"   # 10-15: owner approves a sample reel before it is booked
+        return "queue"
     tj = f"{R}/assets/timing.js"
     if not (os.path.exists(tj) and '"words"' in open(tj).read()): return "voice"
     shots = jload(f"{R}/shots.json")
@@ -82,14 +84,14 @@ def commands(R, stage):
     py, rel = sys.executable, os.path.relpath(R, ROOT)
     if stage == "voice":
         return [[py, "tools/reel_vo.py", rel], [py, "tools/reel_timing.py", rel],
-                ["uv", "run", "-q", "--with", "faster-whisper", "--with", "numpy", "python", "-W", "ignore", "tools/align_words.py", rel]]
+                ["uv", "run", "-q", "--offline", "--with", "faster-whisper", "--with", "numpy", "python", "-W", "ignore", "tools/align_words.py", rel]]
     if stage == "plan":
         return [claude(PLAN_PROMPT.replace("{REEL}", os.path.join(ROOT, rel)), "sonnet", ["Read", "Write", "Bash(python3:*)"])]
     if stage == "clips":
         return [["uv", "run", "-q", "--with", "gallery-dl", "--with", "yt-dlp", "--with", "secretstorage", "python", "tools/fetch_pool.py", rel, "--per", "8"]]
     if stage == "mix":
         return [[py, "tools/shot_times.py", rel], [py, "tools/word_cues.py", rel], [py, "tools/fill_page.py", rel],
-                ["uv", "run", "-q", "--with", "numpy", "--with", "scipy", "--with", "soundfile", "--with", "pyloudnorm", "--with", "librosa",
+                ["uv", "run", "-q", "--offline", "--with", "numpy", "--with", "scipy", "--with", "soundfile", "--with", "pyloudnorm", "--with", "librosa",
                  "python", "-W", "ignore", "tools/reel_mix.py", rel]]
     if stage == "sheets":
         return [["bash", "tools/reel_prep.sh", rel]]
@@ -132,7 +134,8 @@ class Job:
 
 def reels():
     out = []
-    for b in BATCHES:
+    # 10-16 cloud: every reels/*-batch.json is a live batch (a new batch needs no config edit or git commit); retired batches are deleted
+    for b in sorted(set(BATCHES) | set(glob.glob("reels/*-batch.json"))):
         for r in jload(b, []) or []:
             if os.path.isdir(r) and r not in out: out.append(r)
     return out
@@ -164,7 +167,7 @@ def main():
                 if j.stage == "research":
                     cfg = jload(f"{R}/reel.json", {}); cfg["clip_round"] = 2; json.dump(cfg, open(f"{R}/reel.json", "w"), indent=1, ensure_ascii=False)
             elif getattr(j, "limit", False):   # 10-15: Claude "session limit" is not a reel fault (w2-07 got parked by it) — wait 30 min, don't count a failure
-                cool[R] = time.time() + 1800; log(f"{SAY[j.stage]} paused · {title(R)} · Claude session limit, retry in 30 min")
+                cool[R] = time.time() + 600; log(f"{SAY[j.stage]} paused · {title(R)} · Claude session limit, retry in 10 min")   # 10-16: was 30 min — re-check sooner after a reset
             else:
                 n = fails.get((R, j.stage), 0) + 1; fails[(R, j.stage)] = n
                 if n >= 3:
@@ -181,6 +184,13 @@ def main():
             if time.time() - last_clean > 600:
                 last_clean = time.time(); log(f"Disk low · {free:.1f} GB free · cleaning caches, new jobs wait")
                 subprocess.run("rm -rf ~/.cache/hyperframes/history/*", shell=True, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # 10-15: keep the board truthful while waiting (a finished render showed as "rendering" for 10 min because this skipped the snapshot)
+            try:
+                st_now = {os.path.basename(R): stage_of(R) for R in reels()}; run_now = {os.path.basename(R): j.stage for R, j in running.items()}
+                if st_now != last_state.get("reels") or run_now != last_state.get("running"):
+                    snap = {"at": time.strftime("%F %T"), "reels": st_now, "running": run_now, "lanes": {}, "parked": {}, "waiting_for_disk": round(free, 1)}
+                    json.dump(snap, open(f"{LOGS}/factory.json", "w"), indent=1); last_state = snap
+            except Exception: pass
             # 10-15: still beat (the Manager restarted a merely-waiting factory every 5 min) and still nudge the relay (posts stay on time)
             try: open(f"{LOGS}/factory.beat", "w").write(time.strftime("%F %T"))
             except OSError: pass

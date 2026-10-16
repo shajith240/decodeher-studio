@@ -1,0 +1,83 @@
+# The daily planner, in the cloud (10-16 owner: "the complete cloud run"): growth brain (measure → read experts → think) and,
+# when fewer than 6 reels are waiting, Claude writes the next 6 scripts and sets them up as a new batch on Drive. The factory
+# workflow (every 3 h) then voices, edits, renders and books them. Weekly: prune old clip candidates on Drive (15 GB free plan).
+name: planner
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # 05:30 IST
+  workflow_dispatch:
+
+concurrency:
+  group: factory          # never at the same time as a factory run (both write reels/ on Drive)
+  cancel-in-progress: false
+
+permissions:
+  contents: write         # commits brain/ (growth notes, playbook, new script drafts) back to the repo
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      TZ: Asia/Kolkata
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare
+      - name: Pull from Drive
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh pull
+      - name: Growth brain (measure, read the expert sources, think)
+        continue-on-error: true
+        env:
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: timeout 3000 bash tools/growth_daily.sh
+      - name: Write the next batch if fewer than 6 reels are waiting
+        continue-on-error: true
+        env:
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          booked=$(node tools/ig_queue.js ids 2>/dev/null | grep -c " queued " || true)
+          unfinished=$(python3 - <<'EOF'
+          import glob, json, os
+          n = 0
+          for b in glob.glob("reels/*-batch.json"):
+              for r in json.load(open(b)):
+                  slug = os.path.basename(r)
+                  if os.path.isdir(r) and not os.path.exists(f"deliverables/week-2/{slug}.mp4") and not os.path.exists(f"logs/queued/{slug}"):
+                      n += 1
+          print(n)
+          EOF
+          )
+          echo "booked=$booked unfinished=$unfinished"
+          if [ $((booked + unfinished)) -lt 6 ]; then
+            claude -p "$(cat tools/cloud/writer_prompt.txt)" --model sonnet --allowedTools "Read" "Write" "Edit" "Glob" "Grep" "Bash(python3:*)" "Bash(mkdir:*)" "Bash(cp:*)" "Bash(ls:*)" "Bash(cmp:*)" --output-format text | tee logs/writer.log
+            python3 tools/cloud/report.py event done "New batch written: $(grep -v '^\s*$' logs/writer.log | head -8 | tr '\n' ' ' | cut -c1-900)" || true
+          fi
+      - name: Weekly Drive clean-up (Sundays)
+        if: always()
+        continue-on-error: true
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+        run: '[ "$(date +%u)" = 7 ] && APPLY=1 bash tools/cloud/sync.sh prune || true'
+      - name: Push to Drive
+        if: always()
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh push
+      - name: Commit the brain (notes, playbook, plan, script drafts)
+        if: always()
+        run: |
+          git config user.name "decodeher-planner"; git config user.email "planner@users.noreply.github.com"
+          git add brain/ && git diff --cached --quiet || { git commit -q -m "Planner $(date +%F): growth notes, plan, scripts"; git push -q; }

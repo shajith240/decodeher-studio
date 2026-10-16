@@ -58,7 +58,8 @@ function reelRow(dir) {   // a rendered reel counts as judged (its judge files m
   // 10-15: the 350 MB master is deleted once a reel is booked, so "has a video" = master on disk OR booked/posted (logs/queued marker)
   const posted = q && q.status === "posted", queued = q && q.status === "queued", hasVideo = exists(video) || exists(path.join(ROOT, "logs/queued", dir));
   const judgedDone = hasVideo || (sheets && judged >= sheets);
-  let next = !timed ? "voice" : clips < body.length - 1 ? "scout" : !judgedDone ? "judge" : !hasVideo ? "edit" : !q ? "post" : posted ? "posted" : "post";
+  // 10-16: a finished / booked / posted reel never goes back to Scout because the manager cleaned its raw clips off the disk
+  let next = posted ? "posted" : (q || hasVideo) ? "post" : !timed ? "voice" : clips < body.length - 1 ? "scout" : !judgedDone ? "judge" : "edit";
   // the factory's own stage wins (owner 10-14: 6 reels sat on Edit's belt while they were really back with Scout for a 2nd clip search)
   const fst = (json(path.join(ROOT, "logs/factory.json"), {}).reels || {})[dir];
   // 10-15 fix: Mix was mapped to Judge and Render to Edit, so a mixing reel sat at the Judge desk; inside the render stage the clip
@@ -94,7 +95,7 @@ function stations(run) {
     const last = log.find((l) => prefixes.some((p) => l.slice(10).startsWith(p)));
     // each desk is busy only for its OWN step: the reel moves edit → mix → render, so Edit is free while Mix/Render hold it (owner 10-14)
     const busy = (k === "judge" && run.some((r) => r.startsWith("building contact sheets"))) ||
-      (JOB_OF[k] && run.some((r) => r.startsWith(JOB_OF[k]))) || (k === "judge" && last && /^\S+\s+Judging/.test(last) && !log.slice(0, log.indexOf(last)).some((l) => /Judged/.test(l)));
+      (JOB_OF[k] && run.some((r) => r.startsWith(JOB_OF[k]))) || (k === "judge" && last && /^\S+\s+Judging(?! done)/.test(last) && !log.slice(0, log.indexOf(last)).some((l) => /Judged|Judging done/.test(l)));
     out[k] = { busy: !!busy, text: last ? last.slice(10) : "", at: last ? last.slice(0, 8) : "" };
   }
   // 10-15 fix (owner: "audio mixing is going on but every desk says on hold"): the factory's own running list is the truth —
@@ -250,7 +251,7 @@ function handle(req, res) {
     res.writeHead(200, { "content-type": abs.endsWith(".png") ? "image/png" : "image/jpeg", "cache-control": "no-store" }); return res.end(fs.readFileSync(abs));
   }
   if (req.url.split("?")[0] === "/v2") {   // the isometric still-plate version (owner 10-15: "no motion" — kept to compare)
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(fs.readFileSync(path.join(__dirname, "board/studio-v2.html")));
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(fs.readFileSync(path.join(__dirname, "board/studio.html")));
   }
   if (req.url.split("?")[0] === "/" || req.url.startsWith("/studio")) {
     const f = path.join(__dirname, "board/studio.html");

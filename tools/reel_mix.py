@@ -109,7 +109,7 @@ thin = filt(m, 4, 1200, "low")                                            # unde
 ramp = lambda t0, d=0.6: np.clip((np.arange(N) / SR - t0) / d, 0, 1)[:, None]   # 0 → 1 over d seconds from t0
 bed = dark * (1 - ramp(turn)) + m * ramp(turn)
 bed = bed * (1 - ramp(cta - 0.3, 1.0)) + thin * ramp(cta - 0.3, 1.0)
-bed = to_lufs(bed, -22.0)                                                # un-ducked; ducked 6 dB → about -28 under speech (owner 10-14: punchy, but the bed 3 dB under the first try)
+bed = to_lufs(bed, -26.0)   # 10-16 owner: "the music must never come over the narrator" — 4 dB lower than before                                                # un-ducked; ducked 6 dB → about -28 under speech (owner 10-14: punchy, but the bed 3 dB under the first try)
 pre = int(turn * SR); bed[:pre] *= db(-3)                                # the hook bed sits lower still
 env = np.ones(N, np.float32); f = int(0.03 * SR)
 for D in drops:                                                           # 0.35 s NEAR-silence (-24 dB) before each reveal word
@@ -117,10 +117,19 @@ for D in drops:                                                           # 0.35
 tail = int(2.5 * SR); env[-tail:] *= np.linspace(1, 0, tail) ** 1.5
 bed *= env[:, None]
 carved = filt(bed, 2, [200, 300], "band") * (db(-2.5) - 1) + filt(bed, 2, [2500, 5000], "band") * (db(-3.5) - 1) + bed
-bed = (bed * (1 - duck[:, None]) + carved * duck[:, None]) * (1 - duck * (1 - db(-6)))[:, None]
+bed = (bed * (1 - duck[:, None]) + carved * duck[:, None]) * (1 - duck * (1 - db(-9)))[:, None]
+# hard rule (owner 10-16): wherever the narrator talks, the bed stays >= 12 dB under the voice (short-term RMS, 50 ms hops, 400 ms windows)
+_w, _h = int(0.4 * SR), int(0.05 * SR)
+from scipy.ndimage import uniform_filter1d   # O(N) moving average — np.convolve with a 19,200-sample kernel took minutes per reel (10-16)
+_rms = lambda x: np.sqrt(uniform_filter1d((x.mean(axis=1) if x.ndim > 1 else x).astype(np.float64) ** 2, size=_w, mode="nearest") + 1e-12)
+_v, _b = _rms(voice), _rms(bed); _lim = _v * db(-12)
+_g = np.where((duck > 0.2) & (_b > _lim), _lim / _b, 1.0)
+_g = uniform_filter1d(_g.astype(np.float64), size=_h, mode="nearest")                             # smooth the extra gain so it never pumps audibly
+bed *= np.minimum(1.0, _g)[:, None]
 
 # ── sfx: by ear (library/sfx-brand/ranked.json), rotated, jittered, levelled by loudness
-ranked = json.load(open(os.path.join(ROOT, "library/sfx-brand/ranked.json")))
+SFXSET = json.load(open(os.path.join(ROOT, "config.json"))).get("reels", {}).get("sfxSet")   # owner 10-16: "use ONLY the sounds in the pack"
+ranked = json.load(open(os.path.join(ROOT, SFXSET or "library/sfx-brand/ranked.json")))
 used = {}
 def pick(role, salt):
     files = ranked.get(role, [])[:8]
@@ -145,6 +154,10 @@ LOUD = {   # LUFS of each sound in the mix (voice = -17): a hierarchy instead of
 SIG = os.path.join(ROOT, "library/sfx-brand/signature/outro-hit.wav")
 outro_t = next((c["t"] for c in cues if c["type"] == "outro-hit"), T["voEnd"][-1])
 cues = [c for c in cues if c["type"] != "outro-hit"]
+if SFXSET:   # 10-16 owner: snaps and laughs are NOT random — only where the narration peaks (reel.json "snaps"/"laughs", chosen by tools/peak_points.py)
+    cues = [c for c in cues if c["type"] not in ("snap", "sting")]
+    cues += [{"type": "snap", "t": round(T["vo"][i] - 0.02, 3), "gain": 4} for i in cfg.get("snaps", []) if 0 <= i < len(T["vo"])]
+    cues += [{"type": "sting", "t": round(T["voEnd"][i] + 0.05, 3), "gain": -6} for i in cfg.get("laughs", []) if 0 <= i < len(T["voEnd"])]
 cue = sorted(({**c, "rank": LOUD.get(c["type"], ("", 0, 1))[2]} for c in cues), key=lambda c: (-c["rank"], c["t"]))
 big = [outro_t]
 kept = []
@@ -167,7 +180,8 @@ for c in sorted(kept, key=lambda c: c["t"]):
         if sb is not None: place(fx, to_lufs(sb, L - 3), c["t"])
     else: place(soft, x[: int(2.5 * SR)], c["t"])
 OS = json.load(open(os.path.join(ROOT, "config.json"))).get("reels", {}).get("outroSound")
-if OS:   # owner 10-15: a mysterious piano under the spoken tagline instead of the hit — from 1 s before the tagline, under the voice
+if SFXSET: pass   # pack-only sound (10-16): no brand outro piano / hit, the music tail ends the reel
+elif OS:   # owner 10-15: a mysterious piano under the spoken tagline instead of the hit — from 1 s before the tagline, under the voice
     place(fx, to_lufs(load(os.path.join(ROOT, OS)), -24.0), max(0, T["vo"][-1] - 1.0))
 else:
     place(fx, load(SIG), outro_t - 0.005)                                   # signature, at the level it had in REEL-01

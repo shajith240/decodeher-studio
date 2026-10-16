@@ -23,7 +23,7 @@ def one(item):
         os.makedirs(d, exist_ok=True)
         subprocess.run(["gallery-dl", *COOKIES, "-o", "extractor.pinterest.videos=ytdl",
                         "--range", f"1-{per * 4}", "--download-archive", f"{POOL}/seen-{k % 2}.sqlite3", "--filter", "extension in ('mp4','m3u8')", "-D", d,
-                        "https://www.pinterest.com/search/pins/?q=" + urllib.parse.quote(f"{q} flat 2d animation")], capture_output=True, timeout=600)
+                        "https://www.pinterest.com/search/pins/?q=" + urllib.parse.quote(f"{q} dark psychology")], capture_output=True, timeout=600)   # owner 10-16: moodier, on-topic than "flat 2d animation"
         for x in sorted(glob.glob(f"{d}/*.mp4"))[per:]: os.remove(x)
         time.sleep(4)
     vids = sorted(glob.glob(f"{d}/*.mp4"))
