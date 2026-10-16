@@ -5,7 +5,7 @@
 # Usage: tools/queue_reel.sh reels/<reel>
 set -euo pipefail; R="$1"; cd "$(dirname "$0")/.."; slug="$(basename "$R")"; Q=deliverables/queue; mkdir -p "$Q"
 # never twice: if this reel already has a caption in the queue folder, it is queued — stop
-if [ -f "logs/queued/$slug" ]; then echo "already queued: $slug"; exit 0; fi   # marker written only after the relay confirmed
+if [ -f "logs/queued/$slug" ] && ! python3 -c "import json,sys; sys.exit(0 if json.load(open(sys.argv[1])).get('requeue') else 1)" "reels/$slug/reel.json" 2>/dev/null; then echo "already queued: $slug"; exit 0; fi   # marker written only after the relay confirmed; a requeue (re-made video) passes
 # audit 10-15 H1: never write the queue while a post is going live — wait out 3 min before to 12 min after each slot (08:30, 18:30, 22:00 IST — slots changed 10-16, keep in sync with tools/ig_queue.js SLOTS)
 while python3 -c "
 import datetime as d; n=d.datetime.now(d.timezone(d.timedelta(hours=5,minutes=30))); m=n.hour*60+n.minute
