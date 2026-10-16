@@ -16,6 +16,8 @@ raw = subprocess.run(["node", "tools/ig_queue.js", "insights", "30"], capture_ou
 try: data = json.loads(raw)
 except json.JSONDecodeError: raise SystemExit("insights not available: " + raw[:200])
 json.dump(data, open(f"{G}/data/insights-{day}.json", "w"), indent=1)
+# owner 10-17: reels the owner archived/deleted on Instagram ("does not exist") are gone, not 0-view reels — leave them out
+data["reels"] = [r for r in data.get("reels", []) if "does not exist" not in str(r.get("error", ""))]
 acct = data.get("account", {}); followers = acct.get("followers_count")
 new = not os.path.exists(f"{G}/data/followers.csv")
 with open(f"{G}/data/followers.csv", "a", newline="") as f:
