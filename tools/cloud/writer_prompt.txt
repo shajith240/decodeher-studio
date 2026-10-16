@@ -13,8 +13,6 @@ Then:
    the plan's experiment arm asks for. Plain words; never voice text-speak; ethics: decode / defend / honest attraction only.
 2. Run: python3 tools/new_reels_v3.py brain/content/drafts/weekN-rebel-scripts.md wN
    (fix the script text and re-run if it refuses one).
-3. Give each new reel a different opening clip from library/hook-pool/ai/*.mp4 (prefer ones not used in the last 12 reels:
-   check reels/*/clips/hook/ with cmp or file size). For each reel: mkdir -p reels/<reel>/clips/hook, cp the clip to
-   reels/<reel>/clips/hook/hook.mp4, and set reel.json "hookClip": {"file": "clips/hook/hook.mp4", "start": 0.3}
-   (edit the JSON with python3).
+3. For each new reel run: python3 tools/pick_hook.py reels/<reel>   (it picks the AI-woman opener that matches the first
+   line, never one used in the last 12 reels, and sets hookClip/hookSrc).
 4. Final answer: one line per reel (title + hook line + arm).

@@ -60,7 +60,7 @@ jobs:
           )
           echo "booked=$booked unfinished=$unfinished"
           if [ $((booked + unfinished)) -lt 6 ]; then
-            claude -p "$(cat tools/cloud/writer_prompt.txt)" --model sonnet --allowedTools "Read" "Write" "Edit" "Glob" "Grep" "Bash(python3:*)" "Bash(mkdir:*)" "Bash(cp:*)" "Bash(ls:*)" "Bash(cmp:*)" --output-format text | tee logs/writer.log
+            claude -p "$(cat tools/cloud/writer_prompt.txt)" --model sonnet --allowedTools "Read" "Write" "Edit" "Glob" "Grep" "Bash(python3:*)" "Bash(ls:*)" --output-format text | tee logs/writer.log
             python3 tools/cloud/report.py event done "New batch written: $(grep -v '^\s*$' logs/writer.log | head -8 | tr '\n' ' ' | cut -c1-900)" || true
           fi
       - name: Weekly Drive clean-up (Sundays)

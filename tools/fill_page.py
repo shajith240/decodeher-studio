@@ -75,6 +75,21 @@ if V3:
     ts = 124 if len(title) <= 26 else 108 if len(title) <= 38 else 94           # max 2 balanced lines at ~2x the old 60 px title
     bs = 76 if len(bubble) <= 22 else 68 if len(bubble) <= 44 else 64          # her message, never under 64 px
     HOOKV = bool(cfg.get("hookClip"))   # 10-16 owner: no text on the woman during the hook — title in the top band, captions wait
+    HOOK_END = None
+    if HOOKV:   # 10-16 owner: the hook shot is 2.5-4 s (not chopped, not 7-10 s), ending where a sentence ends; clipcut.py uses the same point
+        try:
+            sh = json.load(open(f"{R}/shots.json"))
+            import subprocess as _sp
+            _cl = float(_sp.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", os.path.join(R, cfg["hookClip"]["file"])]).decode())
+            _max = min(4.0, _cl - float(cfg["hookClip"].get("start", 0)) - 0.1)
+            cands = [i for i in range(1, len(sh)) if sh[i]["q"] != "OUTRO" and 2.5 <= sh[i]["t"] <= _max]
+            ends = [i for i in cands if re.search(r"[.?!…]['\"”]?\s*$", sh[i - 1].get("say", ""))]
+            k = (ends or cands or [None])[-1]
+            if k: HOOK_END = round(sh[k]["t"], 3)
+        except Exception as e: print("hook end: kept the default", e)
+        if HOOK_END: cfg["hookEnd"] = HOOK_END
+        else: cfg.pop("hookEnd", None)
+        json.dump(cfg, open(f"{R}/reel.json", "w"), indent=1, ensure_ascii=False)
     css = (" /*v3*/#v3card{position:absolute;left:70px;width:940px;top:" + ("150" if HOOKV else "560" if bubble else "700") + "px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 40%}\n"
            " #v3meta{margin:0 0 14px 20px;font:500 30px/1 'Inter',sans-serif;letter-spacing:.01em;color:#d9d9de;text-shadow:0 1px 6px rgba(0,0,0,.85)}\n"
            " #v3meta b{font-weight:600;color:#fff}\n"
@@ -92,7 +107,7 @@ if V3:
     if card:   # readable from frame 0 (only a 0.15 s scale pop, no fade-in); the word captions wait until the card has gone
         tl3 += ('  /*v3*/tl.fromTo("#v3card", { scale: 0.96 }, { scale: 1, duration: 0.15, ease: "power2.out" }, 0);'
                 ' tl.to("#v3card", { opacity: 0, duration: 0.2, ease: "power2.in" }, 2.0);'
-                ' tl.set("#caps", { opacity: 0 }, 0); tl.set("#caps", { opacity: 1 }, ' + ("Math.max(2.2, T.voEnd[0] + 0.05)" if HOOKV else "2.2") + ');/*/v3*/\n')
+                ' tl.set("#caps", { opacity: 0 }, 0); tl.set("#caps", { opacity: 1 }, ' + (str(HOOK_END) if HOOK_END else "2.2") + ');/*/v3*/\n')
     if isinstance(cfg.get("rehookAt"), int):   # the re-hook line: a quick 0.15 s push-in on the film that relaxes back, and a faint flash
         i = cfg["rehookAt"]
         tl3 += (f'  /*v3*/tl.fromTo("#bg", {{ scale: 1 }}, {{ scale: 1.06, duration: 0.15, ease: "power2.out", immediateRender: false }}, T.vo[{i}]);'

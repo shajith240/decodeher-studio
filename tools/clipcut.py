@@ -47,15 +47,10 @@ segs, moves = [], []; prev, prev_d = None, 0
 # 10-16 owner: the AI-woman hook is NOT chopped after one caption group — it plays as one continuous shot for the whole hook
 # line (until the "Listen…" snap), limited only by how much clip there is after its start point
 HOOK_SKIP, HOOK_END = set(), None
-if _hk:
-    try:
-        _t = open(f"{R}/assets/timing.js").read(); _T = json.loads(_t[_t.index("{"):_t.rindex("}") + 1])
-        _src = os.path.join(R, _hk["file"])
-        _cl = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", _src]).decode())
-        _lim = min(_T["voEnd"][0] + 0.05, max(1.0, _cl - float(_hk.get("start", 0)) - 0.1))
-        _k = next((i for i in range(1, len(shots)) if shots[i]["q"] == "OUTRO" or shots[i]["t"] >= _lim - 0.15), None)
-        if _k and _k > 1 and shots[_k]["t"] > shots[1]["t"] > 0: HOOK_SKIP = set(range(1, _k)); HOOK_END = shots[_k]["t"]   # only with real shot times
-    except Exception as e: print("hook span: kept the normal first shot:", e)
+_he = json.load(open(f"{R}/reel.json")).get("hookEnd")   # chosen by fill_page.py: 2.5-4 s, at a sentence end
+if _hk and _he:
+    _k = min(range(1, len(shots)), key=lambda i: abs(shots[i]["t"] - _he))
+    if _k > 1 and abs(shots[_k]["t"] - _he) < 0.05: HOOK_SKIP = set(range(1, _k)); HOOK_END = shots[_k]["t"]
 for n, s in enumerate(shots):
     if s["q"] == "OUTRO": break
     if n in HOOK_SKIP: continue
