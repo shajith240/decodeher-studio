@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DecodeHer Studio</title>
   <meta name="theme-color" content="#0f0608">
-  <meta name="build" content="20261016T043320Z">
+  <meta name="build" content="20261016T043621Z">
   <meta name="description" content="DecodeHer HQ: the live studio board">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -660,9 +660,9 @@
     #grow .gbar i { display: block; height: 100%; background: linear-gradient(90deg, #4f8a52, #8fd18f); border-radius: 6px }
     #grow .gsub { font-size: 13px; color: var(--dim); margin-bottom: 12px }
     #grow table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums }
-    #grow th { text-align: right; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 0 6px }
+    #grow th { text-align: right; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 0 6px 10px; white-space: nowrap }
     #grow th:first-child, #grow td:first-child { text-align: left }
-    #grow td { text-align: right; padding: 6px 0; border-top: 1px solid var(--line); color: var(--text) }
+    #grow td { text-align: right; padding: 6px 0 6px 10px; border-top: 1px solid var(--line); color: var(--text); white-space: nowrap }
     #grow td:first-child { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px }
     #grow td.zero { color: var(--faint) }
     #grow a { color: inherit; text-decoration: none }
@@ -2075,12 +2075,12 @@ function renderGrowth(){   // 10-16 UI review: the goal metric on the dashboard
   const goal = g.goal || 1000, f = g.followers, days = Math.max(0, Math.ceil((Date.parse((g.goalDate || '2026-10-26') + 'T23:59:00+05:30') - Date.now()) / 864e5));
   const h = g.history || [], wk = h.length > 1 ? f - h[Math.max(0, h.length - 8)].f : null, need = days ? Math.ceil(Math.max(0, goal - f) / days) : 0;
   const fmt = v => v == null ? '–' : v;
-  const rows = (g.reels || []).slice(0, 6).map(r => `<tr><td title="${esc(r.title)}">${r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>` : esc(r.title)}</td>
+  const rows = (g.reels || []).filter(r => r.reach != null || r.views != null).slice(0, 6).map(r => `<tr><td title="${esc(r.title)}">${r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>` : esc(r.title)}</td>
     <td>${fmt(r.reach)}</td><td>${r.avgWatch != null ? r.avgWatch + ' s' : '–'}</td><td class="${r.shares ? '' : 'zero'}">${fmt(r.shares)}</td><td class="${r.saves ? '' : 'zero'}">${fmt(r.saves)}</td></tr>`).join('');
   const html = `<div class="big"><b>${f}</b> followers of ${goal.toLocaleString()}</div>
     <div class="gbar"><i style="width:${Math.max(1, Math.min(100, 100 * f / goal))}%"></i></div>
     <div class="gsub">${days} day${days === 1 ? '' : 's'} to 26 Oct · need about ${need} a day${wk != null ? ` · ${wk >= 0 ? '+' : ''}${wk} this week` : ''}</div>
-    ${rows ? `<table><tr><th>Latest reels</th><th>Reach</th><th>Avg watch</th><th>Shares</th><th>Saves</th></tr>${rows}</table>` : ''}`;
+    ${rows ? `<table><tr><th>Latest reels</th><th>Reach</th><th>Watch</th><th>Shares</th><th>Saves</th></tr>${rows}</table>` : ''}`;
   document.getElementById('growAux').textContent = g.at ? 'updated ' + hhmm(g.at) : '';
   if (el.innerHTML !== html) { el.innerHTML = html; el.dataset.k = 1; }
 }
