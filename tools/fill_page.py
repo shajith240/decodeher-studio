@@ -90,7 +90,7 @@ if V3:
         if HOOK_END: cfg["hookEnd"] = HOOK_END
         else: cfg.pop("hookEnd", None)
         json.dump(cfg, open(f"{R}/reel.json", "w"), indent=1, ensure_ascii=False)
-    css = (" /*v3*/#v3card{" + ("display:none;" if HOOKV else "") + "position:absolute;left:70px;width:940px;top:" + ("150" if HOOKV else "560" if bubble else "700") + "px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 40%}\n"
+    css = (" /*v3*/" + ("#v3card{display:none !important} " if HOOKV else "") + "#v3card{position:absolute;left:70px;width:940px;top:" + ("150" if HOOKV else "560" if bubble else "700") + "px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 40%}\n"
            " #v3meta{margin:0 0 14px 20px;font:500 30px/1 'Inter',sans-serif;letter-spacing:.01em;color:#d9d9de;text-shadow:0 1px 6px rgba(0,0,0,.85)}\n"
            " #v3meta b{font-weight:600;color:#fff}\n"
            " #v3msg{display:flex;flex-direction:column;align-items:flex-start;max-width:900px}\n"
