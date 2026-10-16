@@ -424,7 +424,7 @@ export class HQ extends DurableObject {
   // 10-16 dashboard: followers + per-reel numbers, cached hourly (the dashboard's Growth panel; never on the public request path)
   async refreshGrowth(now, force = false) {
     const g = await this.get("growth", null);
-    if (!force && g && now - g.at < 55 * 60e3) return g;
+    if (!force && g && now - g.at < 15 * 60e3) return g;   // ~every 20 min (Instagram revises counts, e.g. shares 3 -> 0 on 10-16)
     const ins = await this.insights(30); if (!ins) return g;
     const hist = (g && g.history) || [], day = istDate(now);
     if (typeof ins.followers === "number") { const last = hist[hist.length - 1]; if (last && last.d === day) last.f = ins.followers; else hist.push({ d: day, f: ins.followers }); }

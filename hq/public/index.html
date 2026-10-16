@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DecodeHer Studio</title>
   <meta name="theme-color" content="#0f0608">
-  <meta name="build" content="20261016T043621Z">
+  <meta name="build" content="20261016T043938Z">
   <meta name="description" content="DecodeHer HQ: the live studio board">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2081,7 +2081,7 @@ function renderGrowth(){   // 10-16 UI review: the goal metric on the dashboard
     <div class="gbar"><i style="width:${Math.max(1, Math.min(100, 100 * f / goal))}%"></i></div>
     <div class="gsub">${days} day${days === 1 ? '' : 's'} to 26 Oct · need about ${need} a day${wk != null ? ` · ${wk >= 0 ? '+' : ''}${wk} this week` : ''}</div>
     ${rows ? `<table><tr><th>Latest reels</th><th>Reach</th><th>Watch</th><th>Shares</th><th>Saves</th></tr>${rows}</table>` : ''}`;
-  document.getElementById('growAux').textContent = g.at ? 'updated ' + hhmm(g.at) : '';
+  document.getElementById('growAux').textContent = g.at ? 'Instagram, ' + hhmm(g.at) : '';
   if (el.innerHTML !== html) { el.innerHTML = html; el.dataset.k = 1; }
 }
 function renderProg(){   // 10-16 owner: progress bars; UI review: only ACTIVE reels get a bar, the rest are a compact "Up next" list
