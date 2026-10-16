@@ -62,9 +62,13 @@ for n, s in enumerate(shots):
         # 10-16: a continued clip can run into its own fade-to-black ending (2 s of black under the closing words) — if the
         # continuation is dark anywhere in this shot, replay the clip from where it first started instead
         _src = f"{R}/clips/cand/{p['file']}"
-        if any(_yavg(_src, p["start"] + k * d) < 22 for k in (0.05, 0.5, 0.95)): p["start"] = p.get("orig", prev["start"])
+        if os.path.exists(_src) and any(_yavg(_src, p["start"] + k * d) < 22 for k in (0.05, 0.5, 0.95)): p["start"] = p.get("orig", prev["start"])
     if not p:   # nothing before it either (very first shot): a black hold, the caption carries it
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", f"color=c=black:s=1080x1920:r=30:d={d}", "-c:v", "libx264", "-pix_fmt", "yuv420p", out], check=True)
+    if p and not os.path.exists(f"{R}/clips/cand/{p['file']}") and os.path.exists(out):
+        # 10-17 remake (e.g. only a new hook clip): the downloads were cleaned up after the first render, so keep the piece
+        # already cut from it (same shot timings: the voice is unchanged)
+        segs.append(out); prev, prev_d = (p if "orig" in p else {**p, "orig": p["start"]}), d; continue
     if p:
         src = f"{R}/clips/cand/{p['file']}"
         for _ in range(8):   # 10-16: a clip that opens on black frames (fade-in) showed as a black shot — step past them

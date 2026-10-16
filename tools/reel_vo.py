@@ -98,7 +98,10 @@ lines = [untag(l) for l in lines]   # clean text: what is checked, aligned and c
 spoken, spoken_tagged = [], []
 _keep_end = lambda t: (lambda r: r + t[-1] if t and t[-1] in ",;:" and not r.endswith(t[-1]) else r)(_sp(t))   # speak() drops a trailing comma; a tag may follow it
 _sp = lambda t: speak(t, LANG) if LANG != "en" else speak(t)
+# owner 10-17: texting words nobody says aloud ("haha", "lol") sound weird and awkward when the AI reads them; never voiced
+TEXTSPEAK = re.compile(r"(?<![\w\u0900-\u097f])(h+a+h+a+[ha]*|he+he+[he]*|lol+|lmao+|rofl|omg|idk|tbh|smh|brb|ikr|kk|xd|हा+हा+[हा]*|लोल)(?![\w\u0900-\u097f])", re.I)
 for i, text in enumerate(lines, 1):
+    if TEXTSPEAK.search(text): sys.exit(f"line {i} has a texting word nobody says out loud ({TEXTSPEAK.search(text).group(0)!r}): {text!r} (brain/rules/spoken-script-rules.md)")
     s_ = _sp(text); bad = check(s_, LANG) if LANG != "en" else check(s_)
     if bad: sys.exit(f"line {i} still has unspeakable characters {bad!r} after conversion: {s_!r}")
     spoken.append(s_)

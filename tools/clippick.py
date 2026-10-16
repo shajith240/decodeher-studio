@@ -2,13 +2,16 @@
 Usage: python3 tools/clippick.py <reel_dir>
 Reads clips/sheets/index.json (tools/clipsheet.py) + clips/judge/NN.json written by the Haiku judges:
   {"clips": {"A": {"shows": "...", "meaning": 0-10, "style": 0-10, "text": true|false}, ...}, "better_query": "..."}
-Score = meaning (counts most) + 0.4 x judged style + 0.3 x judged quality (owner 10-14: "good quality and good looking"); meaning < 5 or judged style < 5 is never used; text/watermarks cost 3 points.
+Score = meaning (counts most) + 0.4 x judged style + 0.3 x judged quality (owner 10-14: "good quality and good looking"); meaning < 5 or judged style < 5 is never used; ANY baked-in text (judge flag or OCR, library/clip-text.json) is never used.
 Best (line, clip) match is assigned first across the reel, and a pin used once is gone for the rest of the reel —
 and (10-16) for the next 30 reels too (library/clip-usage.json).
 Writes clips/pick.json (the format tools/clipcut.py reads) and lists weak lines with the judge's better search phrase."""
 import json, os, sys
 
 R = os.path.abspath(sys.argv[1]); idx = json.load(open(f"{R}/clips/sheets/index.json"))
+# owner 10-17: the judges' small contact sheets miss baked-in text; tools/clip_text.py reads every candidate with OCR first
+TEXTED = {k for k, v in (json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "library", "clip-text.json")))
+                         if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "library", "clip-text.json")) else {}).items() if v[0]}
 opts, weak = {}, []
 for nn, e in idx.items():
     jf = f"{R}/clips/judge/{nn}.json"
@@ -17,8 +20,7 @@ for nn, e in idx.items():
     for letter, c in e["clips"].items():
         v = j["clips"].get(letter)
         if not v or v.get("meaning", 0) < 5 or v.get("style", 0) < 5 or v.get("quality", 10) < 6: continue   # off-line, live action / 3D, or cheap-looking
-        if v.get("text") or not os.path.exists(f"{R}/clips/cand/{c['file']}"): continue   # 10-16 owner: NO clips with baked-in text, ever; a removed file can't be picked
-        # on-screen text costs 3 points (watermarks lose to clean clips) but is not banned: a chat bubble can BE the line
+        if v.get("text") or os.path.basename(c["file"]) in TEXTED or not os.path.exists(f"{R}/clips/cand/{c['file']}"): continue   # 10-16 owner: NO clips with baked-in text, ever; a removed file can't be picked
         ok.append((v["meaning"] + 0.4 * v.get("style", 5) + 0.3 * v.get("quality", 6) + c["style"] - (3 if v.get("text") else 0), letter, c, v))
     ok.sort(key=lambda r: -r[0]); opts[nn] = ok
     if not ok or ok[0][3]["meaning"] < 7: weak.append((nn, e["say"], j.get("better_query", "")))
@@ -45,7 +47,7 @@ for nn, e in idx.items():
     if str(int(nn)) in pick: continue
     jf = f"{R}/clips/judge/{nn}.json"; j = json.load(open(jf))["clips"] if os.path.exists(jf) else {}
     rows = sorted(((v["meaning"] + 0.4 * v.get("style", 5) + 0.3 * v.get("quality", 5), c, v) for L, c in e["clips"].items() if (v := j.get(L))
-                   and v.get("meaning", 0) >= 4 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text") and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
+                   and v.get("meaning", 0) >= 4 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text") and os.path.basename(c["file"]) not in TEXTED and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
     if rows:
         sc, c, v = rows[0]; used.add(c["pin"])
         pick[str(int(nn))] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v["meaning"], "shows": v["shows"] + "  [fallback]", "q": idx[nn]["q"]}
@@ -54,7 +56,7 @@ for nn, e in idx.items():
     if int(nn) != 0 or "0" in pick: continue
     jf = f"{R}/clips/judge/{nn}.json"; j = json.load(open(jf))["clips"] if os.path.exists(jf) else {}
     rows = sorted(((v.get("meaning", 0) + 0.4 * v.get("style", 5), c, v) for L, c in e["clips"].items() if (v := j.get(L))
-                   and v.get("style", 0) >= 5 and not v.get("text") and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
+                   and v.get("style", 0) >= 5 and not v.get("text") and os.path.basename(c["file"]) not in TEXTED and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
     if rows:
         sc, c, v = rows[0]; used.add(c["pin"])
         pick["0"] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v.get("meaning", 0), "shows": v.get("shows", "") + "  [fallback]", "q": e["q"]}

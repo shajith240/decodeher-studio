@@ -67,3 +67,9 @@ Evidence: [[research/darkneedle-visual-grammar]]. Components: `library/stage/` (
 ## Exit timing: E[li] is NOT when the voice stops
 `T.voEnd` (E) includes about 0.35–0.55 s of trailing silence. Time pause exits from the last word's end time:
 `T.words[li].at(-1)[2]`. Exits timed from E land after the next line has started.
+
+## 10-17 owner, HARD RULE: no text inside clips, ever
+A clip with any baked-in text (words, subtitles, watermarks, usernames, chat screenshots, signs) pulls the eye away from our
+captions. Never used, not even when the text matches the line. The Haiku judges miss it on small contact sheets, so
+tools/clip_text.py reads 8 frames of every candidate with OCR before the pick (run by tools/reel_finish.sh); clippick.py and
+pick_hook.py skip every clip marked true in library/clip-text.json.

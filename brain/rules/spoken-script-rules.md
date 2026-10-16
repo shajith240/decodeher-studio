@@ -1,4 +1,11 @@
 # Spoken script rules (owner 10-15: "can't understand it, robotic, not natural")
+Method (templates, hooks, scorecard, honesty): brain/rules/script-writing-system.md (10-17). This file = how the words sound.
+
+## 10-17 owner, HARD RULE: only words a person really SAYS out loud
+Texting words that are written but never spoken (haha, hahaha, hehe, lol, lmao, rofl, omg, idk, tbh, smh, brb, ikr, k, kk, xD)
+are banned from the voice, even when quoting her text: the AI reads them literally and it sounds weird and awkward. No reel may be
+built around one (the "Haha" reel was pulled from the queue 10-17). Describe it instead ("she sends a laughing reply and nothing else").
+tools/reel_vo.py and tools/hindi_vo.py refuse a script that contains one.
 
 ## 10-16 owner, FINAL: value over length, effort into the hook
 - No 30 s cap. A reel is as long as the explanation needs (usually 35–60 s). Never speed up the voice or squeeze pauses to fit.
@@ -10,7 +17,7 @@ Test: a 16-year-old Indian guy who speaks English as a second language gets ever
 Sources: Biber (speech vs writing), Dicks "Dinner Test", Parker/Stone "so/but", brain/research/reel-storytelling-craft.md, narrator-voice-analysis.md (real narrators average 12 words per sentence, 10% fragments, ours was 5 and 47%).
 
 1. One reel, one idea, one situation. Name her exact text and say what it means in the first 2 sentences.
-2. Order of beats: her text + what it means -> one real moment (what happened, to "my friend", "I", or "you") -> the real reason -> exactly what to text instead -> one comment/send line.
+2. Order of beats: her text + what it means -> one concrete moment (told as "you" or an obvious hypothetical; never a made-up "my friend" story presented as true, 10-17) -> the real reason -> exactly what to text instead -> one comment/send line.
 3. Every sentence is COMPLETE: subject + verb, 6 to 16 words. No fragments ("Just that."), no stacked one-liners. A fragment is allowed at most once, and only for her quoted text.
 4. Connect every idea to the last one with "so", "because", "but", "and that's why", "now". Never jump. If you can't say which connector fits, the idea does not belong.
 5. Grade-5 words. Say "doesn't know what to say", not "has no conversational hook". Ban: metaphors, abstract nouns (energy, dynamic, frame, value, investment), "look at what you sent", "here's", "that's the thing".

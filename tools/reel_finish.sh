@@ -4,6 +4,8 @@
 # Usage: tools/reel_finish.sh reels/<reel> [deliverables/out.mp4]
 set -euo pipefail; R="$1"; cd "$(dirname "$0")/.."; slug="$(basename "$R")"; OUT="${2:-deliverables/week-2/$slug.mp4}"; mkdir -p "$(dirname "$OUT")"
 log(){ echo "$(date +%H:%M:%S)  $*" >> logs/activity.log; }; log "Picking clips · $slug"
+# owner 10-17: OCR every candidate clip first; clippick refuses any clip with baked-in text (library/clip-text.json)
+{ uv run -q --offline --with rapidocr_onnxruntime python -W ignore tools/clip_text.py "$R" || uv run -q --with rapidocr_onnxruntime python -W ignore tools/clip_text.py "$R"; } | head -1
 python3 tools/clippick.py "$R" | grep -cE "fallback|NO CLIP" | sed 's/^/weak or missing shots: /' || true
 python3 tools/clipcut.py "$R" | cut -c1-60
 python3 tools/peak_points.py "$R" || true   # 10-16: snaps/laughs only at the narration peaks

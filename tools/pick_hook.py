@@ -30,6 +30,8 @@ for rj in sorted(glob.glob("reels/*/reel.json"), key=os.path.getmtime)[-13:]:
     if os.path.dirname(rj) != R:
         src = (json.load(open(rj)) or {}).get("hookSrc")
         if src: recent.append(src)
+TX = json.load(open("library/clip-text.json")) if os.path.exists("library/clip-text.json") else {}
+pool = [p for p in pool if not TX.get(os.path.basename(p[0]), [False])[0]]   # owner 10-17: no clip with baked-in text (tools/clip_text.py)
 cands = [p for p in pool if p[0] not in recent and p[1]] or [p for p in pool if p[1]] or pool
 listing = "\n".join(f"{i}: {d} [{', '.join(t)}]" for i, (_, d, t) in enumerate(cands))
 prompt = (f"A dating-psychology reel opens on a short clip of a woman while the narrator says: \"{first}\"\n"

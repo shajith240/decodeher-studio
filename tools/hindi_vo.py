@@ -80,6 +80,8 @@ def main():
             continue
         if "…" in l or "..." in l: sys.exit(f"no '…' inside a Hindi line (Fish makes dead air): {l}")
         if "[" in l: sys.exit(f"no [tags] in Hindi (they sound robotic): {l}")
+        if re.search(r"(?<![\w\u0900-\u097f])(h+a+h+a+[ha]*|lol+|lmao+|omg|हा+हा+[हा]*|लोल)(?![\w\u0900-\u097f])", l, re.I):
+            sys.exit(f"texting word nobody says out loud (haha/lol) in: {l}")
         lines.append(l)
     text = " ".join(lines)
     os.makedirs(CACHE, exist_ok=True)

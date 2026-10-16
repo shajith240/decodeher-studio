@@ -23,3 +23,6 @@ Do, in order:
    to, and the caption/CTA approach. It must respect brain/rules/spoken-script-rules.md and the owner's ethics line.
 7. Append one entry to brain/growth/strategy-log.md: date, numbers in one line, what you learned today, what changes and why.
 Final answer: 5 short plain-English lines for the owner (what we learned, what we change, the experiment).
+
+HARD RULE (owner 10-17): never put texting words that nobody says out loud (haha, lol, lmao, omg, hehe, idk, tbh) in a script, and never build a reel around one; the AI voice reads them literally and it sounds awkward.
+Next-batch plans (10-17): assign each of the 6 reels a template from brain/rules/script-writing-system.md (at least 4 different, T0 at most twice) and a topic pillar; when results exist, compare reels by template.
