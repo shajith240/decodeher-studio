@@ -54,7 +54,7 @@ Someone who thinks before she answers is usually someone who's still deciding.
 [lower voice] Send this to the friend who reads her texts ten times before replying.
 
 ## 03 meta
-<!-- meta: series=Dark psychology #10, titleCard="She read it twice, . One word back.", bubble="",
+<!-- meta: series=Dark psychology #10, titleCard="She read it twice. One word back.", bubble="",
 caption hook="She read your text twice, then replied with just one short word. Why?",
 caption body="It's impression management: people choose their words for someone whose opinion matters. Don't read a short reply as rejection, give her something easy to answer, stay warm and don't over-explain.",
 caption prompt="Send this to the friend who reads her texts ten times.",

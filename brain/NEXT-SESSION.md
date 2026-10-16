@@ -27,3 +27,9 @@ Re-run the switch-over: `bash /tmp/claude-1000/-home-shajith-Projects-dark-psyco
 2. Never run the laptop factory at the same time as a cloud run (both write the same reels on Drive).
 3. When one cloud run finished cleanly: note it in CLAUDE.md "Current state" (cloud is live; laptop optional), then set
    STATUS: DONE.
+
+## 10-17 03:20 IST: text-in-clips redo PAUSED (Pinterest search down, owner saw it in the app)
+6 booked reels need new clips (OCR found baked-in text): w7-02, w7-04, w7-05, w7-06, w8-02, w8-04. Each reel.json has
+requeue:true + parked. Their current videos stay booked. When Pinterest search works again (test: gallery-dl --simulate a
+search returns results), for each: remove "parked", move logs/queued/<slug> aside; the factory re-searches, renders
+(OCR-checked) and swaps the new video into the same slot. Old pieces: scratchpad redo-1017 (temporary).

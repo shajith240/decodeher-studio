@@ -88,7 +88,11 @@ def commands(R, stage):
     if stage == "plan":
         return [claude(PLAN_PROMPT.replace("{REEL}", os.path.join(ROOT, rel)), "sonnet", ["Read", "Write", "Bash(python3:*)"])]
     if stage == "clips":
-        return [["uv", "run", "-q", "--with", "gallery-dl", "--with", "yt-dlp", "--with", "secretstorage", "python", "tools/fetch_pool.py", rel, "--per", "8"]]
+        # 10-17 owner: "use the clips we have" — after the Pinterest fetch, any line still without candidates is filled from our own
+        # pool (tools/libfill.py); reel.json "clipSource": "library" skips Pinterest entirely (Pinterest search was down 10-17)
+        lib = ["uv", "run", "-q", "--with", "torch", "--with", "transformers", "--with", "pillow", "python", "-W", "ignore", "tools/libfill.py", rel]
+        if (jload(f"{R}/reel.json", {}) or {}).get("clipSource") == "library": return [lib]
+        return [["uv", "run", "-q", "--with", "gallery-dl", "--with", "yt-dlp", "--with", "secretstorage", "python", "tools/fetch_pool.py", rel, "--per", "8"], lib]
     if stage == "mix":
         return [[py, "tools/shot_times.py", rel], [py, "tools/word_cues.py", rel], [py, "tools/fill_page.py", rel],
                 ["uv", "run", "-q", "--offline", "--with", "numpy", "--with", "scipy", "--with", "soundfile", "--with", "pyloudnorm", "--with", "librosa",
