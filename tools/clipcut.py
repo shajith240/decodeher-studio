@@ -44,9 +44,22 @@ def _yavg(src, t):   # mean brightness (0-255) of the frame at t; looped clips w
         return float(y.split("YAVG=")[-1].split()[0])
     except (ValueError, IndexError, subprocess.CalledProcessError): return 255.0
 segs, moves = [], []; prev, prev_d = None, 0
+# 10-16 owner: the AI-woman hook is NOT chopped after one caption group — it plays as one continuous shot for the whole hook
+# line (until the "Listen…" snap), limited only by how much clip there is after its start point
+HOOK_SKIP, HOOK_END = set(), None
+if _hk:
+    try:
+        _t = open(f"{R}/assets/timing.js").read(); _T = json.loads(_t[_t.index("{"):_t.rindex("}") + 1])
+        _src = os.path.join(R, _hk["file"])
+        _cl = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", _src]).decode())
+        _lim = min(_T["voEnd"][0] + 0.05, max(1.0, _cl - float(_hk.get("start", 0)) - 0.1))
+        _k = next((i for i in range(1, len(shots)) if shots[i]["q"] == "OUTRO" or shots[i]["t"] >= _lim - 0.15), None)
+        if _k and _k > 1 and shots[_k]["t"] > shots[1]["t"] > 0: HOOK_SKIP = set(range(1, _k)); HOOK_END = shots[_k]["t"]   # only with real shot times
+    except Exception as e: print("hook span: kept the normal first shot:", e)
 for n, s in enumerate(shots):
     if s["q"] == "OUTRO": break
-    t0 = 0.0 if n == 0 else s["t"]; t1 = shots[n + 1]["t"]; d = round(t1 - t0, 3)
+    if n in HOOK_SKIP: continue
+    t0 = 0.0 if n == 0 else s["t"]; t1 = HOOK_END if (n == 0 and HOOK_END) else shots[n + 1]["t"]; d = round(t1 - t0, 3)
     p = pick.get(str(n))
     out = f"{S}/{n:02d}.mp4"
     if not p and prev:   # no clip for this line (owner 10-14: black gaps look like a bug) — the previous shot simply CONTINUES
