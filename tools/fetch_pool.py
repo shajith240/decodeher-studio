@@ -25,6 +25,7 @@ def one(item):
                         "--range", f"1-{per * 4}", "--download-archive", f"{POOL}/seen-{k % 2}.sqlite3", "--filter", "extension in ('mp4','m3u8')", "-D", d,
                         "https://www.pinterest.com/search/pins/?q=" + urllib.parse.quote(f"{q} dark psychology")], capture_output=True, timeout=600)   # owner 10-16: moodier, on-topic than "flat 2d animation"
         for x in sorted(glob.glob(f"{d}/*.mp4"))[per:]: os.remove(x)
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "trim_clip.py"), "30", *sorted(glob.glob(f"{d}/*.mp4"))], capture_output=True)   # 10-16: keep the first 30 s only
         time.sleep(4)
     vids = sorted(glob.glob(f"{d}/*.mp4"))
     for R, n in users:

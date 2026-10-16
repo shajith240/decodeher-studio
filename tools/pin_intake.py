@@ -131,6 +131,7 @@ def run():
                 os.makedirs(DEST[kind], exist_ok=True); ds = describe(vid, kind); pre = "ai" if kind == "hook" else "dark"
                 name = f"{pre}-{ds['slug']}-{(pin or fp['sha'])[-6:]}" if ds else f"{pre}-{pin or fp['sha'][:12]}"
                 out = f"{DEST[kind]}/{name}.mp4"; shutil.copy(vid, out)
+                subprocess.run([sys.executable, os.path.join(ROOT, "tools", "trim_clip.py"), "12" if kind == "hook" else "30", out], capture_output=True)   # 10-16: keep the useful head only
                 json.dump({"pin": pin, "url": url, "title": meta.get("title") or meta.get("grid_title") or "", "description": (meta.get("description") or "")[:300],
                            "from": "owner via Telegram", "at": time.strftime("%F %T"), **({"ai_description": ds["description"], "tags": ds["tags"]} if ds else {})}, open(f"{DEST[kind]}/{name}.json", "w"), indent=1, ensure_ascii=False)
                 reg["items"][pin or "file:" + out] = {"file": out, "kind": kind, **fp, "at": time.strftime("%F")}; save_reg(reg)
