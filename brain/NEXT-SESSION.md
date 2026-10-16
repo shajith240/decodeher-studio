@@ -1,18 +1,23 @@
-# NEXT SESSION — start here (updated 2026-10-16 ~08:50 IST)
+STATUS: OPEN
+# NEXT SESSION — start here (written 2026-10-16 22:35 IST; owner away, laptop on)
 
-Read CLAUDE.md first (Current state is current). Never read/print .env, .relay.json, .secrets/*. Don't restart
-decodeher-factory while logs/factory.json "running" has a queue or render job. Decide on your own (owner's order); report.
+Read CLAUDE.md first. Never read/print .env, .relay.json, .secrets/*. Decide yourself (owner's order); be economical.
+When ALL tasks below are done, change the first line of this file to `STATUS: DONE` (the resume watcher then stops).
 
-## Running now
-- w7: 01 (18:30 today), 03 (22:00 today) booked; 02 "Sometime" and 05 "Why chasing fails" finished, booking into the next
-  slots; 04 at judge; 06 at clips. w8 (6 reels, send/save experiment) starts after the factory restart.
-- Slots are 08:30 / 18:30 / 22:00 IST (tools/ig_queue.js SLOTS + tools/queue_reel.sh quiet windows — keep both in sync).
+## Context
+- Owner's order (10-16 22:30): "make sure production is running in the CLOUD." A cutover script stopped the laptop
+  factory/manager/report/growth timer (disabled on purpose), uploaded reels/library/deliverables/logs to Drive, enabled the
+  GitHub workflows `factory` (every 3 h, gate step) and `planner` (05:30 IST daily) and started a first factory run.
+  Activity lines start with "Cloud cutover ·" in logs/activity.log.
+- Booked: w7-02 (10-17 18:30) and w7-04 (10-17 22:00); w7-05 at 10-17 08:30. Unfinished: w7-06, w8-01..06.
 
-## Next
-1. Check every finished w7/w8 reel's frame grid (no black gaps, no baked-in text, outro at the end, opener visible).
-2. After the 05:30 growth run, read brain/growth/next-batch-plan.md and write the w9 scripts from it (keep the experiment
-   arms intact). Produce them yourself (owner approved autonomy) once w8 is booked, so the queue never runs dry
-   (keep >= 6 reels booked ahead).
-3. Owner still to do in the app: archive the 4 old-style reels (busy-is-an-answer, keep-yourself, doesn't-move-me,
-   your-plans-matter).
-4. Rename the older hook-pool clips with AI names (tools/pin_intake.describe) — low priority.
+## Tasks
+1. Watch the cloud run: `gh run list --workflow factory -L 3`, `gh run view <id> --log-failed`. Success = it pulled Drive,
+   moved w7-06 / w8 reels forward (voice, plan, clips, judge, render), pushed Drive, reported to HQ, and booked reels when
+   finished (`node tools/ig_queue.js ids`). If a step fails: read the log, fix the real cause in the code, commit + push,
+   `gh workflow run factory -f max_minutes=160`, watch again. Typical risks: missing files on Drive (push them with
+   tools/cloud/sync.sh using SYNC_PATHS), Pinterest cookies (secret PINTEREST_COOKIES), Claude auth (secret
+   CLAUDE_CODE_OAUTH_TOKEN), disk on the runner, HyperFrames render time.
+2. Never run the laptop factory at the same time as a cloud run (both write the same reels on Drive).
+3. When one cloud run finished cleanly: note it in CLAUDE.md "Current state" (cloud is live; laptop optional), then set
+   STATUS: DONE.
