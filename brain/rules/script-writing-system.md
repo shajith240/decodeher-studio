@@ -60,3 +60,20 @@ Sends per reach and average watch time first (Mosseri 2025), then likes per reac
 Log each reel's template in its draft notes so tools/growth_analyze.py results can be compared template by template.
 Trial Reels (non-followers first) would suit template tests; our relay posts through the API and trial support there is
 unverified, so not used yet.
+
+## Additions from the second ChatGPT pack (10-17, brain/research/dark-aesthetic-narrative-pack.md)
+Taken:
+- **The first spoken line matches the opening clip** (tools/pick_hook.py already picks the AI-woman clip for line 1) and opens
+  ONE question; the middle answers it; the last line closes it. No second open question stacked on the first.
+- **The three hooks use three angles:** a sharp reframe, a specific situation, a short story opening.
+- **Add analysis, don't narrate the footage.** The voice says what the moment MEANS, never what the clip already shows.
+- **Never call ordinary behaviour a "test", "gaslighting", "narcissism" or "manipulation"** without a repeated pattern;
+  describe what happened and separate a one-off from a pattern.
+- **Never the same opening shape or the same closing line in two posts in a row** (also variety-not-template).
+- **Topic bank** (pack §1-12, rewrite in our words with a hook built on HER specific behaviour): attention is not investment
+  (she watches every story, never gives a day) · silence as a strategy backfires · mixed signals: look for follow-through ·
+  jealousy is not proof of attraction · kindness without boundaries turns into resentment · rejection is information, not
+  a verdict · chemistry is not compatibility · silence can mean different things · the clearest text is the strongest ·
+  a boundary is not a threat · overthinking is not connection · the signal that matters after a date.
+Not taken: 50-75 words / 25-35 s (owner rule: no cap, never rush; we stay 30-50 s) and "change the image only on an idea
+change" (owner-approved format: a new image per 2-4-word caption group, Zoltium style).
