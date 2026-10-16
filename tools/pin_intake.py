@@ -111,17 +111,23 @@ def run():
     if not box or not box.get("items"): return 0
     reg = load_reg(); index(reg)
     for it in box["items"]:
-        kind = it.get("kind") or "dark"; hq("POST", "/api/inbox", {"id": it["id"], "state": "working"})
-        added, dups, bad, photo = [], [], [], None
-        for url in it["urls"]:
+        kind = it.get("kind") or "dark"; added, dups, bad, photo = [], [], [], None; total_n = len(it["urls"]); done_lines = []
+        def progress(i, step):   # 10-16: live progress — HQ edits the bot's first reply
+            pct = int(100 * i / max(1, total_n)); bar = "▓" * (pct // 10) + "░" * (10 - pct // 10)
+            hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": "\n".join(
+                [f"⏳ <b>Working on your {total_n} link{'s' if total_n > 1 else ''}</b> ({NAME[kind]}s)", f"{bar} {pct}%", ""] + done_lines + ([f"{i + 1}/{total_n} {step}"] if i < total_n else []))})
+        for ui, url in enumerate(it["urls"]):
+            progress(ui, "⬇️ downloading…")
             with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "library")) as tmp:
                 try: vid, img, meta = fetch(url, tmp)
                 except Exception: vid, img, meta = None, False, {}
-                if not vid: bad.append(f"{url} ({'a photo, not a video' if img else 'could not download'})"); continue
+                if not vid: bad.append(f"{url} ({'a photo, not a video' if img else 'could not download'})"); done_lines.append(f"{ui + 1}/{total_n} ⚠️ skipped"); continue
+                progress(ui, "🔍 checking we don't already have it…")
                 pin = str(meta.get("id") or pin_of(vid) or ""); fp = prints(vid); d = dup_of(reg, pin, fp)
-                if d: dups.append(f"{url} (already have it: {os.path.basename(d['file'])}, since {d.get('at', '?')})"); continue
+                if d: dups.append(f"{url} (already have it: {os.path.basename(d['file'])}, since {d.get('at', '?')})"); done_lines.append(f"{ui + 1}/{total_n} ♻️ already in the library"); continue
                 w, h = size(vid)
                 if fp["dur"] < 2 or min(w, h) < 240: bad.append(f"{url} (too short or too small: {fp['dur']} s, {w}x{h})"); continue
+                progress(ui, "🏷 the AI is looking at it and naming it…")
                 os.makedirs(DEST[kind], exist_ok=True); ds = describe(vid, kind); pre = "ai" if kind == "hook" else "dark"
                 name = f"{pre}-{ds['slug']}-{(pin or fp['sha'])[-6:]}" if ds else f"{pre}-{pin or fp['sha'][:12]}"
                 out = f"{DEST[kind]}/{name}.mp4"; shutil.copy(vid, out)
@@ -129,13 +135,13 @@ def run():
                            "from": "owner via Telegram", "at": time.strftime("%F %T"), **({"ai_description": ds["description"], "tags": ds["tags"]} if ds else {})}, open(f"{DEST[kind]}/{name}.json", "w"), indent=1, ensure_ascii=False)
                 reg["items"][pin or "file:" + out] = {"file": out, "kind": kind, **fp, "at": time.strftime("%F")}; save_reg(reg)
                 subprocess.run(["rclone", "copy", out, DRIVE[kind], "-q"], capture_output=True, timeout=600)
-                added.append(f"{name} ({fp['dur']:.0f} s, {w}x{h})" + (f" — {ds['description']}" if ds else " — (no AI description: Claude was busy, named by pin number)")); photo = photo or frame_b64(out)
+                done_lines.append(f"{ui + 1}/{total_n} ✅ new: {name}"); added.append(f"{name} ({fp['dur']:.0f} s, {w}x{h})" + (f" — {ds['description']}" if ds else " — (no AI description: Claude was busy, named by pin number)")); photo = photo or frame_b64(out)
         lines = [f"✅ <b>{len(added)} new {NAME[kind]}{'s' if len(added) != 1 else ''}</b> added and backed up to Drive."] if added else [f"No new {NAME[kind]}s from those links."]
         lines += [f"• {a}" for a in added[:10]]
         if dups: lines += ["", f"♻️ Already in the library ({len(dups)}):"] + [f"• {d}" for d in dups[:10]]
         if bad: lines += ["", f"⚠️ Skipped ({len(bad)}):"] + [f"• {b}" for b in bad[:10]]
-        total = sum(1 for v in reg["items"].values() if v.get("kind") == kind)
-        lines += ["", f"Library now has {total} {NAME[kind]}s."]
+        total = len(glob.glob(f"{DEST[kind]}/*.mp4"))   # 10-16: count only the curated library, not every clip ever downloaded
+        lines += ["", f"Curated {NAME[kind]} library: {total} clips."]
         hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if (added or dups) else "failed", "text": "\n".join(lines), **({"photo_b64": photo} if photo else {})})
         log(f"Pinterest links · {len(added)} new {NAME[kind]}, {len(dups)} duplicates, {len(bad)} skipped")
     return len(box["items"])

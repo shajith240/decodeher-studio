@@ -296,7 +296,11 @@ export class HQ extends DurableObject {
     await this.put("pinInbox", inbox.slice(-300));
     await this.note("activity", `Owner sent ${urls.length} Pinterest link${urls.length > 1 ? "s" : ""}${kind ? ` (${KIND_SAY[kind]})` : ""}`);
     const n = `${urls.length} link${urls.length > 1 ? "s" : ""}`;
-    if (kind) return say(this.env, `📥 Got ${n} for <b>${KIND_SAY[kind]}</b>. I'll download, check for duplicates and tell you what I added.`);
+    if (kind) {
+      const r = await say(this.env, `📥 Got ${n} for <b>${KIND_SAY[kind]}</b>.\n⏳ Waiting for the factory to pick them up (within a few minutes)…`);
+      const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
+      return r;
+    }
     return say(this.env, `📥 Got ${n}. What are they?`, { reply_markup: { inline_keyboard: [[
       { text: "💃 AI girl hook", callback_data: `pin:hook:${id}` }, { text: "🌑 Dark-psychology clip", callback_data: `pin:dark:${id}` }]] } });
   }
@@ -310,7 +314,11 @@ export class HQ extends DurableObject {
     it.state = ["working", "done", "failed"].includes(b.state) ? b.state : it.state; it.updatedAt = Date.now();
     await this.put("pinInbox", inbox);
     const text = String(b.text || "").slice(0, 3500);
-    if (text) { if (b.photo_b64 && String(b.photo_b64).length < 1.3e6) await tgPhoto(this.env, String(b.photo_b64), text); else await say(this.env, text); }
+    if (text && it.msg) {   // 10-16 owner: live progress — the bot's first reply updates itself, then shows the result
+      const e = await tg(this.env, "editMessageText", { chat_id: this.env.OWNER_CHAT_ID, message_id: it.msg, text, parse_mode: "HTML", disable_web_page_preview: true });
+      if (!e.ok && b.state !== "working") await say(this.env, text);
+      if (b.state !== "working" && b.photo_b64 && String(b.photo_b64).length < 1.3e6) await tgPhoto(this.env, String(b.photo_b64), "Preview of the first new clip");
+    } else if (text && b.state !== "working") { if (b.photo_b64 && String(b.photo_b64).length < 1.3e6) await tgPhoto(this.env, String(b.photo_b64), text); else await say(this.env, text); }
     if (it.state === "done" || it.state === "failed") await this.note("activity", `Pinterest links ${it.id}: ${it.state}`);
     return { ok: true };
   }
@@ -336,7 +344,9 @@ export class HQ extends DurableObject {
       const chat = cq.message && cq.message.chat && cq.message.chat.id, mid = cq.message && cq.message.message_id;
       if (chat && mid) await tg(this.env, "editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } });
       await answer(KIND_SAY[kind]);
-      return say(this.env, `👍 ${it.urls.length} link${it.urls.length > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>. Downloading when the laptop is on; I'll report back.`);
+      const r = await say(this.env, `👍 ${it.urls.length} link${it.urls.length > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>.\n⏳ Waiting for the factory to pick them up (within a few minutes)…`);
+      if (r.ok) { const box = await this.get("pinInbox", []), x = box.find((y) => y.id === it.id); if (x) { x.msg = r.result.message_id; await this.put("pinInbox", box); } }
+      return r;
     }
     const [action, id] = parts;
     if (!["approve", "reject"].includes(action) || !id) return answer("I don't know that button.");
