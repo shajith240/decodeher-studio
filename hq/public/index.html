@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DecodeHer Studio</title>
   <meta name="theme-color" content="#0f0608">
-  <meta name="build" content="20261016T030319Z">
+  <meta name="build" content="20261016T043320Z">
   <meta name="description" content="DecodeHer HQ: the live studio board">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -604,6 +604,12 @@
     }
 
     /* ---------- phone ---------- */
+    @media (max-width:1100px) {
+      #main, #side { display: contents }
+      #main > *, #side > * { margin-left: var(--gut); margin-right: var(--gut); margin-bottom: 14px }
+      #top { order: 0; margin: 0 0 14px } #nowbar { order: 1 } #sleep { order: 1 } #growthP { order: 2 } #schedP { order: 3 } #actP { order: 4 }
+      #stage { order: 5 } #queue, #key, #sum { order: 6 } #mgrP, #side > .panel:not(#growthP):not(#schedP):not(#actP) { order: 7 }
+    }
     @media (max-width:699px) {
       :root { --gut: 14px }
       #top { padding-top: 10px; gap: 10px }
@@ -646,6 +652,25 @@
     #prog .steps span.on { color: #e0b04a; font-weight: 600 } #prog .steps span.ok { color: var(--dim) }
     #prog .sub { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
     #prog .none { font-size: 13.5px; color: var(--dim) }
+    /* 10-16 UI review: growth panel, honest freshness, quieter summary */
+    #sum { display: none !important }
+    #grow .big { display: flex; align-items: baseline; gap: 10px; font-size: 15px; color: var(--dim) }
+    #grow .big b { font-size: 34px; line-height: 1; color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums }
+    #grow .gbar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; margin: 10px 0 6px }
+    #grow .gbar i { display: block; height: 100%; background: linear-gradient(90deg, #4f8a52, #8fd18f); border-radius: 6px }
+    #grow .gsub { font-size: 13px; color: var(--dim); margin-bottom: 12px }
+    #grow table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums }
+    #grow th { text-align: right; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 0 6px }
+    #grow th:first-child, #grow td:first-child { text-align: left }
+    #grow td { text-align: right; padding: 6px 0; border-top: 1px solid var(--line); color: var(--text) }
+    #grow td:first-child { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px }
+    #grow td.zero { color: var(--faint) }
+    #grow a { color: inherit; text-decoration: none }
+    #prog .steps span { font-size: 11.5px; color: #a8908f } #prog .steps span.ok { color: #c9b6a2 }
+    #prog .waitT { font-size: 12.5px; color: var(--dim); margin: 2px 0 6px; letter-spacing: .02em }
+    #prog .wait { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; padding: 7px 0; border-top: 1px solid var(--line); color: var(--text) }
+    #prog .wait em { font-style: normal; color: var(--dim); white-space: nowrap }
+    body.stale #nowbar { border-left-color: #6a5a4a } body.stale .lab .pd { background: #6a5a4a !important }
   </style>
 </head>
 
@@ -682,14 +707,14 @@
       <div class="brand"><span class="logo" aria-hidden="true"></span><span class="bt">DecodeHer Studio</span></div>
       <div id="kpis">
       <div class="stats card">
-        <div class="stat" title="Reels in this batch with a finished video"><span class="k">Rendered</span><span
-            class="v"><svg class="ic c-acc"><use href="#i-play"/></svg><span id="mRend">–</span></span></div>
-        <div class="stat" title="Reels the owner has put on hold (factory will not move them)"><span class="k">On
-            hold</span><span class="v"><svg class="ic c-warn"><use href="#i-clock"/></svg><span id="mHold">–</span></span></div>
-        <div class="stat" title="Posts booked on the relay, waiting for their time slot"><span class="k">Booked to
-            post</span><span class="v"><svg class="ic c-lil"><use href="#i-cal"/></svg><span id="mBooked">–</span></span></div>
-        <div class="stat" title="Posts the relay has published to Instagram"><span class="k">Posted</span><span
+        <div class="stat" title="Instagram followers, against the goal of 1,000 by 26 Oct"><span class="k">Followers</span><span
+            class="v"><svg class="ic c-ok"><use href="#i-user"/></svg><span id="mFol">–</span></span></div>
+        <div class="stat" title="Reels published on Instagram"><span class="k">Posted</span><span
             class="v"><svg class="ic c-ok"><use href="#i-check"/></svg><span id="mPosted">–</span></span></div>
+        <div class="stat" title="Reels booked, waiting for their time slot"><span class="k">Booked</span><span
+            class="v"><svg class="ic c-lil"><use href="#i-cal"/></svg><span id="mBooked">–</span></span></div>
+        <div class="stat" title="Reels the factory is still making"><span class="k">In production</span><span
+            class="v"><svg class="ic c-acc"><use href="#i-play"/></svg><span id="mProd">–</span></span></div>
       </div>
       <div class="stat next card opt" title="The next booked post and how long until it goes out"><span class="k">Next post</span><span
           class="v"><svg class="ic c-lil"><use href="#i-cal"/></svg><span id="mNext">–</span></span></div>
@@ -724,6 +749,10 @@
     </main>
 
     <aside id="side">
+      <section class="panel" id="growthP">
+        <div class="ph"><h2><svg class="ic"><use href="#i-user"/></svg>Growth</h2><span class="aux" id="growAux"></span></div>
+        <div class="pb" id="grow"><div class="none">Waiting for the first numbers…</div></div>
+      </section>
       <section class="panel" id="schedP">
         <div class="ph">
           <h2><svg class="ic"><use href="#i-cal"/></svg>Posting schedule</h2><span class="aux" id="schedAux"></span>
@@ -1089,7 +1118,7 @@ function applyData(d){
   IGN = Math.max([...tokens.values()].filter(tk => tk.wall).length, (d.queue||[]).filter(x => x.status === 'posted').length);
   dataReady = true;
   updateMedia(d.media || {});
-  refreshOverlays(); renderStrip(); renderProg(); renderSched(); renderMetrics();
+  refreshOverlays(); renderStrip(); renderProg(); renderGrowth(); renderSched(); renderMetrics();
 }
 
 /* ---------- workers ---------- */
@@ -2040,35 +2069,50 @@ view.addEventListener('click', ev => showTip(pick(ev), ev));
 
 /* ---------- header / strip ---------- */
 const humanize = s => String(s || '').replace(/\bw\d+-\d+-[\w-]+/g, x => slugTitle(x)).replace(/\b\d+-(?:[A-Za-z]{3}|W\d+)-[\w-]+/g, x => slugTitle(x)).replace(/ ?(\d{4}-\d\d-\d\d \d\d:\d\d) IST/g, (_, a) => ' ' + dayLabel(a));
-function renderProg(){   // 10-16 owner: "a percentage / status bar instead of the logs"
+function renderGrowth(){   // 10-16 UI review: the goal metric on the dashboard
+  const el = document.getElementById('grow'), g = DATA.growth; if (!el) return;
+  if (!g || typeof g.followers !== 'number') { if (!el.dataset.k) el.innerHTML = '<div class="none">Waiting for the first numbers…</div>'; return; }
+  const goal = g.goal || 1000, f = g.followers, days = Math.max(0, Math.ceil((Date.parse((g.goalDate || '2026-10-26') + 'T23:59:00+05:30') - Date.now()) / 864e5));
+  const h = g.history || [], wk = h.length > 1 ? f - h[Math.max(0, h.length - 8)].f : null, need = days ? Math.ceil(Math.max(0, goal - f) / days) : 0;
+  const fmt = v => v == null ? '–' : v;
+  const rows = (g.reels || []).slice(0, 6).map(r => `<tr><td title="${esc(r.title)}">${r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>` : esc(r.title)}</td>
+    <td>${fmt(r.reach)}</td><td>${r.avgWatch != null ? r.avgWatch + ' s' : '–'}</td><td class="${r.shares ? '' : 'zero'}">${fmt(r.shares)}</td><td class="${r.saves ? '' : 'zero'}">${fmt(r.saves)}</td></tr>`).join('');
+  const html = `<div class="big"><b>${f}</b> followers of ${goal.toLocaleString()}</div>
+    <div class="gbar"><i style="width:${Math.max(1, Math.min(100, 100 * f / goal))}%"></i></div>
+    <div class="gsub">${days} day${days === 1 ? '' : 's'} to 26 Oct · need about ${need} a day${wk != null ? ` · ${wk >= 0 ? '+' : ''}${wk} this week` : ''}</div>
+    ${rows ? `<table><tr><th>Latest reels</th><th>Reach</th><th>Avg watch</th><th>Shares</th><th>Saves</th></tr>${rows}</table>` : ''}`;
+  document.getElementById('growAux').textContent = g.at ? 'updated ' + hhmm(g.at) : '';
+  if (el.innerHTML !== html) { el.innerHTML = html; el.dataset.k = 1; }
+}
+function renderProg(){   // 10-16 owner: progress bars; UI review: only ACTIVE reels get a bar, the rest are a compact "Up next" list
   const el = document.getElementById('prog'); if (!el) return;
-  const STEPS = [['voice','Voice'],['scout','Clips'],['judge','Judge'],['edit','Edit'],['mix','Mix'],['render','Render'],['post','Ready']];
-  const act = DATA.activity || [], P = FACT.parked || {}, nowS = (() => { const d = new Date(); return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds(); })();
+  const STEPS = [['voice','Voice'],['scout','Scout'],['judge','Judge'],['edit','Edit'],['mix','Mix'],['render','Render'],['post','Post']];
+  const act = DATA.activity || [], P = FACT.parked || {}, nowMs = Date.now();
   const secs = l => { const m = String(l).match(/^(\d\d):(\d\d):(\d\d)/); return m ? (+m[1])*3600 + (+m[2])*60 + (+m[3]) : null; };
+  const nowS = (() => { const d = new Date(); return d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds(); })();
+  const ACT = [[/Recording voice|Voice ready/, 0], [/Planning shots|Clip search|Second clip|Searching clips/, 1], [/Contact sheet|Judging|Judged/, 2],
+               [/Picking clips|Cutting clips/, 3], [/Audio mix/, 4], [/Rendering ·|Rendered ·|Rendering failed/, 5], [/Rendering done|Queuing post|Queued|Cover set/, 6]];
   const rows = (DATA.reels || []).filter(r => !r.queued && !/^(posted|queued)/.test(r.posted || '') && r.next !== 'posted').map(r => {
     const name = (r.dir || '').split('/').pop(), park = P[name] || P[r.dir];
     const mine = act.filter(l => l.includes(name) || (r.title && l.includes(' · ' + r.title)));
-    // the step comes from what is ACTUALLY happening (latest action), in real pipeline order; the factory's own stage names don't match the bar
-    const ACT = [[/Recording voice|Voice ready/, 0], [/Planning shots|Clip search|Second clip|Searching clips/, 1], [/Contact sheet|Judging|Judged/, 2],
-                 [/Picking clips|Cutting clips/, 3], [/Audio mix/, 4], [/Rendering ·|Rendered ·|Rendering failed/, 5], [/Rendering done|Queuing post|Queued|Cover set/, 6]];
     const hit = mine.length ? ACT.find(a => a[0].test(mine[0])) : null;
     let si = hit ? hit[1] : Math.max(0, STEPS.findIndex(x => x[0] === r.next)); if (r.video === 'done') si = 6;
-    let frac = 0, sub = '';
-    const last = mine[0] || '';
-    const m = last.match(/(\d+) of (\d+)/); if (m && si < 6) frac = Math.min(.95, (+m[1]) / (+m[2]));
-    if (si === 5) { const st = mine.find(l => /Rendering · /.test(l)); const t0 = st && secs(st); if (t0 != null) frac = Math.min(.95, ((nowS - t0 + 86400) % 86400) / 100); }
-    sub = last ? last.replace(/^\d\d:\d\d:\d\d\s+/, '').replace(' · ' + name, '').replace(' · ' + r.title, '') : '';
+    const last = mine[0] || '', ago = last && secs(last) != null ? ((nowS - secs(last) + 86400) % 86400) : 1e9;
+    let frac = 0; const m = last.match(/(\d+) of (\d+)/); if (m && si < 6) frac = Math.min(.95, (+m[1]) / (+m[2]));
+    if (si === 5 && /Rendering · /.test(last)) frac = Math.min(.95, ago / 150);
     const pct = si >= 6 ? 100 : Math.round((si + frac) / 6 * 100);
-    if (si >= 6) sub = /approval/i.test(park || '') ? 'Finished · waiting for your OK' : 'Finished · being booked into the next slot';
-    const hold = park && !/approval/i.test(park) && si < 6;
-    if (hold) sub = 'On hold · ' + String(park).replace(/^owner [\d-]+:\s*/i, '');
-    return { r, si, pct, sub, hold };
-  }).filter(x => !(x.hold && /retired|rewritten|waiting for approval of the first/i.test(x.sub))).slice(0, 6);
-  document.getElementById('progAux').textContent = rows.length ? rows.length + ' reel' + (rows.length > 1 ? 's' : '') : '';
-  const html = rows.length ? rows.map(x => `<div class="${x.pct >= 100 ? 'done' : x.hold ? 'hold' : ''}"><div class="pr0"><b>${esc(x.r.title || x.r.dir)}</b><em>${x.pct}%</em></div>
+    const active = !STALE && si < 6 && ago < 15 * 60 && !park;
+    const sub = last ? last.replace(/^\d\d:\d\d:\d\d\s+/, '').replace(' · ' + name, '').replace(' · ' + r.title, '') : '';
+    return { r, si, pct, sub, active, park, done: si >= 6 };
+  }).filter(x => !(x.park && /retired|rewritten|waiting for approval of the first/i.test(x.park)));
+  const on = rows.filter(x => x.active), wait = rows.filter(x => !x.active);
+  document.getElementById('progAux').textContent = rows.length ? (on.length ? `${on.length} working` : `${wait.length} waiting`) : '';
+  const card = x => `<div class="${x.done ? 'done' : ''}"><div class="pr0"><b>${esc(x.r.title || x.r.dir)}</b><em>${x.pct}%</em></div>
     <div class="bar"><i style="width:${x.pct}%"></i></div>
     <div class="steps">${STEPS.map((s, i) => `<span class="${i === x.si ? 'on' : i < x.si ? 'ok' : ''}">${s[1]}</span>`).join('')}</div>
-    <div class="sub">${esc(x.sub)}</div></div>`).join('') : '<div class="none">Nothing in production right now.</div>';
+    <div class="sub">${esc(x.sub)}</div></div>`;
+  const html = (on.length ? on.map(card).join('') : `<div class="none">${STALE ? 'Nothing is being made right now — the factory is between runs.' : 'Nothing is being made this minute.'}</div>`)
+    + (wait.length ? `<div><div class="waitT">Up next (${wait.length})</div>${wait.map(x => `<div class="wait"><span>${esc(x.r.title || x.r.dir)}</span><em>${x.done ? 'finished · booking' : x.park ? 'on hold' : 'at ' + STEPS[x.si][1]}</em></div>`).join('')}</div>` : '');
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 setInterval(() => { try { if (typeof DATA !== 'undefined' && DATA) renderProg(); } catch (e) {} }, 2000);   // the render bar moves between data pushes
@@ -2086,7 +2130,8 @@ function renderStrip(){
     const reasons = {}; Object.values(FACT.parked || {}).forEach(v => { const r = String(v).replace(/^owner [\d-]+:\s*/i, ''); reasons[r] = (reasons[r] || 0) + 1; });
     const top = Object.entries(reasons).sort((a, b) => b[1] - a[1])[0];
     sub = top ? `Your note: “${top[0]}”` : '';
-  } else head = 'Quiet. Waiting for the next job.';
+  } else if (STALE) { head = `Factory idle since ${hhmm(new Date(snapAt).toISOString())} — the cloud factory runs every 3 hours`; sub = 'Posting is live (Cloudflare) · new reels appear here after the next run'; }
+  else head = 'Quiet. Waiting for the next job.';
   document.getElementById('nowHead').textContent = head;
   document.getElementById('nowbar').classList.toggle('run', !!(run.length || busy.length));
   document.querySelector('#nowIc use').setAttribute('href', (run.length || busy.length) ? '#i-run' : '#i-pause');
@@ -2169,8 +2214,9 @@ function nextPostDate(){
 }
 function renderMetrics(){
   const c = counts(), total = c.reels.length;
-  setHTML(document.getElementById('mRend'), !total ? '\u2013' : `${c.rendered.length}<small>of ${total}</small>`);
-  setHTML(document.getElementById('mHold'), !total ? '\u2013' : c.held.length ? `${c.held.length}<small>reels</small>` : '0');
+  const gr = DATA.growth || null, prod = (DATA.reels || []).filter(r => r.video !== 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')).length;
+  setHTML(document.getElementById('mFol'), gr && typeof gr.followers === 'number' ? `${gr.followers}<small>/ 1,000</small>` : '\u2013');
+  document.getElementById('mProd').textContent = prod;
   document.getElementById('mBooked').textContent = c.booked.length;
   document.getElementById('mPosted').textContent = c.posted.length;
   tickNext();
@@ -2189,12 +2235,12 @@ function tickNext(){
    ?api=<url> points the page at another endpoint (testing). No version auto-reload: the cloud page is static. */
 const conn = document.getElementById('conn'), connTxt = document.getElementById('connTxt');
 const API = (() => { try { const u = new URLSearchParams(location.search).get('api'); if (u) return u; } catch (_) {} return '/api/state'; })();
-let fails = 0, lastNow = '', lastOk = 0, snapAt = 0;
+let fails = 0, lastNow = '', lastOk = 0, snapAt = 0, STALE = false;
 const ASLEEP_MS = 30 * 60e3;
 function setConn(ok){
   conn.classList.toggle('bad', !ok);
   const fresh = snapAt && Date.now() - snapAt < ASLEEP_MS;
-  connTxt.textContent = !ok ? 'Reconnecting…' : fresh || !snapAt ? 'Live' : 'Updated ' + hhmm(new Date(snapAt).toISOString());
+  connTxt.textContent = !ok ? 'Reconnecting…' : fresh || !snapAt ? 'Live' : 'Factory ' + hhmm(new Date(snapAt).toISOString());   // the page is live; only the factory's last report is old
   conn.title = !ok ? 'Cannot reach HQ right now, showing the last known state' : snapAt ? 'Factory snapshot from ' + new Date(snapAt).toLocaleString('en-GB') : '';
 }
 const IST_MS = 330 * 60e3;
@@ -2255,9 +2301,12 @@ function handle(d){
   if (stamp && (!lastNow || String(stamp) >= String(lastNow))) lastNow = String(stamp);
   const t = Date.parse(lastNow); snapAt = isNaN(t) ? (typeof s.snapshotAt === 'number' ? s.snapshotAt : 0) : t;
   fails = 0; lastOk = Date.now();
+  STALE = !!snapAt && Date.now() - snapAt > 10 * 60e3;   // 10-16 UI review: never show an old snapshot as live work
+  document.body.classList.toggle('stale', STALE);
   const relay = s.relay && typeof s.relay === 'object' ? s.relay : null;
   const queue = relay && Array.isArray(relay.queue) ? relayQueue(relay.queue) : (s.queue || []);
   const data = Object.assign({}, s, { queue, reels: rematch(s.reels, queue), stations: Object.assign({}, s.stations || {}) });
+  if (STALE) { data.running = []; Object.keys(data.stations).forEach(k => { data.stations[k] = Object.assign({}, data.stations[k], { busy: false }); }); }
   if (relay) data.stations.post = postStation(queue, (s.stations || {}).post);
   if (relay && relay.log) data.activity = relayActivity(relay.log, snapAt).concat(s.activity || []);
   if (relay) { data.queueStale = !!(s.stale && (s.stale === true || s.stale.relay)); data.queueAt = ''; }

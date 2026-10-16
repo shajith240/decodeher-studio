@@ -232,7 +232,7 @@ export class HQ extends DurableObject {
   // ----- public state for the dashboard -----
   async state() {
     await this.ensureAlarm();
-    const [snap, snapAt, msgs, pending, rs] = [await this.get("snapshot"), await this.get("snapshotAt"), await this.get("msgs", []), await this.get("pending", {}), await this.relayStatus()];
+    const [snap, snapAt, msgs, pending, rs, growth] = [await this.get("snapshot"), await this.get("snapshotAt"), await this.get("msgs", []), await this.get("pending", {}), await this.relayStatus(), await this.get("growth", null)];
     const age = snapAt ? Date.now() - snapAt : null;
     return {
       ...(snap && typeof snap === "object" ? snap : {}),
@@ -241,6 +241,7 @@ export class HQ extends DurableObject {
       manager: msgs.slice(-50),
       pending: Object.values(pending).filter((p) => p.state === "waiting").map(({ id, reel, text, slot, at }) => ({ id, reel, text, slot, at: new Date(at).toISOString() })),
       stale: { factory: age === null ? true : age > STALE_MS, factoryAgeMin: age === null ? null : Math.round(age / 60e3), relay: !rs.ok, unfinished: unfinished(snap).length },
+      growth: growth ? { ...growth, at: new Date(growth.at).toISOString(), goal: 1000, goalDate: "2026-10-26" } : null,
       hqNow: new Date().toISOString(),
     };
   }
@@ -420,6 +421,20 @@ export class HQ extends DurableObject {
     return out.join("\n");
   }
 
+  // 10-16 dashboard: followers + per-reel numbers, cached hourly (the dashboard's Growth panel; never on the public request path)
+  async refreshGrowth(now, force = false) {
+    const g = await this.get("growth", null);
+    if (!force && g && now - g.at < 55 * 60e3) return g;
+    const ins = await this.insights(30); if (!ins) return g;
+    const hist = (g && g.history) || [], day = istDate(now);
+    if (typeof ins.followers === "number") { const last = hist[hist.length - 1]; if (last && last.d === day) last.f = ins.followers; else hist.push({ d: day, f: ins.followers }); }
+    const reels = ins.reels.map((r) => ({ title: String(r.title || "").replace(/^\d+-[A-Za-z0-9]+-/, "").replace(/-/g, " "), postedAt: r.postedAt || null, link: r.permalink || null,
+      reach: r.reach ?? null, views: r.views ?? null, avgWatch: r.ig_reels_avg_watch_time != null ? Math.round(r.ig_reels_avg_watch_time / 100) / 10 : null,
+      likes: r.likes ?? null, comments: r.comments ?? null, shares: r.shares ?? null, saves: r.saved ?? null })).sort((a, b) => (b.postedAt || 0) - (a.postedAt || 0));
+    const out = { at: now, followers: ins.followers, history: hist.slice(-60), reels: reels.slice(0, 12) };
+    await this.put("growth", out); return out;
+  }
+
   async insights(days) {   // relay GET /insights?days=N; null when the relay doesn't have it (404) or fails
     const r = await relay(this.env, "GET", `/insights?days=${days}`);
     if (!r.ok || !r.data || typeof r.data !== "object") return null;
@@ -440,6 +455,7 @@ export class HQ extends DurableObject {
 
   async tick() {
     const now = Date.now();
+    try { await this.refreshGrowth(now); } catch (e) { await this.note("error", `growth numbers failed: ${e && e.message}`); }
     await this.watchRelay(now);
     await this.watchFactory(now);
     try { await this.replyToComments(now); } catch (e) { await this.note("error", `comment replies failed: ${e && e.message}`); }
