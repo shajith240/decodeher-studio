@@ -35,7 +35,7 @@ def post(path, payload):
 def snapshot():
     out = subprocess.run(["node", os.path.join(ROOT, "tools", "dashboard.js"), "--snapshot"], cwd=ROOT, capture_output=True, text=True, timeout=120)
     if out.returncode != 0: sys.exit(f"dashboard --snapshot failed: {out.stderr.strip()[-300:]}")
-    snap = json.loads(out.stdout)
+    snap = json.loads(out.stdout); snap["origin"] = "github" if os.environ.get("GITHUB_ACTIONS") else "laptop"   # 10-16: HQ's offline alert only for the laptop
     snap["source"] = "github-actions" if os.environ.get("GITHUB_ACTIONS") else "local"
     if os.environ.get("GITHUB_RUN_ID"):
         snap["run"] = {"id": os.environ["GITHUB_RUN_ID"], "workflow": os.environ.get("GITHUB_WORKFLOW", ""),

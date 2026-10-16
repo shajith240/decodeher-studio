@@ -526,7 +526,7 @@ export class HQ extends DurableObject {
     const snap = await this.get("snapshot"), at = await this.get("snapshotAt");
     // owner 10-16: the campus Wi-Fi login expired and the laptop went silent — tell the owner (once per outage) and when it's back
     const st = await this.get("stats", {});
-    if (at && now - at > 15 * 60e3 && st.offlineFor !== at) {
+    if (at && (snap && snap.origin) === "laptop" && now - at > 15 * 60e3 && st.offlineFor !== at) {   // cloud runs report every few hours: no alert
       st.offlineFor = at; st.offlineWarnedAt = now; await this.put("stats", st);
       await say(this.env, `📴 The laptop has been offline for ${Math.round((now - at) / 60e3)} min (last check-in ${istTime(at)} IST). Most likely the campus Wi-Fi login expired (open any site on the laptop and log in) or the laptop went to sleep.\n\nPosting is NOT affected — booked reels still go out. Only new reels wait.`);
       await this.note("error", "Laptop offline (no check-in for 15+ min)");
