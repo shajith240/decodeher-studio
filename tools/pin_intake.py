@@ -26,7 +26,7 @@ def hq(method, path, body=None):
     url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY")
     if not url or not key: return None
     req = urllib.request.Request(url + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": "decodeher-pin-intake/1.0"})   # Cloudflare 403s the default Python-urllib agent
     try: return json.loads(urllib.request.urlopen(req, timeout=30).read())
     except Exception: return None
 

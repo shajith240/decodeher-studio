@@ -4,7 +4,7 @@ inbox, or the snapshot is older than 12 h (be safe: run). Prints work=true|false
 import json, os, urllib.request
 url, key = os.environ.get("HQ_URL", "").rstrip("/"), os.environ.get("HQ_KEY", "")
 def get(path, auth=False):
-    req = urllib.request.Request(url + path, headers={"Authorization": f"Bearer {key}"} if auth else {})
+    req = urllib.request.Request(url + path, headers={"User-Agent": "decodeher-gate/1.0", **({"Authorization": f"Bearer {key}"} if auth else {})})   # Cloudflare 403s the default Python-urllib agent
     return json.loads(urllib.request.urlopen(req, timeout=20).read())
 why = []
 try:
