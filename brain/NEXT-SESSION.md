@@ -1,8 +1,14 @@
-STATUS: OPEN
+STATUS: DONE
+# 10-17 00:20 IST: owner back; laptop production restarted. Cloud cutover NOT done (factory/planner workflows still disabled).
+# Do the cutover only when the owner leaves again; never run both at once.
 # NEXT SESSION — start here (written 2026-10-16 22:35 IST; owner away, laptop on)
 
 Read CLAUDE.md first. Never read/print .env, .relay.json, .secrets/*. Decide yourself (owner's order); be economical.
 When ALL tasks below are done, change the first line of this file to `STATUS: DONE` (the resume watcher then stops).
+
+## RESUME FIRST (10-16 22:40): the owner had to leave; the Drive upload was stopped half-way and the workflows were NOT enabled.
+Re-run the switch-over: `bash /tmp/claude-1000/-home-shajith-Projects-dark-psycology/7c7b3dfe-a307-40c8-817f-b198e2428639/scratchpad/cutover.sh` if it still exists, otherwise:
+`SYNC_PATHS="reels library/hook-pool library/clips deliverables logs brain/content/captions" bash tools/cloud/sync.sh push`, rclone copy library/clip-usage.json + library/pin-registry.json to gdrive:decodeher/library/, then `gh workflow enable factory && gh workflow enable planner && gh workflow run factory -f max_minutes=160`.
 
 ## Context
 - Owner's order (10-16 22:30): "make sure production is running in the CLOUD." A cutover script stopped the laptop

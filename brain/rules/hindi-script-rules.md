@@ -57,3 +57,7 @@ Reference: deliverables/voice-tests/hindi-v7-research-recipe-LOUD.mp3; research:
   line, after each move, after the payoff), ±40 ms jitter, none inside the opening question.
 - Final pass caps EVERY silence at 0.6 s (the longest natural beat in conversation), then mastering (chain above).
 Reference: deliverables/voice-tests/hindi-FINAL-hot-and-cold.mp3.
+
+## Tool (10-17): `tools/hindi_vo.py <lines.txt> <out_base>` does the whole LOCKED recipe in one go
+(the 10-16 version lived in a temp folder and was lost on reboot). Blank line in lines.txt = section break (longer pause).
+Writes out_base.wav/.mp3 + .json (each line's start/end for captions). First output: deliverables/voice-tests/hindi-hot-and-cold-tool.mp3.
