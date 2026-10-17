@@ -122,9 +122,15 @@ bed = (bed * (1 - duck[:, None]) + carved * duck[:, None]) * (1 - duck * (1 - db
 _w, _h = int(0.4 * SR), int(0.05 * SR)
 from scipy.ndimage import uniform_filter1d   # O(N) moving average — np.convolve with a 19,200-sample kernel took minutes per reel (10-16)
 _rms = lambda x: np.sqrt(uniform_filter1d((x.mean(axis=1) if x.ndim > 1 else x).astype(np.float64) ** 2, size=_w, mode="nearest") + 1e-12)
-_v, _b = _rms(voice), _rms(bed); _lim = _v * db(-12)
-_g = np.where((duck > 0.2) & (_b > _lim), _lim / _b, 1.0)
-_g = uniform_filter1d(_g.astype(np.float64), size=_h, mode="nearest")                             # smooth the extra gain so it never pumps audibly
+_v, _b = _rms(voice), _rms(bed)
+# owner 10-18 "the background score is breaking bit by bit": the limit used the voice's INSTANT level, so as each sentence faded
+# out (duck still releasing) the limit fell toward silence and cut the music 40-80 dB for ~0.4 s at every sentence end (28x a
+# reel). The limit now follows the phrase level (loudest voice in the last/next 0.75 s), only acts while words are spoken,
+# never takes more than 8 dB, and moves over 300 ms
+from scipy.ndimage import maximum_filter1d
+_lim = maximum_filter1d(_v, size=int(1.5 * SR), mode="nearest") * db(-12)
+_g = np.where((talk > 0.5) & (_b > _lim), np.maximum(_lim / _b, db(-8)), 1.0)
+_g = uniform_filter1d(_g.astype(np.float64), size=int(0.3 * SR), mode="nearest")                  # smooth the extra gain so it never pumps audibly
 bed *= np.minimum(1.0, _g)[:, None]
 
 # ── sfx: by ear (library/sfx-brand/ranked.json), rotated, jittered, levelled by loudness
