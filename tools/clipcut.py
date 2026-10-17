@@ -43,6 +43,13 @@ def _yavg(src, t):   # mean brightness (0-255) of the frame at t; looped clips w
         y = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(t % max(du, 0.1)), "-i", src, "-frames:v", "1", "-vf", "signalstats,metadata=print:key=lavfi.signalstats.YAVG:file=-", "-f", "null", "-"], capture_output=True, text=True).stdout
         return float(y.split("YAVG=")[-1].split()[0])
     except (ValueError, IndexError, subprocess.CalledProcessError): return 255.0
+def _dark(src, t, d):   # 10-17: True if ANY frame in [t, t+d] is near-black (4 checks/s; a 3-point check missed a 1 s fade-out)
+    try:
+        du = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src]).decode())
+        if t + d > du: return any(_yavg(src, t + k * d / 8) < 22 for k in range(9))   # looped window: spot checks
+        y = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(t), "-t", str(d), "-i", src, "-vf", "fps=4,signalstats,metadata=print:key=lavfi.signalstats.YAVG:file=-", "-f", "null", "-"], capture_output=True, text=True).stdout
+        return any(float(v) < 22 for v in re.findall(r"YAVG=([0-9.]+)", y))
+    except (ValueError, subprocess.CalledProcessError): return False
 segs, moves = [], []; prev, prev_d = None, 0
 # 10-16 owner: the AI-woman hook is NOT chopped after one caption group — it plays as one continuous shot for the whole hook
 # line (until the "Listen…" snap), limited only by how much clip there is after its start point
@@ -62,7 +69,7 @@ for n, s in enumerate(shots):
         # 10-16: a continued clip can run into its own fade-to-black ending (2 s of black under the closing words) — if the
         # continuation is dark anywhere in this shot, replay the clip from where it first started instead
         _src = f"{R}/clips/cand/{p['file']}"
-        if os.path.exists(_src) and any(_yavg(_src, p["start"] + k * d) < 22 for k in (0.05, 0.5, 0.95)): p["start"] = p.get("orig", prev["start"])
+        if os.path.exists(_src) and _dark(_src, p["start"], d): p["start"] = p.get("orig", prev["start"])
     if not p:   # nothing before it either (very first shot): a black hold, the caption carries it
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", f"color=c=black:s=1080x1920:r=30:d={d}", "-c:v", "libx264", "-pix_fmt", "yuv420p", out], check=True)
     if p and not os.path.exists(f"{R}/clips/cand/{p['file']}") and os.path.exists(out):
@@ -77,6 +84,13 @@ for n, s in enumerate(shots):
             except (ValueError, IndexError): break
             if yavg >= 22: break
             p = dict(p); p["start"] = round(p["start"] + 0.5, 2)
+        # 10-17 test reel: the start frame was fine but the clip faded to black MID-shot (a 1.5 s black stretch). Check the
+        # middle and end of the window too; if dark, slide the window to the first spot that stays lit all the way through
+        if _dark(src, p["start"], d):
+            try: _du = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src]).decode())
+            except (ValueError, subprocess.CalledProcessError): _du = 0
+            for s0 in [x * 0.5 for x in range(int(max(_du - 0.2, 0) / 0.5) + 1)]:
+                if not _dark(src, s0, d): p = dict(p); p["start"] = s0; break
         mv, name = move_vf(n, d); moves.append(name)
         vf = f"fps=30,scale=2160:3840:force_original_aspect_ratio=increase:flags=lanczos,crop=2160:3840,{mv},{GRADE},format=yuv420p"
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", str(p["start"]), "-stream_loop", "-1", "-i", src,

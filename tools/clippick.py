@@ -67,6 +67,26 @@ for nn, rows in opts.items():
         if c["pin"] in recent and c["pin"] not in {p_["file"] for p_ in pick.values()}:
             pick[str(int(nn))] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v["meaning"], "shows": v["shows"] + "  [reused: nothing new fit]", "q": idx[nn]["q"]}
             break
+# 10-17 test reel: 3 lines in a row had no clean clip, so clipcut held one hand clip for 10 s. A line still empty now takes
+# one of the owner's Telegram mood clips (reels/_pool/telegram-dark: dark-psychology look, all OCR-checked) that sits closest to
+# what the line's own search found (mean CLIP fingerprint of its candidates), each used once per reel, none from the last 30 reels
+PCACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "reels", "_pool", "emb.json")
+pc = json.load(open(PCACHE)) if os.path.exists(PCACHE) else {}
+mood = {k: v for k, v in pc.items() if v and v.get("ok") and "/telegram-dark/" in v.get("file", "") and os.path.exists(v["file"])
+        and os.path.basename(v["file"]) not in TEXTED and k not in used}
+def _cos(a, b): return sum(x * y for x, y in zip(a, b)) / ((sum(x * x for x in a) ** .5) * (sum(y * y for y in b) ** .5) or 1)
+for nn, e in idx.items():
+    if int(nn) == 0 or str(int(nn)) in pick or not mood: continue
+    embs = [pc[c["pin"]]["emb"] for c in e["clips"].values() if pc.get(c["pin"], {}) and pc[c["pin"]].get("emb")]
+    ctr = [sum(col) / len(embs) for col in zip(*embs)] if embs else None
+    k = max(mood, key=lambda k: (_cos(mood[k]["emb"], ctr) if ctr else 0) + 0.5 * mood[k]["style"])
+    v = mood.pop(k); used.add(k)
+    d = f"{R}/clips/cand/{nn}"; os.makedirs(d, exist_ok=True); dst = f"{d}/{os.path.basename(v['file'])}"
+    if not os.path.exists(dst):
+        try: os.link(v["file"], dst)
+        except OSError: import shutil; shutil.copy(v["file"], dst)
+    e["clips"]["MOOD"] = {"file": f"{nn}/{os.path.basename(v['file'])}", "pin": k, "start": 0.0, "style": v["style"]}
+    pick[str(int(nn))] = {"file": f"{nn}/{os.path.basename(v['file'])}", "start": 0.0, "style": v["style"], "meaning": 0, "shows": "mood clip  [library filler]", "q": e["q"]}
 json.dump(pick, open(f"{R}/clips/pick.json", "w"), indent=1, ensure_ascii=False)
 pins = sorted({c["pin"] for nn, e in idx.items() for L, c in e["clips"].items() if c["file"] in {p_["file"] for p_ in pick.values()}})
 usage["reels"] = [u for u in usage["reels"] if u["reel"] != me] + [{"reel": me, "pins": pins}]
