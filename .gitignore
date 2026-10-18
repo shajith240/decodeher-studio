@@ -42,3 +42,8 @@ __pycache__/
 # old copies kept next to the live files on the laptop (*.pre-audit.js, config.pre-fish-1015.json, …)
 *.pre-*
 *-pre-audit-*
+library/_bin/
+library/_thumbs/
+library/.drive-list.json*
+library/.drive.lock
+library/pin-registry.json.lock

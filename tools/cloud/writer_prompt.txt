@@ -24,3 +24,10 @@ Then:
 4. Final answer: one line per reel (title + hook line + arm).
 
 HARD RULE (owner 10-17): never put texting words that nobody says out loud (haha, lol, lmao, omg, hehe, idk, tbh) in a script, and never build a reel around one; the AI voice reads them literally and it sounds awkward.
+
+KEYWORD RULE (10-18, brain/growth/tactics/keyword-seo.md + brain/growth/keywords.md): at least 4 of the 6 reels take one phrase
+from the keyword bank, in the man's own wording (e.g. "she is hot and cold with me"). Use that SAME phrase three times: caption hook
+(line 1, phrase + verdict), titleCard (3-7 words built from it) and the first spoken sentence (within ~3 s, natural, not stuffed).
+Add one long-tail variant in the caption body. Caption tags: exactly 3 — #datingadviceformen + 2 that match the phrase
+(e.g. #mixedsignals #textingtips); no #darkpsychology/#psychologyfacts on a reel about one specific behaviour. Add an HTML
+note <!-- keyword: the phrase --> under each script.

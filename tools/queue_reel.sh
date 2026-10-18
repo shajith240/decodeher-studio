@@ -57,7 +57,7 @@ if c: hook, body, prompt, tags = c.get("hook", ""), c.get("body", ""), c.get("pr
 else: hook, body, tags = caps[slug]; prompt = ""
 base = ["#datingadviceformen", "#datingtips"]; weak = {"#psychology", "#relationships", "#modernromance", "#relationshipadvice", "#mensadvice", "#communication"}
 extra = [t for t in dict.fromkeys(re.findall(r"#\w+", tags.lower())) if t not in base and t not in weak]
-tags = " ".join(base + extra[:3])
+tags = " ".join(base[:1] + [t for t in extra if t != "#darkpsychology"][:2] or base)   # 10-18 keyword research: 3 tags (#datingadviceformen + 2 topic tags); hashtags add little reach now, keywords do
 credit = open(f"{R}/assets/audio/credit.txt").read().strip() if os.path.exists(f"{R}/assets/audio/credit.txt") else ""
 lines = [hook.strip(), body.strip()] + ([""] + [prompt.strip()] if prompt.strip() else [""])
 open(out, "w").write("\n".join(lines) + "\nFollow @thedecodeher for more dating advice for men.\n\n" + tags + "\n" + (f"\nMusic: {credit}\n" if credit else ""))

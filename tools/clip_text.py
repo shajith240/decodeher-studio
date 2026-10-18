@@ -1,6 +1,6 @@
 """Find clips with baked-in text (owner 10-17: the judges' contact sheets miss it, and any text in a clip pulls attention off our
 captions). OCR reads 8 frames spread over each candidate clip; a clip HAS TEXT when a word of 3+ letters/digits is read with
-confidence >= 0.75 on at least 2 of those frames (one stray letter is a shape, e.g. a cartoon head read as "B").
+confidence >= 0.75 on at least 2 of those frames (each frame read whole, plus its top and bottom edges enlarged and contrast-boosted, where watermarks sit) (one stray letter is a shape, e.g. a cartoon head read as "B").
 Usage: uv run -q --with rapidocr_onnxruntime python tools/clip_text.py <reel_dir> [more files.mp4 ...]
 A reel dir means the clips its judges passed (the only ones clippick can use) + its hook clip; all candidates before judging.
 Results are remembered per clip file in library/clip-text.json {file name: [has_text, "words seen"]}, so a pin is read only once.
@@ -26,10 +26,17 @@ def has_text(ocr, f):
     with tempfile.TemporaryDirectory() as td:
         for k in range(FRAMES):
             t = d * (k + 0.5) / FRAMES; img = f"{td}/{k}.jpg"
-            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", f"{t:.2f}", "-i", f, "-frames:v", "1", "-vf", "scale=720:-2", img])
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", f"{t:.2f}", "-i", f, "-frames:v", "1", "-vf", "scale=720:-2", "-q:v", "2", img])
             if not os.path.exists(img): continue
             res, _ = ocr(img)
-            words = [w for _, txt, c in (res or []) if c >= CONF for w in WORD.findall(txt)]
+            # 10-17: a dark watermark on a dark clip ("...club" at the bottom) read as nothing; a contrast-equalised copy finds it
+            # small watermarks hide in the top/bottom edges ("The Libros Club", tiny dark serif): read those bands enlarged 2.5x
+            extra = []
+            for band, crop in (("bot", "crop=iw:ih*0.22:0:ih*0.78"), ("top", "crop=iw:ih*0.16:0:0")):
+                b = f"{img}.{band}.jpg"
+                subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", img, "-vf", f"{crop},scale=iw*2.5:-2:flags=lanczos,histeq=strength=0.8,eq=contrast=1.6", b])
+                if os.path.exists(b): extra += ocr(b)[0] or []
+            words = [w for _, txt, c in (res or []) + extra if c >= CONF for w in WORD.findall(txt)]
             if words: hits += 1; seen += words
     return hits >= MIN_HITS, " ".join(dict.fromkeys(seen))[:120]
 

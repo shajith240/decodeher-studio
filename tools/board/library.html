@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clip Library · DecodeHer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* same house look as the studio board (tools/board/studio.html): deep crimson-black, aged gold, Cinzel + Geist */
+    :root {
+      --bg: #0f0608; --bg2: #160a0d; --panel: #1b0b0f; --panel2: #241015; --line: #3b1c20; --line2: #57302b;
+      --gold: #c9a45c; --goldHi: #ecd6a3; --goldD: #8a6a35; --crimson: #6a121f;
+      --text: #f3ead9; --dim: #c4b196; --faint: #8d7a66; --ok: #9fd18b; --warn: #ff9f43; --alert: #ff6464;
+      --serif: 'Cinzel', Georgia, serif; --sans: 'Geist', system-ui, sans-serif; --r: 6px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+    body { background: radial-gradient(120% 90% at 40% 0%, #1d0a0f 0%, var(--bg) 60%) fixed, var(--bg); color: var(--text); font: 14px/1.5 var(--sans); min-height: 100vh }
+    button, input, textarea, select { font: inherit; color: inherit }
+    :focus-visible { outline: 2px solid var(--goldHi); outline-offset: 2px }
+    a { color: var(--goldHi) }
+
+    header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 28px; padding: 28px 32px 22px; border-bottom: 1px solid var(--line); align-items: start }
+    h1 { font: 600 30px/1.1 var(--serif); color: var(--goldHi); letter-spacing: .02em }
+    .lede { color: var(--dim); margin-top: 8px; max-width: 52ch }
+    .totals { margin-top: 14px; color: var(--faint); font-size: 13px }
+
+    .add { background: var(--panel); border: 1px solid var(--line2); border-radius: var(--r); padding: 14px; display: grid; gap: 10px }
+    .add label { font-weight: 600; color: var(--goldHi) }
+    .add textarea { width: 100%; min-height: 64px; resize: vertical; background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 9px 10px; color: var(--text) }
+    .add textarea::placeholder { color: var(--faint) }
+    .addrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+    .seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 4px; overflow: hidden }
+    .seg button { background: none; border: 0; padding: 7px 12px; cursor: pointer; color: var(--dim) }
+    .seg button[aria-pressed="true"] { background: var(--crimson); color: var(--goldHi) }
+    .btn { background: var(--gold); color: #1a0b07; border: 0; border-radius: 4px; padding: 8px 16px; font-weight: 600; cursor: pointer }
+    .btn:disabled { opacity: .5; cursor: default }
+    .ghost { background: none; border: 1px solid var(--line2); color: var(--dim); border-radius: 4px; padding: 7px 12px; cursor: pointer }
+    .ghost:hover { border-color: var(--gold); color: var(--goldHi) }
+    .danger { border-color: #6b2a2a; color: #ffb3a8 }
+    .danger:hover { border-color: var(--alert); color: #fff }
+    .hint { color: var(--faint); font-size: 12.5px }
+    .jobs { display: grid; gap: 6px }
+    .job { font-size: 13px; color: var(--dim) }
+    .job .bar { height: 3px; background: var(--line); border-radius: 2px; margin-top: 4px; overflow: hidden }
+    .job .bar i { display: block; height: 100%; background: var(--gold); transition: width .4s }
+    .job.done { color: var(--text) }
+    .job details { margin-top: 4px; color: var(--faint) }
+
+    nav { display: flex; gap: 4px; padding: 0 32px; border-bottom: 1px solid var(--line); overflow-x: auto }
+    nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 14px 14px 12px; cursor: pointer; color: var(--dim); white-space: nowrap }
+    nav button[aria-selected="true"] { color: var(--goldHi); border-bottom-color: var(--gold) }
+    nav button b { font-weight: 500; color: var(--faint); margin-left: 6px }
+    .tabnote { padding: 14px 32px 0; color: var(--faint); max-width: 90ch }
+
+    .filters { display: flex; gap: 14px; padding: 14px 32px; align-items: center; flex-wrap: wrap }
+    .filters input[type=search] { background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; width: min(340px, 100%) }
+    .filters label { display: inline-flex; gap: 6px; align-items: center; color: var(--dim); cursor: pointer }
+    .filters .count { color: var(--faint); margin-left: auto }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; padding: 4px 32px 60px }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; text-align: left; padding: 0 }
+    .card:hover { border-color: var(--goldD) }
+    .frame { position: relative; aspect-ratio: 9 / 16; background: #000 }
+    .frame img, .frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+    .flags { position: absolute; left: 6px; top: 6px; right: 6px; display: flex; gap: 4px; flex-wrap: wrap }
+    .flag { font-size: 11px; padding: 1px 6px; border-radius: 3px; background: rgba(15, 6, 8, .82); color: var(--dim) }
+    .flag.text { color: #ffcf99; background: rgba(90, 30, 10, .9) }
+    .flag.used { color: var(--goldHi) }
+    .meta { padding: 8px 9px 0; margin-bottom: 10px; line-height: 1.4; max-height: calc(4.2em + 8px); font-size: 12.5px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden }
+    .empty { padding: 40px 32px; color: var(--dim) }
+    .sentinel { height: 1px }
+
+    dialog { margin: auto; background: var(--panel); color: var(--text); border: 1px solid var(--line2); border-radius: 8px; width: min(980px, 96vw); max-height: 94vh; padding: 0 }
+    dialog::backdrop { background: rgba(5, 2, 3, .78) }
+    .dlg { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); max-height: 94vh }
+    .dlg video { width: 100%; max-height: 94vh; background: #000; display: block }
+    .side { padding: 20px 22px; overflow-y: auto; display: grid; gap: 14px; align-content: start }
+    .side h2 { font: 600 17px/1.3 var(--serif); color: var(--goldHi); word-break: break-word }
+    .side .row { color: var(--dim); font-size: 13px }
+    .side .row strong { color: var(--text); font-weight: 500 }
+    .side textarea, .side input[type=text] { width: 100%; background: var(--bg2); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px }
+    .side textarea { min-height: 80px; resize: vertical }
+    .side .acts { display: flex; gap: 8px; flex-wrap: wrap }
+    .side .x { position: absolute; right: 12px; top: 8px; background: none; border: 0; font-size: 26px; color: var(--dim); cursor: pointer }
+    .warnbox { background: rgba(90, 30, 10, .5); border: 1px solid #7a3b1a; color: #ffd9b0; padding: 8px 10px; border-radius: 4px; font-size: 13px }
+
+    .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--gold); border-radius: 6px; padding: 10px 14px; display: flex; gap: 14px; align-items: center; z-index: 9; max-width: 92vw }
+    .toast[hidden] { display: none }
+
+    @media (max-width: 760px) {
+      header { grid-template-columns: 1fr; padding: 20px 16px }
+      nav, .filters, .tabnote { padding-left: 16px; padding-right: 16px }
+      .grid { padding: 4px 16px 60px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px }
+      .dlg { grid-template-columns: 1fr }
+      .dlg video { max-height: 60vh }
+    }
+    @media (prefers-reduced-motion: reduce) { .job .bar i { transition: none } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Clip Library</h1>
+      <p class="lede">Every clip the factory can put in a reel. Play any of them, fix what the AI wrote about it, move it to the right shelf, or delete it.</p>
+      <p class="totals" id="totals">Loading…</p>
+    </div>
+    <form class="add" id="addForm">
+      <label for="links">Add clips</label>
+      <textarea id="links" placeholder="Paste one or more links: Pinterest, Instagram reel, TikTok or YouTube Shorts"></textarea>
+      <div class="addrow">
+        <div class="seg" role="group" aria-label="What kind of clip">
+          <button type="button" data-kind="hook" aria-pressed="true">AI-woman hook</button>
+          <button type="button" data-kind="visual" aria-pressed="false">Visual hook</button>
+          <button type="button" data-kind="dark" aria-pressed="false">Reel clip</button>
+        </div>
+        <button class="btn" id="addBtn" type="submit">Add to library</button>
+      </div>
+      <p class="hint">Each link is downloaded, checked against what we already have, checked for text, named by the AI and backed up to Drive. Telegram still works the same way.</p>
+      <div class="jobs" id="jobs"></div>
+    </form>
+  </header>
+
+  <nav role="tablist" id="tabs"></nav>
+  <p class="tabnote" id="tabnote"></p>
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search descriptions and tags" aria-label="Search">
+    <label><input type="checkbox" id="fUnused"> Not used yet</label>
+    <label><input type="checkbox" id="fText"> Only clips with text</label>
+    <label><input type="checkbox" id="fNoDrive"> Not on Drive</label>
+    <button class="ghost" id="binBtn" type="button">Recently deleted</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="sentinel" id="more"></div>
+
+  <dialog id="dlg">
+    <div class="dlg">
+      <video id="player" controls playsinline preload="metadata"></video>
+      <div class="side" style="position:relative">
+        <button class="x" id="dlgX" aria-label="Close">&times;</button>
+        <h2 id="dName"></h2>
+        <div id="dWarn"></div>
+        <div class="row" id="dFacts"></div>
+        <div id="dEdit">
+          <label class="row" for="dDesc"><strong>What it shows</strong> (the factory matches this to the script)</label>
+          <textarea id="dDesc"></textarea>
+          <label class="row" for="dTags" style="display:block;margin-top:10px"><strong>Tags</strong>, separated by commas</label>
+          <input type="text" id="dTags">
+          <div class="acts" style="margin-top:10px"><button class="btn" id="dSave" type="button">Save changes</button></div>
+        </div>
+        <div id="dMove">
+          <div class="row"><strong>Shelf</strong></div>
+          <div class="acts" id="dMoveBtns" style="margin-top:6px"></div>
+        </div>
+        <div class="acts">
+          <a class="ghost" id="dSrc" target="_blank" rel="noopener" style="text-decoration:none">Open the original link</a>
+          <button class="ghost danger" id="dDel" type="button">Delete clip</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="binDlg">
+    <div class="side" style="position:relative">
+      <button class="x" id="binX" aria-label="Close">&times;</button>
+      <h2>Recently deleted</h2>
+      <p class="row">Deleted clips stay here for 7 days, then they're gone for good, from Drive too.</p>
+      <div id="binList" class="jobs"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" hidden><span id="toastTxt"></span><button class="ghost" id="toastUndo" type="button" hidden>Undo</button></div>
+
+<script>
+const TABS = [
+  { k: "hook", name: "AI-woman hooks", note: "The opening shot of most reels. The factory picks the one that matches the first line of the script." },
+  { k: "visual", name: "Visual hooks", note: "Other scroll-stopping openers (not AI women). Used on at most 1 reel in 4, and only when it fits the first line clearly better." },
+  { k: "dark", name: "Your reel clips", note: "Clips you sent. They sit in the same pool as everything below: for every line the factory ranks all of them together by meaning." },
+  { k: "pool", name: "Found by the factory", note: "Clips the factory found on Pinterest for past reels. Same pool as your clips." },
+];
+const KIND_NAME = { hook: "AI-woman hook", visual: "Visual hook", dark: "Reel clip" };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let all = [], tab = (() => { try { return localStorage.getItem("libTab") || "hook"; } catch { return "hook"; } })(), shown = [], drawn = 0, cur = null, addKind = "hook";
+
+async function api(p, body) {
+  const r = await fetch(p, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : {});
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || r.statusText); return j;
+}
+async function load() {
+  all = await api("/library/api/list");
+  const n = (k) => all.filter((c) => c.kind === k).length;
+  $("totals").textContent = `${all.length} clips · ${all.filter((c) => c.usedIn.length).length} used in a reel · ${all.filter((c) => c.text).length} have text and are never picked`;
+  $("tabs").innerHTML = TABS.map((t) => `<button role="tab" data-k="${t.k}" aria-selected="${t.k === tab}">${t.name}<b>${n(t.k)}</b></button>`).join("");
+  render();
+}
+function filtered() {
+  const q = $("q").value.trim().toLowerCase();
+  return all.filter((c) => c.kind === tab
+    && (!q || (c.description + " " + c.tags.join(" ") + " " + c.name).toLowerCase().includes(q))
+    && (!$("fUnused").checked || !c.usedIn.length) && (!$("fText").checked || c.text) && (!$("fNoDrive").checked || !c.drive));
+}
+function render() {
+  const t = TABS.find((x) => x.k === tab); $("tabnote").textContent = t.note;
+  shown = filtered().sort((a, b) => String(b.added).localeCompare(String(a.added))); drawn = 0; $("grid").innerHTML = "";
+  $("count").textContent = `${shown.length} shown`;
+  if (!shown.length) $("grid").innerHTML = `<p class="empty">${tab === "visual" && !all.some((c) => c.kind === "visual") ? "No visual hooks yet. Paste a link above and choose “Visual hook”." : "Nothing matches these filters."}</p>`;
+  more();
+}
+function card(c, i) {
+  const flags = [c.text ? `<span class="flag text">Has text</span>` : "", c.usedIn.length ? `<span class="flag used">Used ${c.usedIn.length}×</span>` : "", c.drive ? "" : (c.kind !== "pool" ? `<span class="flag">Not on Drive</span>` : "")].join("");
+  return `<button class="card" data-i="${i}"><div class="frame"><img loading="lazy" alt="" src="/library/thumb?f=${encodeURIComponent(c.file)}"><div class="flags">${flags}</div></div><div class="meta">${esc(c.description || c.name)}</div></button>`;
+}
+function more() {
+  const next = shown.slice(drawn, drawn + 60); if (!next.length) return;
+  $("grid").insertAdjacentHTML("beforeend", next.map((c, j) => card(c, drawn + j)).join("")); drawn += next.length;
+}
+new IntersectionObserver((e) => { if (e[0].isIntersecting) more(); }, { rootMargin: "800px" }).observe($("more"));
+
+// hover: the card plays its clip, muted
+$("grid").addEventListener("pointerover", (e) => {
+  const el = e.target.closest(".card"); if (!el || el.querySelector("video") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.src = "/library/video?f=" + encodeURIComponent(shown[el.dataset.i].file);
+  el.querySelector(".frame").insertBefore(v, el.querySelector(".flags")); v.play().catch(() => {});
+  el.addEventListener("pointerleave", () => v.remove(), { once: true });
+});
+$("grid").addEventListener("click", (e) => { const el = e.target.closest(".card"); if (el) open(shown[el.dataset.i]); });
+$("tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; tab = b.dataset.k; try { localStorage.setItem("libTab", tab); } catch {} load(); });
+["q", "fUnused", "fText", "fNoDrive"].forEach((id) => $(id).addEventListener("input", render));
+
+function open(c) {
+  cur = c; $("player").src = "/library/video?f=" + encodeURIComponent(c.file);
+  $("dName").textContent = c.description ? c.description.split(/[,.—]/)[0] : c.name;
+  $("dWarn").innerHTML = c.text ? `<div class="warnbox">Text found inside this clip${c.textSeen ? ` (“${esc(c.textSeen)}”)` : ""}. The factory never uses it.</div>` : "";
+  $("dFacts").innerHTML = [`<strong>${esc(c.name)}</strong>`, `${c.mb} MB, added ${esc(String(c.added).slice(0, 10))}${c.from ? ` by ${esc(c.from.replace("owner", "you"))}` : ""}`,
+    c.drive ? "Backed up on Drive" : (c.kind === "pool" ? "On the laptop only" : "Not on Drive yet"),
+    c.usedIn.length ? `Used in: ${c.usedIn.map(esc).join(", ")}` : "Not used in a reel yet"].join("<br>");
+  const curated = c.kind !== "pool";
+  $("dEdit").hidden = !curated; $("dMove").hidden = !curated;
+  $("dDesc").value = c.description || ""; $("dTags").value = (c.tags || []).join(", ");
+  $("dMoveBtns").innerHTML = Object.entries(KIND_NAME).map(([k, n]) => k === c.kind ? `<button class="ghost" disabled aria-current="true">${n} (here now)</button>` : `<button class="ghost" data-to="${k}">Move to ${n}</button>`).join("");
+  $("dSrc").hidden = !c.url; $("dSrc").href = c.url || "#";
+  $("dlg").showModal(); $("player").play().catch(() => {});
+}
+const close = () => { $("player").pause(); $("player").removeAttribute("src"); $("player").load(); $("dlg").close(); };
+$("dlgX").onclick = close; $("dlg").addEventListener("close", () => { $("player").pause(); });
+$("dlg").addEventListener("click", (e) => { if (e.target === $("dlg")) close(); });
+
+let toastT;
+function toast(msg, undoId) {
+  $("toastTxt").textContent = msg; $("toastUndo").hidden = !undoId; $("toast").hidden = false;
+  $("toastUndo").onclick = async () => { try { await api("/library/api/undo", { id: undoId }); toast("Clip restored."); load(); } catch (e) { toast(e.message); } };
+  clearTimeout(toastT); toastT = setTimeout(() => ($("toast").hidden = true), undoId ? 12000 : 4000);
+}
+$("dSave").onclick = async () => {
+  try { await api("/library/api/edit", { file: cur.file, description: $("dDesc").value, tags: $("dTags").value.split(",") }); toast("Changes saved."); load(); } catch (e) { toast(e.message); }
+};
+$("dMoveBtns").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-to]"); if (!b) return;
+  try { await api("/library/api/move", { file: cur.file, to: b.dataset.to }); close(); toast(`Moved to ${KIND_NAME[b.dataset.to]}.`); load(); } catch (err) { toast(err.message); }
+});
+$("dDel").onclick = async () => {
+  if (!confirm("Delete this clip? You can undo it for 7 days.")) return;
+  try { const r = await api("/library/api/delete", { file: cur.file }); close(); toast("Clip deleted.", r.id); load(); } catch (e) { toast(e.message); }
+};
+
+// recently deleted
+$("binBtn").onclick = async () => {
+  const items = await api("/library/api/bin");
+  $("binList").innerHTML = items.length ? items.map((m) => `<div class="job">${esc(m.name)} <span class="hint">deleted ${new Date(m.at * 1000).toLocaleString()}</span> <button class="ghost" data-undo="${esc(m.id)}">Restore</button></div>`).join("") : `<p class="hint">Nothing deleted in the last 7 days.</p>`;
+  $("binDlg").showModal();
+};
+$("binX").onclick = () => $("binDlg").close();
+$("binList").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-undo]"); if (!b) return;
+  try { await api("/library/api/undo", { id: b.dataset.undo }); b.parentElement.remove(); toast("Clip restored."); load(); } catch (err) { toast(err.message); }
+});
+
+// adding links
+document.querySelector(".seg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return; addKind = b.dataset.kind;
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+});
+$("addForm").addEventListener("submit", async (e) => {
+  e.preventDefault(); const urls = $("links").value;
+  if (!/https?:\/\//.test(urls)) return toast("Paste at least one link first.");
+  $("addBtn").disabled = true;
+  try { await api("/library/api/add", { kind: addKind, urls }); $("links").value = ""; pollJobs(); } catch (err) { toast(err.message); }
+  $("addBtn").disabled = false;
+});
+let polling = false;
+async function pollJobs() {
+  if (polling) return; polling = true;
+  for (;;) {
+    let js = []; try { js = await api("/library/api/jobs"); } catch {}
+    $("jobs").innerHTML = js.slice(0, 4).map((j) => {
+      const r = j.result || {}; const n = j.urls.length;
+      if (!j.done) return `<div class="job">Adding ${n} link${n > 1 ? "s" : ""} as ${KIND_NAME[j.kind]}: ${esc(j.step)}<div class="bar"><i style="width:${j.pct}%"></i></div></div>`;
+      if (r.error) return `<div class="job done">That didn't work: ${esc(r.error)}</div>`;
+      const lines = [...(r.added || []).map((a) => "Added: " + a), ...(r.dups || []).map((d) => "Already had it: " + d), ...(r.bad || []).map((b) => "Skipped: " + b)];
+      return `<div class="job done">${(r.added || []).length} added, ${(r.dups || []).length} already in the library, ${(r.bad || []).length} skipped<details><summary>Details</summary>${lines.map(esc).join("<br>")}</details></div>`;
+    }).join("");
+    const running = js.some((j) => !j.done);
+    if (!running) { polling = false; load(); return; }
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+}
+document.addEventListener("keydown", (e) => {
+  if (!$("dlg").open || ["TEXTAREA", "INPUT"].includes(document.activeElement.tagName)) return;
+  if (e.key === " ") { e.preventDefault(); const p = $("player"); p.paused ? p.play() : p.pause(); }
+});
+load().catch((e) => ($("totals").textContent = "Couldn't read the library: " + e.message)); pollJobs();
+</script>
+</body>
+</html>

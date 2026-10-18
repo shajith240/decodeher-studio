@@ -124,7 +124,7 @@ function stations(run) {
 }
 function newest(glob1) {   // newest file among reels/*/<sub>/* or deliverables/week-2/*-frames.png, as a /media URL
   let best = null;
-  for (const d of fs.readdirSync(REELS).filter((x) => /^w\d+-/.test(x))) {
+  for (const d of fs.readdirSync(REELS).filter((x) => /^[a-z]\d+-/.test(x))) {
     for (const f of ls(path.join(REELS, d, glob1))) if (/\.(jpg|png)$/.test(f)) {
       const p = path.join(REELS, d, glob1, f), t = fs.statSync(p).mtimeMs; if (!best || t > best.t) best = { t, p, reel: d, name: f };
     }
@@ -148,7 +148,7 @@ function running() {
   // only real job programs count: shells, greps and watch loops that merely MENTION a script name are not work (a stale wait loop showed Voice busy 10-15)
   const real = lines.filter((l) => !/(^|\/)(ba|z)?sh -c|\bu?grep\b|\bpgrep\b/.test(l));
   return jobs.flatMap(([k, label]) => { const hits = real.filter((l) => l.includes(k)); if (!hits.length) return [];
-    const reels = [...new Set(hits.map((l) => (l.match(/reels\/(w\d+-[\w-]+)/) || [])[1]).filter(Boolean))];
+    const reels = [...new Set(hits.map((l) => (l.match(/reels\/([a-z]\d+-[\w-]+)/) || [])[1]).filter(Boolean))];
     return [label + (reels.length ? " · " + reels.map((r) => json(path.join(REELS, r, "reel.json"), {}).title || r).join(", ") : "")]; });
 }
 
@@ -177,7 +177,7 @@ ${rows.map((r) => `<tr><td class="t">${r.title}<small>${r.dir}</small></td>${["v
 </table></main></body></html>`;
 
 // 10-15: every batch the factory works on (config.json factory.batches), not just week 2 — the w3 reels were invisible on the board
-const batchDirs = () => { const cfg = json(path.join(ROOT, "config.json"), {}), bs = (cfg.factory && cfg.factory.batches) || ["reels/w2-batch.json"];
+const batchDirs = () => { const cfg = json(path.join(ROOT, "config.json"), {}), bs = [...new Set([...((cfg.factory && cfg.factory.batches) || []), ...ls(REELS).filter((f) => f.endsWith("-batch.json")).map((f) => "reels/" + f)])];   // 10-17: every reels/*-batch.json, exactly like the factory (a new s2 batch was invisible)
   return [...new Set(bs.flatMap((b) => json(path.join(ROOT, b), [])).map((p) => path.basename(p)))].filter((d) => exists(path.join(REELS, d))); };
 const snapshot = () => { const run = running(); return { reels: batchDirs().map(reelRow), running: run, activity: feed(), queue, stations: stations(run), manager: managerState(), media: { sheet: newest("clips/sheets"), frames: latestFrames() }, ver: pageVer(),
   queueStale, queueAt: queueOkAt ? new Date(queueOkAt).toISOString() : "" }; };
@@ -219,7 +219,9 @@ http.createServer((req, res) => {
     try { if (!res.headersSent) res.writeHead(400, { "content-type": "text/plain" }); res.end("bad request"); } catch {}
   }
 }).listen(PORT, () => console.log(`production board: http://localhost:${PORT}`));
+const library = require("./library_routes");   // 10-18 Clip Library page (/library)
 function handle(req, res) {
+  if (library.handle(req, res)) return;
   refreshQueue();
   const batch = batchDirs();
   if (req.url.startsWith("/events")) {
