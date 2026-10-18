@@ -25,7 +25,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Organization", "name": "DecodeHer", "alternateName": "Decode Her", "url": "https://decodeher.pages.dev/", "logo": "https://decodeher.pages.dev/img/icon-512.png", "sameAs": ["https://www.instagram.com/thedecodeher"]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "DecodeHer", "alternateName": ["Decode Her", "thedecodeher"], "url": "https://decodeher.pages.dev/"}, {"@context": "https://schema.org", "@type": "Product", "name": "Decode Her: The Texting Playbook", "brand": {"@type": "Brand", "name": "DecodeHer"}, "description": "A 73-page PDF guide for men: 25 real texting situations, what her text usually means, and exactly what to send back. Honest communication, no manipulation.", "image": ["https://decodeher.pages.dev/img/og.jpg"], "category": "E-book", "offers": {"@type": "Offer", "price": "9.00", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://decodeher.pages.dev/"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I get Decode Her: The Texting Playbook?", "acceptedAnswer": {"@type": "Answer", "text": "Right after paying, you get a download link on screen and by email."}}, {"@type": "Question", "name": "Will it read well on my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The page size and type were chosen for phones, so there's no zooming."}}, {"@type": "Question", "name": "Is this about manipulating women?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's about reading texts honestly, asking clearly and respecting her answer."}}, {"@type": "Question", "name": "Is it professional advice?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's general communication and dating advice."}}]}]</script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Organization", "name": "DecodeHer", "alternateName": "Decode Her", "url": "https://decodeher.pages.dev/", "logo": "https://decodeher.pages.dev/img/icon-512.png", "sameAs": ["https://www.instagram.com/thedecodeher"]}, {"@context": "https://schema.org", "@type": "WebSite", "name": "DecodeHer", "alternateName": ["Decode Her", "thedecodeher"], "url": "https://decodeher.pages.dev/"}, {"@context": "https://schema.org", "@type": "Product", "name": "Decode Her: The Texting Playbook", "brand": {"@type": "Brand", "name": "DecodeHer"}, "description": "A 73-page PDF guide for men: 25 real texting situations, what her text usually means, and exactly what to send back. Honest communication, no manipulation.", "image": ["https://decodeher.pages.dev/img/og.jpg"], "category": "E-book", "offers": {"@type": "AggregateOffer", "lowPrice": "9.00", "highPrice": "27.00", "offerCount": 2, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://decodeher.pages.dev/#get"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I get Decode Her: The Texting Playbook?", "acceptedAnswer": {"@type": "Answer", "text": "Right after paying, you get a download link on screen and by email."}}, {"@type": "Question", "name": "Will it read well on my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The page size and type were chosen for phones, so there's no zooming."}}, {"@type": "Question", "name": "Is this about manipulating women?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's about reading texts honestly, asking clearly and respecting her answer."}}, {"@type": "Question", "name": "Can I get a refund?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Within 30 days, no questions asked. Reply to your receipt email."}}, {"@type": "Question", "name": "Is it professional advice?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's general communication and dating advice."}}]}]</script>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preload" href="fonts/ZalandoSansExpanded-500.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ZalandoSans-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -190,6 +190,27 @@ figcaption { margin-top: var(--s2) }
 .endbar img { width: 32px; height: 32px; border-radius: 50% }
 
 /* sticky buy bar on phones, once the hero has scrolled away */
+.offer { padding: var(--s8) 0 }
+.offer .head { max-width: 760px; margin-bottom: var(--s6) }
+.offer .head .lede { margin-top: var(--s3); color: var(--on-2) }
+.tiers { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); align-items: stretch }
+.tier { position: relative; display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5) var(--s4); border: 1px solid var(--rule-d); background: rgba(243, 234, 217, .025) }
+.tier.best { border-color: var(--gold); background: linear-gradient(180deg, rgba(201, 164, 92, .10), rgba(201, 164, 92, .02)); box-shadow: 0 30px 60px -40px rgba(201, 164, 92, .45) }
+.tier .tag { position: absolute; top: 0; left: var(--s4); transform: translateY(-50%); padding: 4px 12px; background: var(--gold); color: #2a1608; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase }
+.tier h3 { font: 500 clamp(20px, 2vw, 26px)/1.2 var(--disp); text-transform: uppercase; letter-spacing: .02em; color: var(--gold-hi) }
+.tier .amt { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap }
+.tier .amt b { font: 600 clamp(44px, 5vw, 60px)/1 var(--text); color: var(--on); font-variant-numeric: lining-nums tabular-nums }
+.tier .amt span { color: var(--on-3); font-size: 16px }
+.tier ul { list-style: none; display: grid; gap: var(--s2); flex: 1; align-content: start; padding-top: var(--s3); border-top: 1px solid var(--rule-d) }
+.tier li { position: relative; padding-left: 28px; color: var(--on-2) }
+.tier li::before { content: ""; position: absolute; left: 0; top: .62em; width: 14px; height: 1px; background: var(--gold) }
+.tier li b { color: var(--on); font-weight: 600 }
+.tier .btn { width: 100%; white-space: nowrap }
+.btn.ghost { background: transparent; color: var(--gold-hi); box-shadow: inset 0 0 0 1px var(--gold) }
+.btn.ghost::before { display: none } .btn.ghost .price { border-left-color: rgba(236, 214, 163, .4) }
+.promise { margin-top: var(--s5); max-width: 760px; color: var(--on-2) }
+.promise b { color: var(--on) }
+@media (max-width: 900px) { .tiers { grid-template-columns: 1fr; gap: var(--s5) } .tier.best { order: -1 } .tier { padding: var(--s5) var(--s3) var(--s4) } .tier .btn { padding: 0 18px; font-size: 15px; gap: 12px } }
 .buybar { display: none }
 @media (max-width: 900px) {
   .problem, .decoder, .book, .approach { padding: var(--s7) 0 }
@@ -229,7 +250,7 @@ figcaption { margin-top: var(--s2) }
     <div class="rule" aria-hidden="true"></div>
     <p class="lede reveal">Twenty-five texts that keep men up at night, read honestly, with exactly what to send back.</p>
     <div class="cta reveal">
-      <a class="btn" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM">Get the playbook <span class="price">$9</span></a>
+      <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
       <p class="small">73 pages. Instant download.</p>
     </div>
   </div>
@@ -274,7 +295,7 @@ figcaption { margin-top: var(--s2) }
     </div>
     <div class="dec-foot">
       <p>That’s one of twenty-five. The book has the rest, two pages each.</p>
-      <a class="textlink" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM">Get the playbook, $9</a>
+      <a class="textlink" href="#get">Get the playbook, from $9</a>
     </div>
   </div>
 </section>
@@ -308,7 +329,7 @@ figcaption { margin-top: var(--s2) }
     <div class="extra">
       <p class="reveal">Plus twelve messages you should never send, thirty openers that turn a chat into a plan, and a cheat sheet for your phone.</p>
       <div class="cta reveal">
-        <a class="btn" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM">Get the playbook <span class="price">$9</span></a>
+        <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
         <p class="small">Instant PDF download.</p>
       </div>
     </div>
@@ -335,13 +356,47 @@ figcaption { margin-top: var(--s2) }
   <h2 class="split">Read her honestly. Be clear about yourself.</h2>
 </section>
 
+<section class="offer dark grain" id="get">
+  <div class="inner">
+    <div class="head">
+      <h2 class="split">Choose <em>your copy.</em></h2>
+      <p class="lede reveal">Launch price for the first 100 copies, counted by the checkout. After that it goes to the full price on its own.</p>
+    </div>
+    <div class="tiers stagger">
+      <article class="tier">
+        <h3>The Playbook</h3>
+        <p class="amt"><b>$9</b><span>launch price, then $17</span></p>
+        <ul>
+          <li>25 real texting situations: what her text usually means and exactly what to send back</li>
+          <li>12 messages never to send, and why</li>
+          <li>30 openers that turn a chat into a plan</li>
+          <li>73 pages, set for your phone</li>
+        </ul>
+        <a class="btn ghost" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM">Get the playbook <span class="price">$9</span></a>
+      </article>
+      <article class="tier best">
+        <p class="tag">Best value</p>
+        <h3>The Complete Pack</h3>
+        <p class="amt"><b>$19</b><span>launch price, then $27</span></p>
+        <ul>
+          <li>Everything in the playbook</li>
+          <li><b>Her Signals: a field guide.</b> 20 things she does, not says, in person and on dates. What each one often means, and your move. 29 pages</li>
+          <li><b>The Reply Bank.</b> 40 ready replies for 25 situations, plus 30 openers, as a PDF and as a plain note you paste into your phone’s Notes app and search mid-chat</li>
+        </ul>
+        <a class="btn" href="https://buy.polar.sh/polar_cl_J1OGD8lJb9WcPLHkpdwRybjbFiKQWclaoEgmP2C42ue">Get the complete pack <span class="price">$19</span></a>
+      </article>
+    </div>
+    <p class="promise reveal"><b>30-day refund, no questions.</b> If it doesn’t help, reply to your receipt email within 30 days and you get every cent back. Everything is a private file on your phone. Nothing follows, posts or messages anyone.</p>
+  </div>
+</section>
+
 <section class="close light">
   <div class="inner">
     <div class="grid">
       <div>
-        <p class="what reveal"><b>Decode Her: The Texting Playbook.</b> A 73-page PDF, set for reading on a phone, delivered the moment you pay. Secure checkout by Polar.</p>
+        <p class="what reveal"><b>Decode Her: The Texting Playbook.</b> PDFs set for reading on a phone, delivered the moment you pay. Secure checkout by Polar. 30-day refund.</p>
         <div class="cta reveal">
-          <a class="btn" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM">Get the playbook <span class="price">$9</span></a>
+          <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
           <p class="small">One-time payment. Yours to keep.</p>
         </div>
       </div>
@@ -349,6 +404,7 @@ figcaption { margin-top: var(--s2) }
         <div><dt>How do I get it?</dt><dd>Right after paying, you get a download link on screen and by email.</dd></div>
         <div><dt>Will it read well on my phone?</dt><dd>Yes. The page size and type were chosen for phones, so there’s no zooming.</dd></div>
         <div><dt>Is this about manipulating women?</dt><dd>No. It’s about reading texts honestly, asking clearly and respecting her answer.</dd></div>
+        <div><dt>Can I get a refund?</dt><dd>Yes. Within 30 days, no questions asked. Reply to your receipt email.</dd></div>
         <div><dt>Is it professional advice?</dt><dd>No. It’s general communication and dating advice. Use your own judgement and respect her choices.</dd></div>
       </dl>
     </div>
@@ -360,7 +416,7 @@ figcaption { margin-top: var(--s2) }
 </section>
 </main>
 
-<div class="buybar" aria-hidden="true"><span>The Texting Playbook</span><a class="btn" href="https://buy.polar.sh/polar_cl_AQM3cSkGzLEWKjmM6YDEwUtMJbggC0BjJjZf725jaHM" tabindex="-1">Get it <span class="price">$9</span></a></div>
+<div class="buybar" aria-hidden="true"><span>The Texting Playbook</span><a class="btn" href="#get" tabindex="-1">Get it <span class="price">from $9</span></a></div>
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -371,13 +427,13 @@ addEventListener("DOMContentLoaded", () => {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
   /* sticky buy bar: shows after the hero, hides at the closing section */
-  const bar = $(".buybar"), hero = $(".hero"), close = $(".close");
+  const bar = $(".buybar"), hero = $(".hero"), close = $("#get");
   const io = new IntersectionObserver(() => {
     const hb = hero.getBoundingClientRect().bottom, ct = close.getBoundingClientRect().top;
-    bar.classList.toggle("on", hb < 0 && ct > innerHeight * .6);
+    bar.classList.toggle("on", hb < 0 && ct > innerHeight);
   }, { threshold: [0, .1, .5, 1] });
   io.observe(hero); io.observe(close);
-  addEventListener("scroll", () => { const hb = hero.getBoundingClientRect().bottom, ct = close.getBoundingClientRect().top; bar.classList.toggle("on", hb < 0 && ct > innerHeight * .6); }, { passive: true });
+  addEventListener("scroll", () => { const hb = hero.getBoundingClientRect().bottom, ct = close.getBoundingClientRect().top; bar.classList.toggle("on", hb < 0 && ct > innerHeight); }, { passive: true });
 
   /* the decoder: the book's own content */
   const CASES = [
@@ -442,6 +498,7 @@ addEventListener("DOMContentLoaded", () => {
   gsap.registerPlugin(ScrollTrigger);
   const lenis = new Lenis({ lerp: .09, smoothWheel: true });
   lenis.on("scroll", ScrollTrigger.update);
+  $$('a[href="#get"]').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); lenis.scrollTo("#get", { offset: -8, duration: 1.4 }); history.replaceState(null, "", "#get"); }));
   gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
 
   function splitLines(el) {   // masked lines, measured after fonts load so the breaks are real
