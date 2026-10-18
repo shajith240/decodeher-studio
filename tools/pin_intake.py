@@ -77,6 +77,11 @@ def dup_of(reg, pin, fp):
     return None
 
 def fetch(url, tmp):
+    if os.path.isfile(url):   # 10-18: a clip already downloaded (e.g. a Pinterest search run by hand), with gallery-dl's .json beside it
+        shutil.copy(url, tmp); meta = {}
+        try: meta = json.load(open(url + ".json")) if os.path.exists(url + ".json") else json.load(open(url[:-4] + ".json"))
+        except Exception: pass
+        return os.path.join(tmp, os.path.basename(url)), False, meta
     if "pin.it" not in url and "pinterest." not in url:   # 10-18: Instagram reels / TikTok / YouTube Shorts links from the Clip Library page
         subprocess.run(["uv", "run", "-q", "--with", "yt-dlp", "--with", "secretstorage", "yt-dlp", "--cookies-from-browser", "brave+gnomekeyring",
                         "-f", "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b", "--merge-output-format", "mp4", "--write-info-json", "--no-playlist",

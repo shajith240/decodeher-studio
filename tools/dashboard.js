@@ -67,7 +67,8 @@ function reelRow(dir) {   // a rendered reel counts as judged (its judge files m
   const BY_STAGE = { voice: "voice", plan: "scout", clips: "scout", research: "scout", mix: "mix", sheets: "judge", judge: "judge", render: "render", queue: "post" };
   if (BY_STAGE[fst]) next = BY_STAGE[fst];
   if (fst === "render" && cutting(dir)) next = "edit";
-  return { dir, title: cfg.title || dir, voice: stage(timed ? script.length : Math.min(lines, script.length - 1), script.length),
+  return { dir, title: cfg.title || dir, approval: cfg.approval || "",   // 10-18: "pending" = waiting for the owner's OK (the factory leaves no park reason for it)
+    voice: stage(timed ? script.length : Math.min(lines, script.length - 1), script.length),
     audio: exists(path.join(R, "assets/audio/final.wav")) ? "done" : "", clips: stage(clips, body.length),
     next, queued: !!queued, judged: hasVideo ? "done" : stage(judged, sheets || body.length), video: hasVideo ? "done" : "", posted: q ? `${q.status === "posted" ? "posted" : "queued"} · ${q.at.slice(5, 16)}` : "" };
 }

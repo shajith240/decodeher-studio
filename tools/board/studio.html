@@ -352,7 +352,10 @@
     .ph h2 .ic { color: var(--gold) }
     .ph .aux { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums }
     .pb { padding: 12px 16px 16px; min-height: 0 }
-    #schedP { flex: none }
+    /* 10-18 owner: the schedule took the whole column and squeezed "In production" with no way to scroll — the two panels now
+       share the column (schedule ≤ 52 %, production gets the rest, never under 260 px) and each scrolls on its own */
+    #schedP { flex: 0 1 auto; max-height: 52%; min-height: 200px }
+    #schedP .pb { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line2) transparent }
 
     #sched .row {
       display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 8px 0;
@@ -389,13 +392,9 @@
     #lr .thumbs i:nth-child(4) { background-position: 100% 50% }
     #lr .mon:hover .thumbs i { box-shadow: 0 0 0 1px var(--gold) }
 
-    #actP { flex: 1 }
+    #actP { flex: 1 1 0; min-height: 260px }
 
-    #actP .pb {
-      overflow: hidden; flex: 1; padding-top: 6px;
-      -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent);
-      mask-image: linear-gradient(to bottom, #000 84%, transparent)
-    }
+    #actP .pb { overflow-y: auto; flex: 1; padding-top: 6px; scrollbar-width: thin; scrollbar-color: var(--line2) transparent }
 
     #act li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; font-size: 13.5px; padding: 6px 0; line-height: 1.4; border-bottom: 1px solid rgba(59, 28, 32, .55) }
     #act time { color: var(--faint); font-variant-numeric: tabular-nums }
@@ -1686,7 +1685,7 @@ function updateSum(){   // 10-16: the whole line in one sentence the owner can r
   const R = DATA.reels || [], P = FACT.parked || {}, park = r => P[r.dir] || P[(r.dir||'').split('/').pop()];
   const posted = (DATA.queue || []).filter(q => q.status === 'posted').length || R.filter(r => /^posted/.test(r.posted || '')).length, ql = queuedList();   // relay log is the truth (it has the first reel too)
   const making = Object.keys(FACT.running || {}).length;
-  const ok = R.filter(r => /approval/i.test(park(r) || '')), booking = R.filter(r => !ok.includes(r) && r.video === 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')), stuck = R.filter(r => park(r) && !isHold(park(r)));   // 10-16: 'waiting for your OK' only when an approval is really pending
+  const ok = R.filter(r => r.approval === 'pending' || /approval/i.test(park(r) || '')), booking = R.filter(r => !ok.includes(r) && r.video === 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')), stuck = R.filter(r => park(r) && !isHold(park(r)));   // 10-16: 'waiting for your OK' only when an approval is really pending
   const parts = [`<span class="ok"><b>${posted}</b>posted</span>`,
     `<span><b>${ql.length}</b>booked${ql.length ? ' · next post ' + esc(dayLabel(ql[0].at)) : ''}</span>`,
     `<span><b>${making}</b>being made right now</span>`];
@@ -1893,7 +1892,7 @@ function renderProg(){   // 10-16 owner: "a percentage / status bar instead of t
     if (si === 5) { const st = mine.find(l => /Rendering · /.test(l)); const t0 = st && secs(st); if (t0 != null) frac = Math.min(.95, ((nowS - t0 + 86400) % 86400) / 100); }
     sub = last ? last.replace(/^\d\d:\d\d:\d\d\s+/, '').replace(' · ' + name, '').replace(' · ' + r.title, '') : '';
     const pct = si >= 6 ? 100 : Math.round((si + frac) / 6 * 100);
-    if (si >= 6) sub = /approval/i.test(park || '') ? 'Finished · waiting for your OK' : 'Finished · being booked into the next slot';
+    if (si >= 6) sub = (r.approval === 'pending' || /approval/i.test(park || '')) ? 'Finished · waiting for your OK' : 'Finished · being booked into the next slot';
     const hold = park && !/approval/i.test(park) && si < 6;
     if (hold) sub = 'On hold · ' + String(park).replace(/^owner [\d-]+:\s*/i, '');
     return { r, si, pct, sub, hold };
