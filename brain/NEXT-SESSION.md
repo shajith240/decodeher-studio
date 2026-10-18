@@ -1,49 +1,56 @@
-STATUS: DONE
-# 10-17 00:20 IST: owner back; laptop production restarted. Cloud cutover NOT done (factory/planner workflows still disabled).
-# Do the cutover only when the owner leaves again; never run both at once.
-# NEXT SESSION — start here (written 2026-10-16 22:35 IST; owner away, laptop on)
+STATUS: TODO
+# NEXT SESSION — written 2026-10-19 04:45 IST (owner's Claude limit ran out; auto-resume at 07:35 IST)
 
-Read CLAUDE.md first. Never read/print .env, .relay.json, .secrets/*. Decide yourself (owner's order); be economical.
-When ALL tasks below are done, change the first line of this file to `STATUS: DONE` (the resume watcher then stops).
+Read CLAUDE.md first. Never read/print .env, .relay.json, .secrets/*. Decide yourself; be economical. When ALL tasks below are
+done, change the first line to `STATUS: DONE`.
 
-## RESUME FIRST (10-16 22:40): the owner had to leave; the Drive upload was stopped half-way and the workflows were NOT enabled.
-Re-run the switch-over: `bash /tmp/claude-1000/-home-shajith-Projects-dark-psycology/7c7b3dfe-a307-40c8-817f-b198e2428639/scratchpad/cutover.sh` if it still exists, otherwise:
-`SYNC_PATHS="reels library/hook-pool library/clips deliverables logs brain/content/captions" bash tools/cloud/sync.sh push`, rclone copy library/clip-usage.json + library/pin-registry.json to gdrive:decodeher/library/, then `gh workflow enable factory && gh workflow enable planner && gh workflow run factory -f max_minutes=160`.
+## What changed on 10-19 (owner orders, all decided)
+- NEW CONTENT RULE "steal like an artist" + 95/5: every reel remixes a proven viral Short/Reel (1M+ views). Keep 95% of the
+  source (same hook, same points in the same order, same examples, similar length); ours = the "Listen" beat after the hook +
+  our closing line ("Save this…"/"Send this to…") + our voice/opener/clips/look. Reword sentence by sentence, never word for word.
+  Mainstream niche tactics (space, push-pull, "make her miss you") are allowed. Each script names its source URL + views.
+- All 21 old queued reels (w2 remakes, w9–w11) were REMOVED from the relay (owner: abandon them). Their folders stay; their
+  logs/queued markers stay so they never re-book. deliverables/queue/booked was emptied.
+- v1/v2/v3 batches RETIRED (parked: they changed the sources too much). Replacements:
+  - reels/v4-batch.json = TODAY's 3 (brain/content/drafts/viral4-scripts.md): Habits women find attractive (4.4M),
+    Six words (1.2M), Biggest turn-off (1.3M) → slots today 08:30 / 18:30 / 22:00 (the factory books the next free slot).
+  - reels/v5-batch.json = 7 for Tue–Wed (brain/content/drafts/viral5-scripts.md).
+- Every reel must open on its AI-woman hook clip with NO text on her (no title, no captions until the hook ends).
+  tools/new_reels_v3.py now runs tools/pick_hook.py itself; fill_page.py hides the title when reel.json has hookClip.
+  If a reel was built before its hookClip existed: `python3 tools/fill_page.py reels/<r>` and re-render.
 
-## Context
-- Owner's order (10-16 22:30): "make sure production is running in the CLOUD." A cutover script stopped the laptop
-  factory/manager/report/growth timer (disabled on purpose), uploaded reels/library/deliverables/logs to Drive, enabled the
-  GitHub workflows `factory` (every 3 h, gate step) and `planner` (05:30 IST daily) and started a first factory run.
-  Activity lines start with "Cloud cutover ·" in logs/activity.log.
-- Booked: w7-02 (10-17 18:30) and w7-04 (10-17 22:00); w7-05 at 10-17 08:30. Unfinished: w7-06, w8-01..06.
+## Tasks, in order
+1. Check v5 exists: `ls reels/v5-batch.json`. If missing, run
+   `python3 tools/new_reels_v3.py brain/content/drafts/viral5-scripts.md v5` (it also picks the hook clips).
+   Every v4/v5 reel.json must have hookSrc/hookClip; if one says "first available", re-run `python3 tools/pick_hook.py reels/<r> --force`.
+2. VERIFY each v4 reel as it books (`node tools/ig_queue.js ids`; the posting copy is deliverables/queue/booked/*-FINAL.mp4):
+   - first 4 s: `ffmpeg -ss 0 -t 4 -i F -vf "fps=2,scale=200:-1,tile=8x1" -frames:v 1 open.jpg` → the AI woman, ZERO text on her.
+   - whole reel grid (fps=1/3), captions present after the hook, bronze bust outro at the end, no black frames.
+   - loudness: ebur128 integrated about -11 to -14 LUFS, no clipping.
+   If one fails: `node tools/ig_queue.js remove <id>`, move logs/queued/<slug> + its booked files aside, fix the cause, let the
+   factory re-render. Make sure 08:30 today gets a correct reel; if it can't be ready, leave the slot empty (never post a wrong one).
+3. Same checks for v5 reels as they book (Tue 08:30 onward).
+4. Viral bank (two agents were building it when the session ended; they may have been cut off):
+   brain/research/viral-bank/ (ig.jsonl, yt-tiktok.jsonl, README.md), tools/viral_bank_ig.py, tools/viral_bank_yt.py,
+   library/research/viral/. If the scripts exist, run them once; if not, build tools/viral_bank_yt.py (yt-dlp, channel /shorts
+   tabs, keep ≥1M views, incremental, "used_by": null, "added") — method that worked 10-19: list niche channels via
+   `yt-dlp --flat-playlist -J "ytsearch30:<query>"` → channel_url → `yt-dlp --flat-playlist -J --playlist-end 120 <channel>/shorts`.
+   Download with `-f "136+ba/398+ba/bv*+ba" --merge-output-format mp4`; transcribe via faster-whisper (scratchpad tx.py pattern:
+   ffmpeg → 16 kHz PCM → WhisperModel("small.en", int8)).
+   Mark the 10 sources already used (viral4/viral5 drafts) as used_by.
+5. Write the next batch (v6, 6 reels for Thu 10-22 → Fri 10-23) with the 95/5 rule from the bank's best unused ≥1M entries,
+   create it with tools/new_reels_v3.py. Same for v7 (Sat–Sun) if the bank has enough.
+6. 24/7 plan (owner asked; do after content is safe): systemd user timers with Persistent=true for the bank refresh (daily) and an
+   auto-planner (daily: if < 7 days booked, write the next 95/5 batch from the bank); Telegram alert when < 3 days booked;
+   cloud factory failover later (GitHub factory/planner workflows exist but are disabled — never run both at once).
 
-## Tasks
-1. Watch the cloud run: `gh run list --workflow factory -L 3`, `gh run view <id> --log-failed`. Success = it pulled Drive,
-   moved w7-06 / w8 reels forward (voice, plan, clips, judge, render), pushed Drive, reported to HQ, and booked reels when
-   finished (`node tools/ig_queue.js ids`). If a step fails: read the log, fix the real cause in the code, commit + push,
-   `gh workflow run factory -f max_minutes=160`, watch again. Typical risks: missing files on Drive (push them with
-   tools/cloud/sync.sh using SYNC_PATHS), Pinterest cookies (secret PINTEREST_COOKIES), Claude auth (secret
-   CLAUDE_CODE_OAUTH_TOKEN), disk on the runner, HyperFrames render time.
-2. Never run the laptop factory at the same time as a cloud run (both write the same reels on Drive).
-3. When one cloud run finished cleanly: note it in CLAUDE.md "Current state" (cloud is live; laptop optional), then set
-   STATUS: DONE.
+## Owner to-do (only they can)
+- Paste the lid-close command (keeps the laptop working with the lid shut while plugged in):
+  `sudo mkdir -p /etc/systemd/logind.conf.d && printf '[Login]\nHandleLidSwitchExternalPower=ignore\nHandleLidSwitchDocked=ignore\n' | sudo tee /etc/systemd/logind.conf.d/decodeher-lid.conf && sudo systemctl kill -s HUP systemd-logind`
+- Polar: replace the playbook PDF in the "Decode Her Texting Playbook (PDF)" benefit with deliverables/products/Decode-Her-Texting-Playbook.pdf; test-buy the pack with a 100% code.
+- Make the relaxed ethics rule permanent in CLAUDE.md (the edit was blocked for Claude).
 
-## 10-17 03:20 IST: text-in-clips redo PAUSED (Pinterest search down, owner saw it in the app)
-6 booked reels need new clips (OCR found baked-in text): w7-02, w7-04, w7-05, w7-06, w8-02, w8-04. Each reel.json has
-requeue:true + parked. Their current videos stay booked. When Pinterest search works again (test: gallery-dl --simulate a
-search returns results), for each: remove "parked", move logs/queued/<slug> aside; the factory re-searches, renders
-(OCR-checked) and swaps the new video into the same slot. Old pieces: scratchpad redo-1017 (temporary).
-
-## 10-18 ~08:00 IST: state when the owner went to sleep
-- Production running: w9, w10, w11 (18 reels, AI-woman openers, keyword rule) fill Tue 10-20 → Sun 10-25. Remakes of w8-02
-  "Three hours" (18:30 today) and w8-04 "Double text" (22:00 today) re-searching clips; they swap into their slots.
-- s1 / s2 test reels: approval pending (owner).
-- Visual hooks: 25 clips on the shelf (library/hook-pool/visual), OFF (config reels.visualHooks=false) until the owner plans it.
-- Zoltium study: blocked. Brave is logged in as @thedecodeher (do NOT scrape with our own account); Instagram refuses all
-  tools for @zoltium anyway. Owner will send saved Zoltium reel VIDEOS on Telegram. TODO: the bot only takes Pinterest links
-  DONE 10-18: videos sent to the bot → Drive only (gdrive:DecodeHer/research/zoltium, laptop keeps no copy);
-  (never used in reels), then run the measure script (scratchpad tools/measure.py, rewrite into tools/) + analysis + skill.
-- PLANNED (owner OK'd 10-18, build ~Tue after w9-w11 are produced): Drive as the clip database. Laptop keeps only
-  fingerprints (reels/_pool/emb.json + clip .json); factory ranks by fingerprint, downloads the ~100 candidates per reel,
-  deletes after render. Frees ~700 MB. FIRST: owner's own Google Drive client_id for rclone (shared one is retiring in 2026);
-  keep laptop copies of owner clips until the Drive path has made a few reels cleanly.
+## Also done 10-19 (no action needed)
+Site live https://decodeher.pages.dev (two tiers $9/$19 launch, throne-king image, native scroll, short copy); bonuses in
+deliverables/products/bonuses/; carousel research brain/research/carousels/manly-pinnacle-analysis.md (carousel sample not made yet);
+memories: steal-like-an-artist (95/5), simple-hands-off, private-audience.
