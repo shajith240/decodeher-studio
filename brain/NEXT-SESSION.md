@@ -41,5 +41,5 @@ search returns results), for each: remove "parked", move logs/queued/<slug> asid
 - Visual hooks: 25 clips on the shelf (library/hook-pool/visual), OFF (config reels.visualHooks=false) until the owner plans it.
 - Zoltium study: blocked. Brave is logged in as @thedecodeher (do NOT scrape with our own account); Instagram refuses all
   tools for @zoltium anyway. Owner will send saved Zoltium reel VIDEOS on Telegram. TODO: the bot only takes Pinterest links
-  (hq/worker.js PIN_RE, KIND_SAY) — add video-file intake with a "📚 Research (Zoltium)" kind → library/research/zoltium/
+  DONE 10-18: videos sent to the bot → Drive only (gdrive:DecodeHer/research/zoltium, laptop keeps no copy);
   (never used in reels), then run the measure script (scratchpad tools/measure.py, rewrite into tools/) + analysis + skill.
