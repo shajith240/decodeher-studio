@@ -157,6 +157,7 @@ def add_link(url, kind, reg, ui, total_n, progress, added, dups, bad, done_lines
         done_lines.append(f"{ui + 1}/{total_n} ✅ new: {name}" + (" · has text, won't be used" if has_tx else "")); added.append(f"{name} ({fp['dur']:.0f} s, {w}x{h})" + (f" — {ds['description']}" if ds else " — (no AI description: Claude was busy, named by pin number)") + (" — ⚠️ has text inside, kept but never used in a reel" if has_tx else "")); photo_box.append(frame_b64(out)) if not photo_box else None
 
 RESEARCH = "library/research/zoltium"   # 10-18 owner: saved @zoltium reels for the craft study — never used in our reels
+RDRIVE = "gdrive:DecodeHer/research/zoltium"   # owner 10-18: "store it directly in the Drive" — the laptop keeps no copy
 def research(it):
     os.makedirs(RESEARCH, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
     for f in it.get("files", []):
@@ -167,11 +168,14 @@ def research(it):
             if len(data) < 10000: raise ValueError("empty file")
             open(out, "wb").write(data)
             json.dump({"from": "owner via Telegram", "at": time.strftime("%F %T"), "caption": f.get("caption", ""), "name": f.get("name", "")}, open(out[:-4] + ".json", "w"), indent=1, ensure_ascii=False)
-            subprocess.run(["rclone", "copy", out, "gdrive:DecodeHer/research/zoltium", "-q"], capture_output=True, timeout=600)
-            got.append(f"{os.path.basename(out)} ({dur(out):.0f} s)")
+            secs = dur(out)
+            mv = subprocess.run(["rclone", "move", RESEARCH, RDRIVE, "--include", os.path.basename(out)[:-4] + ".*", "-q"], capture_output=True, timeout=600)
+            if mv.returncode != 0 or os.path.exists(out): raise RuntimeError("Drive upload failed, kept on the laptop for now")
+            got.append(f"{os.path.basename(out)} ({secs:.0f} s)")
         except Exception as e: bad.append(f"{f.get('name') or 'video'} ({str(e)[:60]})")
-    total = len(glob.glob(f"{RESEARCH}/*.mp4"))
-    lines = [f"📚 <b>{len(got)} reel{'s' if len(got) != 1 else ''}</b> saved for the Zoltium study (backed up to Drive; never used in our reels)."] + [f"• {g}" for g in got]
+    ls = subprocess.run(["rclone", "lsf", RDRIVE, "--include", "*.mp4"], capture_output=True, text=True, timeout=120).stdout
+    total = len([l for l in ls.splitlines() if l.strip()])
+    lines = [f"📚 <b>{len(got)} reel{'s' if len(got) != 1 else ''}</b> saved to Google Drive for the Zoltium study (DecodeHer/research/zoltium; never used in our reels)."] + [f"• {g}" for g in got]
     if bad: lines += ["", f"⚠️ Couldn't save ({len(bad)}):"] + [f"• {b}" for b in bad]
     lines += ["", f"Study library: {total} reels."]
     hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
