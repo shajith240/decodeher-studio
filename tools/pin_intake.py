@@ -156,11 +156,33 @@ def add_link(url, kind, reg, ui, total_n, progress, added, dups, bad, done_lines
         subprocess.run(["rclone", "copy", out, DRIVE[kind], "-q"], capture_output=True, timeout=600)
         done_lines.append(f"{ui + 1}/{total_n} ✅ new: {name}" + (" · has text, won't be used" if has_tx else "")); added.append(f"{name} ({fp['dur']:.0f} s, {w}x{h})" + (f" — {ds['description']}" if ds else " — (no AI description: Claude was busy, named by pin number)") + (" — ⚠️ has text inside, kept but never used in a reel" if has_tx else "")); photo_box.append(frame_b64(out)) if not photo_box else None
 
+RESEARCH = "library/research/zoltium"   # 10-18 owner: saved @zoltium reels for the craft study — never used in our reels
+def research(it):
+    os.makedirs(RESEARCH, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
+    for f in it.get("files", []):
+        out = f"{RESEARCH}/{time.strftime('%Y%m%d')}-{re.sub(r'[^A-Za-z0-9_-]', '', f.get('uid') or f['file_id'][-12:])}.mp4"
+        try:
+            req = urllib.request.Request(f"{url}/api/tgfile?file_id={f['file_id']}", headers={"Authorization": f"Bearer {key}", "User-Agent": "decodeher-pin-intake/1.0"})
+            data = urllib.request.urlopen(req, timeout=180).read()
+            if len(data) < 10000: raise ValueError("empty file")
+            open(out, "wb").write(data)
+            json.dump({"from": "owner via Telegram", "at": time.strftime("%F %T"), "caption": f.get("caption", ""), "name": f.get("name", "")}, open(out[:-4] + ".json", "w"), indent=1, ensure_ascii=False)
+            subprocess.run(["rclone", "copy", out, "gdrive:DecodeHer/research/zoltium", "-q"], capture_output=True, timeout=600)
+            got.append(f"{os.path.basename(out)} ({dur(out):.0f} s)")
+        except Exception as e: bad.append(f"{f.get('name') or 'video'} ({str(e)[:60]})")
+    total = len(glob.glob(f"{RESEARCH}/*.mp4"))
+    lines = [f"📚 <b>{len(got)} reel{'s' if len(got) != 1 else ''}</b> saved for the Zoltium study (backed up to Drive; never used in our reels)."] + [f"• {g}" for g in got]
+    if bad: lines += ["", f"⚠️ Couldn't save ({len(bad)}):"] + [f"• {b}" for b in bad]
+    lines += ["", f"Study library: {total} reels."]
+    hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
+    log(f"Zoltium study · {len(got)} reels saved, {len(bad)} failed")
+
 def run():
     box = hq("GET", "/api/inbox")
     if not box or not box.get("items"): return 0
     reg = load_reg(); index(reg)
     for it in box["items"]:
+        if it.get("kind") == "research": research(it); continue
         kind = it.get("kind") or "dark"; added, dups, bad, photo_box = [], [], [], []; total_n = len(it["urls"]); done_lines = []
         def progress(i, step, frac=0.0):   # 10-16: live progress — HQ edits the bot's first reply; moves per STEP, not per link
             pct = min(100, int(100 * (i + frac) / max(1, total_n))); bar = "▓" * (pct // 10) + "░" * (10 - pct // 10)

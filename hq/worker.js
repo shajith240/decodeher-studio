@@ -133,7 +133,7 @@ function unfinished(snap) {
 const PIN_RE = /https?:\/\/(?:pin\.it\/[A-Za-z0-9]+|(?:[a-z]{2,3}\.)?(?:www\.)?pinterest\.[a-z.]+\/pin\/[A-Za-z0-9_-]+\/?)/gi;
 const pinLinks = (t) => [...new Set((String(t).match(PIN_RE) || []).map((u) => u.replace(/\/+$/, "")))].slice(0, 30);
 const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.test(t) ? "hook" : /\b(dark|psych\w*|story|clip|scene|b-?roll)\b/i.test(t) ? "dark" : null;
-const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips" };
+const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the Zoltium study (research only, never used in our reels)" };
 async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop (JPEG, base64)
   if (!env.TELEGRAM_BOT_TOKEN || !env.OWNER_CHAT_ID) return { ok: false };
   const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), f = new FormData();
@@ -265,6 +265,9 @@ export class HQ extends DurableObject {
     }
     const m = update.message;   // edits of old messages are ignored (they are not new requests)
     if (!m || !m.chat || String(m.chat.id) !== owner) return;          // only the owner's chat
+    // owner 10-18: saved reels (e.g. @zoltium) sent as video files → the laptop's research library, never used in our reels
+    const vid = m.video || (m.document && /^video\//.test(m.document.mime_type || "") ? m.document : null);
+    if (vid) return this.onVideo(m, vid);
     const text = String(m.text || m.caption || "").trim();
     if (!text) return say(this.env, "I can only read text for now. Type what you'd like, or /help.");
     const cmd = text.startsWith("/") ? text.split(/\s+/)[0].slice(1).split("@")[0].toLowerCase() : null;
@@ -305,9 +308,22 @@ export class HQ extends DurableObject {
     return say(this.env, `📥 Got ${n}. What are they?`, { reply_markup: { inline_keyboard: [[
       { text: "💃 AI girl hook", callback_data: `pin:hook:${id}` }, { text: "🌑 Dark-psychology clip", callback_data: `pin:dark:${id}` }]] } });
   }
+  async onVideo(m, v) {
+    if (Number(v.file_size || 0) > 20e6) return say(this.env, "⚠️ That video is over 20 MB, and Telegram won't let the bot download files that big. Please send a shorter or smaller copy.");
+    const inbox = await this.get("pinInbox", []), group = m.media_group_id ? String(m.media_group_id) : null;
+    const file = { file_id: v.file_id, uid: v.file_unique_id || "", name: v.file_name || "", size: v.file_size || 0, caption: String(m.caption || "").slice(0, 500) };
+    const same = group && inbox.find((x) => x.group === group && x.state === "queued");
+    if (same) { same.files.push(file); await this.put("pinInbox", inbox); return { ok: true }; }   // one reply per album
+    const id = newId("v"); inbox.push({ id, urls: [], files: [file], kind: "research", group, state: "queued", at: Date.now() });
+    await this.put("pinInbox", inbox.slice(-300));
+    await this.note("activity", "Owner sent reel video(s) for the Zoltium study");
+    const r = await say(this.env, `📚 Got it, saving for <b>${KIND_SAY.research}</b>.\n⏳ The laptop picks it up within a few minutes…`);
+    const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
+    return r;
+  }
   async pinInbox() {   // the laptop manager asks for work
     const inbox = await this.get("pinInbox", []);
-    return { ok: true, items: inbox.filter((x) => x.state === "queued").map(({ id, urls, kind, at }) => ({ id, urls, kind, at })) };
+    return { ok: true, items: inbox.filter((x) => x.state === "queued").map(({ id, urls, files, kind, at }) => ({ id, urls, files: files || [], kind, at })) };
   }
   async pinResult(b) {   // the laptop manager reports: {id, state: "working"|"done"|"failed", text, photo_b64?}
     const inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === b.id);
@@ -634,6 +650,15 @@ async function handle(req, env) {
     if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
     if (req.method === "GET") return json(await hq(env).pinInbox());
     if (req.method === "POST") { const b = await body(req); if (!b || !b.id) return json({ ok: false, error: "send {id, state, text}" }, 400); const r = await hq(env).pinResult(b); return json(r, r.ok ? 200 : 400); }
+  }
+  if (p === "/api/tgfile" && req.method === "GET") {   // 10-18: the laptop downloads a video the owner sent (the bot token never leaves HQ)
+    if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+    const fid = url.searchParams.get("file_id") || ""; if (!/^[A-Za-z0-9_-]{10,200}$/.test(fid)) return json({ ok: false, error: "bad file_id" }, 400);
+    const g = await tg(env, "getFile", { file_id: fid });
+    if (!g.ok || !g.result || !g.result.file_path) return json({ ok: false, error: g.error || "file not available" }, 404);
+    const f = await fetch(`https://api.telegram.org/file/bot${env.TELEGRAM_BOT_TOKEN}/${g.result.file_path}`);
+    if (!f.ok) return json({ ok: false, error: `telegram HTTP ${f.status}` }, 502);
+    return new Response(f.body, { headers: { "Content-Type": "video/mp4", "Cache-Control": "no-store" } });
   }
   if (p === "/tg" && req.method === "POST") {
     if (!env.TELEGRAM_SECRET || !same(req.headers.get("X-Telegram-Bot-Api-Secret-Token"), env.TELEGRAM_SECRET)) return new Response("forbidden", { status: 403 });
