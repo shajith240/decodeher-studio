@@ -228,6 +228,16 @@ def main():
             check_agent()
             services(); heartbeat(); disk(); tmp_space(); pin_inbox(); stuck()
             incidents = []; posts(incidents); thinking_problems(incidents)
+            # 10-18 owner ("the manager isn't even working"): the disk sat under 4 GB, the routine cleanup freed 0 GB and the whole
+            # factory waited 20 min with nobody acting. If the cleanup can't get it over 4 GB, a Claude agent finds and frees space.
+            free_gb = shutil.disk_usage(ROOT).free / 1e9
+            if free_gb < 4:
+                incidents.append(("disk-full", "", f"The laptop disk has {free_gb:.1f} GB free; the factory pauses all new work under 4 GB and the "
+                                  "routine cleanup (tools/manager.py disk(), tools/pool_prune.py) could not fix it. Find what is using space "
+                                  "(du on reels/, deliverables/, library/, ~/.cache, ~/.npm, /tmp; on btrfs `du` of ~/.cache/uv is not real) and free "
+                                  "at least 1.5 GB SAFELY: caches, re-downloadable files, finished reels' working files. Never delete the owner's "
+                                  "files, booked/queued videos, library/hook-pool, library/clips, logs/queued markers or anything in brain/. Moving "
+                                  "old archives to Drive with `rclone move` is fine. Then make the fix permanent in tools/ so it doesn't recur."))
             S["checked"] = time.strftime("%F %T")
             fresh = [i for i in incidents if time.time() - S["seen"].get(i[0], 0) > 7200]
             if fresh and not agent and time.time() > S.get("claude_wait", 0): start_agent(*fresh[0])
