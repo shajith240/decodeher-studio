@@ -99,8 +99,11 @@
 
     #side {
       display: flex; flex-direction: column; gap: var(--gut);
-      padding: 20px var(--gut) 12px 0; min-height: 0
+      padding: 20px var(--gut) 12px 0; min-height: 0;
+      /* 10-18 owner: growth + schedule pushed "In production" off the bottom with no way to reach it — the column scrolls */
+      overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line2) transparent
     }
+    #side > .panel { flex-shrink: 0 }
 
     /* ---------- top bar ---------- */
     .brand {
@@ -400,13 +403,9 @@
     #lr .thumbs i:nth-child(4) { background-position: 100% 50% }
     #lr .mon:hover .thumbs i { box-shadow: 0 0 0 1px var(--gold) }
 
-    #actP { flex: 1 }
+    #actP { flex: 1 0 auto; min-height: 280px }
 
-    #actP .pb {
-      overflow: hidden; flex: 1; padding-top: 6px;
-      -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent);
-      mask-image: linear-gradient(to bottom, #000 84%, transparent)
-    }
+    #actP .pb { flex: 1; padding-top: 6px }
 
     #act li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; font-size: 13.5px; padding: 6px 0; line-height: 1.4; border-bottom: 1px solid rgba(59, 28, 32, .55) }
     #act time { color: var(--faint); font-variant-numeric: tabular-nums }
@@ -1872,7 +1871,7 @@ function updateSum(){   // 10-16: the whole line in one sentence the owner can r
   const R = DATA.reels || [], P = FACT.parked || {}, park = r => P[r.dir] || P[(r.dir||'').split('/').pop()];
   const posted = (DATA.queue || []).filter(q => q.status === 'posted').length || R.filter(r => /^posted/.test(r.posted || '')).length, ql = queuedList();   // relay log is the truth (it has the first reel too)
   const making = Object.keys(FACT.running || {}).length;
-  const ok = R.filter(r => /approval/i.test(park(r) || '')), booking = R.filter(r => !ok.includes(r) && r.video === 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')), stuck = R.filter(r => park(r) && !isHold(park(r)));   // 10-16: 'waiting for your OK' only when an approval is really pending
+  const ok = R.filter(r => r.approval === 'pending' || /approval/i.test(park(r) || '')), booking = R.filter(r => !ok.includes(r) && r.video === 'done' && !r.queued && !/^(posted|queued)/.test(r.posted || '')), stuck = R.filter(r => park(r) && !isHold(park(r)));   // 10-16: 'waiting for your OK' only when an approval is really pending
   const parts = [`<span class="ok"><b>${posted}</b>posted</span>`,
     `<span><b>${ql.length}</b>booked${ql.length ? ' · next post ' + esc(dayLabel(ql[0].at)) : ''}</span>`,
     `<span><b>${making}</b>being made right now</span>`];
@@ -2112,7 +2111,7 @@ function renderProg(){   // 10-16 owner: progress bars; UI review: only ACTIVE r
     <div class="steps">${STEPS.map((s, i) => `<span class="${i === x.si ? 'on' : i < x.si ? 'ok' : ''}">${s[1]}</span>`).join('')}</div>
     <div class="sub">${esc(x.sub)}</div></div>`;
   const html = (on.length ? on.map(card).join('') : `<div class="none">${STALE ? 'Nothing is being made right now — the factory is between runs.' : 'Nothing is being made this minute.'}</div>`)
-    + (wait.length ? `<div><div class="waitT">Up next (${wait.length})</div>${wait.map(x => `<div class="wait"><span>${esc(x.r.title || x.r.dir)}</span><em>${x.done ? 'finished · booking' : x.park ? 'on hold' : 'at ' + STEPS[x.si][1]}</em></div>`).join('')}</div>` : '');
+    + (wait.length ? `<div><div class="waitT">Up next (${wait.length})</div>${wait.map(x => `<div class="wait"><span>${esc(x.r.title || x.r.dir)}</span><em>${x.done ? (x.r.approval === 'pending' ? 'finished · waiting for your OK' : 'finished · booking') : x.park ? 'on hold' : 'at ' + STEPS[x.si][1]}</em></div>`).join('')}</div>` : '');
   if (el.innerHTML !== html) el.innerHTML = html;
 }
 setInterval(() => { try { if (typeof DATA !== 'undefined' && DATA) renderProg(); } catch (e) {} }, 2000);   // the render bar moves between data pushes
