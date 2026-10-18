@@ -104,7 +104,11 @@ h1 .ink { display: inline-block; padding: .06em .04em }
 /* II. the problem */
 .problem { padding: var(--s8) 0 }
 .problem .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(48px, 8vw, 120px); align-items: center }
-.problem h2 { margin-bottom: var(--s4) }
+.problem .said { font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: var(--s2) }
+.problem h2.quote { font-size: clamp(32px, 4.6vw, 64px); line-height: 1.05; letter-spacing: 0; color: var(--crimson); max-width: none; white-space: nowrap; margin-bottom: var(--s2) }
+.problem .after { font-size: clamp(22px, 2.4vw, 32px); line-height: 1.3; font-weight: 500; color: var(--ink); margin-bottom: var(--s4); max-width: 22ch }
+.problem .after em { font-style: normal; color: var(--crimson) }
+.problem .lede { color: var(--ink-2) }
 .plate { overflow: hidden; position: relative }
 .plate picture { display: block; width: 100%; height: 100% }
 .plate img { width: 100%; height: 100%; object-fit: cover }
@@ -266,11 +270,12 @@ details.more[open] .toc { margin-top: var(--s4) }
 <section class="problem light">
   <div class="inner grid">
     <div>
-      <h2 class="split">She replied “we’ll see.” You’ve read it <em>eleven times.</em></h2>
-      <p class="lede reveal">Typed, deleted, typed again. This book ends the guessing.</p>
+      <h2 class="split quote">“We’ll see.”</h2>
+      <p class="after reveal">Her whole reply. You’ve read it <em>eleven times.</em></p>
+      <p class="lede reveal">This book ends the guessing.</p>
     </div>
     <figure>
-      <div class="plate wipe"><picture><source type="image/webp" srcset="img/opt/part1-640.webp 640w, img/opt/part1-1024.webp 1024w" sizes="(max-width: 900px) 100vw, 45vw"><img src="img/part1.jpg" alt="A bronze bust in a dark museum, lit only by a phone screen on its plinth" width="1024" height="1536" loading="lazy" decoding="async"></picture></div>
+      <div class="plate wipe"><picture><source type="image/webp" srcset="img/opt/king-640.webp 640w, img/opt/king-1024.webp 1024w" sizes="(max-width: 900px) 100vw, 45vw"><img src="img/king.jpg" alt="A bronze statue of a Greek king on his throne, bent over the glowing phone in his hands" width="1024" height="1536" loading="lazy" decoding="async" style="object-position: 50% 30%"></picture></div>
     </figure>
   </div>
 </section>
@@ -357,7 +362,7 @@ details.more[open] .toc { margin-top: var(--s4) }
 
 <section class="rest dark" aria-label="Read her honestly">
   <picture><source type="image/webp" srcset="img/opt/back-640.webp 640w, img/opt/back-1024.webp 1024w" sizes="100vw"><img class="push" src="img/back.jpg" alt="A phone lying face-down on black marble beside a single red rose" width="1024" height="1536" loading="lazy" decoding="async"></picture>
-  <h2 class="split">Read her honestly. Be clear about yourself.</h2>
+  <h2 class="split">Read her <em>honestly.</em></h2>
 </section>
 
 <section class="offer dark grain" id="get">
