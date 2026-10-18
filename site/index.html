@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Decode Her: The Texting Playbook</title>
+<meta name="description" content="25 real texting situations. What her text usually means, and exactly what to send back. A 73-page PDF made for your phone, from @thedecodeher.">
+<meta property="og:title" content="Decode Her: The Texting Playbook">
+<meta property="og:description" content="Tap her text. Read what it means. Send the right reply.">
+<meta property="og:image" content="img/1-cover.jpg">
+<meta name="theme-color" content="#0f0608">
+<link rel="icon" href="img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zalando+Sans+Expanded:wght@400;500;600&family=Zalando+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Type: Zalando Sans Expanded (display, capitals only) + Zalando Sans (text and every number). Owner pick 10-18.
+   Spacing: one 8-based scale. Rules: brain/content/products/site-design-rules (scratchpad research 10-18). */
+:root {
+  --void: #0f0608; --on: #f3ead9; --on-2: rgba(243, 234, 217, .84); --on-3: rgba(243, 234, 217, .66);
+  --gold: #c9a45c; --gold-hi: #ecd6a3; --paper: #f4ecdc; --ink: #1b1214; --ink-2: #47392f; --ink-3: #64554b; --gold-ink: #6b4f22; --crimson: #8a1a2a;
+  --rule-d: rgba(201, 164, 92, .5); --rule-l: #cdbb94;
+  --disp: "Zalando Sans Expanded", system-ui, sans-serif; --text: "Zalando Sans", system-ui, sans-serif;
+  --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s5: 48px; --s6: 64px; --s7: 96px; --s8: 128px;
+  --pad: clamp(24px, 5vw, 72px); --max: 1180px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0 }
+html.lenis, html.lenis body { height: auto }
+.lenis.lenis-smooth { scroll-behavior: auto !important }
+body { background: var(--void); color: var(--on); font: 400 17px/1.62 var(--text); font-variant-numeric: lining-nums; -webkit-font-smoothing: antialiased; overflow-x: hidden }
+@media (min-width: 900px) { body { font-size: 19px } }
+img { display: block; max-width: 100%; height: auto }
+a { color: inherit }
+::selection { background: var(--gold); color: var(--void) }
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px }
+.light :focus-visible { outline-color: var(--crimson) }
+.inner { width: min(var(--max), 100%); margin: 0 auto; padding: 0 var(--pad) }
+section { position: relative }
+.dark { background: var(--void); color: var(--on) }
+.light { background: var(--paper); color: var(--ink) }
+.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") }
+
+h2 { font: 500 clamp(26px, 3.6vw, 50px)/1.15 var(--disp); letter-spacing: .01em; text-transform: uppercase; max-width: 20ch }
+h2 em { font-style: normal; color: var(--gold-hi) }
+.light h2 em { color: var(--crimson) }
+.lede { font-size: 1.06em; line-height: 1.62; max-width: 42ch }
+.dark .lede { color: var(--on-2) } .light .lede { color: var(--ink-2) }
+.lede + .lede { margin-top: var(--s3) }
+.small { font-size: 15px; line-height: 1.5 }
+.dark .small { color: var(--on-3) } .light .small { color: var(--ink-3) }
+.ml { display: block; overflow: hidden; padding: .08em 0 .12em; margin: -.08em 0 -.12em }
+.ml > span { display: block }
+
+/* the button: brushed gold, inset bevel, one slow band of light on hover (desktop only) */
+.cta { display: flex; flex-direction: column; align-items: center; gap: 14px }
+.btn { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+  min-height: 56px; padding: 0 40px; text-decoration: none; border-radius: 2px;
+  font: 600 16px/1 var(--text); letter-spacing: .03em; color: #2a1608;
+  background: linear-gradient(180deg, #f1dba2 0%, #d9b46a 42%, #b98e47 64%, #d4af6a 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 249, 228, .8), inset 0 -1px 0 rgba(96, 60, 18, .5), 0 0 0 1px rgba(126, 88, 32, .6), 0 16px 34px -16px rgba(0, 0, 0, .7) }
+.btn::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: .25; mix-blend-mode: soft-light;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .55) 0 1px, rgba(0, 0, 0, .3) 1px 2px, transparent 2px 5px) }
+.btn::after { content: ""; position: absolute; top: -10%; bottom: -10%; left: -55%; width: 40%; z-index: -1;
+  background: linear-gradient(100deg, transparent, rgba(255, 253, 244, .85), transparent); transform: skewX(-20deg); transition: transform 1.2s cubic-bezier(.2, .7, .1, 1) }
+@media (hover: hover) { .btn:hover::after { transform: skewX(-20deg) translateX(440%) } .btn:hover { filter: brightness(1.04) } }
+.btn .price { font-weight: 600; font-variant-numeric: tabular-nums; padding-left: 14px; border-left: 1px solid rgba(60, 34, 10, .35) }
+.cta .small { text-align: center }
+.textlink { display: inline-flex; align-items: center; min-height: 48px; text-decoration: none; font-weight: 600; border-bottom: 1px solid currentColor }
+.dark .textlink { color: var(--gold-hi) } .light .textlink { color: var(--crimson) }
+
+/* I. hero: the cover, set live */
+.hero { min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; background: radial-gradient(85% 60% at 50% 0%, #2c0e16 0%, var(--void) 66%) }
+.hero .frame { position: absolute; inset: clamp(12px, 2.2vw, 28px); border: 1px solid rgba(201, 164, 92, .42); pointer-events: none }
+.hero .top { position: relative; z-index: 2; display: flex; align-items: center; padding: clamp(28px, 4.5vh, 44px) clamp(32px, 5vw, 60px) 0 }
+.hero .top a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; text-decoration: none; font-size: 15px; color: var(--on-2) }
+.hero .top img { width: 32px; height: 32px; border-radius: 50% }
+.hero .stack { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--s5) var(--pad) var(--s6) }
+h1 { font: 500 clamp(40px, 9.6vw, 136px)/1.02 var(--disp); letter-spacing: .05em; margin-right: -.05em; text-transform: uppercase; color: var(--gold-hi) }
+h1 .ink { display: inline-block; padding: .06em .04em }
+.hero .sub { margin-top: var(--s2); font: 500 clamp(12px, 1.15vw, 15px)/1.3 var(--disp); letter-spacing: .2em; margin-right: -.2em; text-transform: uppercase; color: var(--on-2) }
+.hero .rule { width: 48px; height: 1px; background: var(--gold); margin: var(--s4) auto 0; opacity: .7 }
+.hero .lede { margin: var(--s4) auto 40px; text-align: center; max-width: 34ch }
+@media (max-height: 760px) and (max-width: 900px) { .hero .stack { padding-top: var(--s3); padding-bottom: var(--s4) } .hero .lede { margin: var(--s3) auto var(--s4) } .hero .rule { margin-top: var(--s3) } }
+
+/* II. the problem */
+.problem { padding: var(--s8) 0 }
+.problem .grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(48px, 8vw, 120px); align-items: center }
+.problem h2 { margin-bottom: var(--s4) }
+.plate { overflow: hidden; position: relative }
+.plate img { width: 100%; height: 100%; object-fit: cover }
+.problem .plate { aspect-ratio: 4 / 5 }
+figcaption { margin-top: var(--s2) }
+
+/* III. the decoder */
+.decoder { padding: var(--s8) 0; overflow: hidden; background: radial-gradient(70% 55% at 85% 35%, #2a0c14 0%, var(--void) 66%) }
+.decoder .head { display: grid; grid-template-columns: 1.1fr .9fr; gap: var(--s5); align-items: end; margin-bottom: var(--s6) }
+.picks { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); margin-bottom: var(--s5) }
+.pick { all: unset; position: relative; overflow: hidden; cursor: pointer; display: grid; gap: var(--s1); align-content: start; padding: var(--s3); min-height: 48px; border: 1px solid var(--rule-d); border-radius: 2px; transition: border-color .4s, background .4s }
+.pick b { font-weight: 600; font-size: 17px; line-height: 1.35; color: var(--on) }
+.pick span { font-size: 15px; line-height: 1.4; color: var(--on-3) }
+.pick[aria-pressed="true"] { border-color: var(--gold-hi); background: rgba(201, 164, 92, .1) }
+.pick:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 3px }
+.pick::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; background: radial-gradient(200px circle at var(--mx, 50%) var(--my, 50%), rgba(236, 214, 163, .12), transparent 70%) }
+@media (hover: hover) { .pick:hover { border-color: rgba(236, 214, 163, .75) } .pick:hover::before { opacity: 1 } }
+.stage { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: clamp(48px, 7vw, 104px); align-items: start }
+.phone { background: #efeae2; border-radius: 24px; overflow: hidden; box-shadow: 0 36px 90px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .06) }
+.phone .bar { display: flex; align-items: center; gap: 12px; background: #f0f2f5; padding: 14px 18px; border-bottom: 1px solid rgba(0, 0, 0, .07) }
+.phone .av { width: 36px; height: 36px; border-radius: 50%; background: #b9a68e; color: #fff; font: 600 15px/36px var(--text); text-align: center }
+.phone .nm { font: 600 15px/1.2 var(--text); color: #111b21; display: block } .phone .st { font: 400 12px/1.3 var(--text); color: #5d6d76; display: block }
+.phone .thread { padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 10px; min-height: 330px }
+.bb { max-width: 84%; padding: 9px 12px 7px; border-radius: 10px; font: 400 15.5px/1.4 var(--text); color: #111b21; box-shadow: 0 1px .6px rgba(11, 20, 26, .13); position: relative; opacity: 0 }
+.bb.in { align-self: flex-start; background: #fff; border-top-left-radius: 2px }
+.bb.out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px }
+.bb .t { float: right; margin: 8px 0 -3px 10px; font-size: 11px; color: #5d6d76 }
+.bb .tk { color: #3a9fd0; margin-left: 3px; letter-spacing: -.15em }
+.bb.no { background: #f7e4e2; color: #5a4943 }
+.bb.no .x { position: absolute; left: 10px; right: 10px; top: 50%; height: 1.5px; background: var(--crimson); transform-origin: left; transform: scaleX(0) }
+.typing { align-self: flex-end; background: #d9fdd3; border-radius: 10px; padding: 12px 14px; display: flex; gap: 4px }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: #6f8f6b; display: block }
+.notes { display: grid; gap: var(--s5); padding-top: var(--s3); max-width: 44ch }
+.note { position: relative; padding-left: var(--s3); opacity: 0 }
+.note::before { content: ""; position: absolute; left: 0; top: 4px; bottom: 4px; width: 2px; background: var(--gold); transform-origin: top; transform: scaleY(var(--d, 0)) }
+.note h3 { font: 500 14px/1.3 var(--disp); letter-spacing: .14em; text-transform: uppercase; color: var(--gold-hi); margin-bottom: var(--s1) }
+.note p { color: var(--on) }
+.note.bad::before { background: #c4505f } .note.bad h3 { color: #ec9ca6 }
+.dec-foot { margin-top: var(--s6); padding-top: var(--s3); border-top: 1px solid var(--rule-d); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s5) }
+.dec-foot p { color: var(--on-2) }
+
+/* IV. the book */
+.book { padding: var(--s8) 0; perspective: 1400px }
+.book .head { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); align-items: end }
+.book .spread { margin: var(--s7) 0 }
+.book .spread img { box-shadow: 0 50px 90px -30px rgba(27, 18, 20, .45) }
+.toc { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6) clamp(48px, 7vw, 104px) }
+.toc h3 { font: 500 15px/1.3 var(--disp); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); padding-bottom: var(--s2); border-bottom: 1px solid var(--rule-l) }
+.toc ol { list-style: none }
+.toc li { display: flex; gap: var(--s3); justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(205, 187, 148, .6); line-height: 1.4 }
+.toc li span:last-child { color: var(--ink-3); font-variant-numeric: tabular-nums; font-size: .9em; flex: none }
+.extra { margin-top: var(--s7); padding-top: var(--s5); border-top: 1px solid var(--rule-l); display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s5); align-items: center }
+.extra p { font-size: clamp(20px, 1.9vw, 25px); line-height: 1.45; max-width: 32ch }
+.extra .cta { justify-self: end }
+
+/* V. the approach */
+.approach { padding: var(--s8) 0; overflow: hidden }
+.approach .grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(48px, 8vw, 120px); align-items: center }
+.approach .plate { aspect-ratio: 3 / 4 }
+.approach h2 { margin-bottom: var(--s4) }
+.vows { margin-top: var(--s5); list-style: none }
+.vows li { padding: var(--s3) 0; border-top: 1px solid var(--rule-d); color: var(--on) }
+.vows li:last-child { border-bottom: 1px solid var(--rule-d) }
+
+/* VI. rest + close */
+.rest { height: 105svh; overflow: hidden }
+.rest img { position: absolute; inset: -8% 0 0; width: 100%; height: 116%; object-fit: cover; object-position: 50% 40% }
+.rest::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 40%, rgba(15, 6, 8, .9) 100%) }
+.rest h2 { position: absolute; z-index: 2; left: var(--pad); right: var(--pad); bottom: clamp(56px, 11vh, 120px); color: var(--on) }
+.close { padding: var(--s8) 0 var(--s6) }
+.close .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(48px, 9vw, 136px); align-items: start }
+.close .what { font-size: clamp(20px, 1.9vw, 24px); line-height: 1.55; max-width: 30ch; margin-bottom: 40px }
+.close .what b { font-weight: 600 }
+.close .cta { align-items: flex-start } .close .cta .small { text-align: left }
+.faq { display: grid; gap: var(--s4) }
+.faq dt { font-weight: 600; line-height: 1.4 }
+.faq dd { margin-top: var(--s1); color: var(--ink-2) }
+.endbar { margin-top: var(--s7); padding-top: var(--s3); border-top: 1px solid var(--rule-l); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--s2); font-size: 15px; color: var(--ink-3) }
+.endbar a { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; text-decoration: none; color: var(--ink); font-weight: 600 }
+.endbar img { width: 32px; height: 32px; border-radius: 50% }
+
+/* sticky buy bar on phones, once the hero has scrolled away */
+.buybar { display: none }
+@media (max-width: 900px) {
+  .problem, .decoder, .book, .approach { padding: var(--s7) 0 }
+  .close { padding: var(--s7) 0 calc(var(--s7) + 72px) }
+  .problem .grid, .decoder .head, .stage, .book .head, .toc, .extra, .approach .grid, .close .grid { grid-template-columns: 1fr }
+  .decoder .head, .book .head { gap: var(--s3) }
+  .decoder .head { margin-bottom: var(--s5) }
+  .problem .plate { aspect-ratio: 4 / 4.3 }
+  .picks { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 76%; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 calc(-1 * var(--pad)) var(--s4); padding: 0 var(--pad) 4px; scrollbar-width: none }
+  .picks::-webkit-scrollbar { display: none }
+  .pick { scroll-snap-align: start }
+  .notes { padding-top: 0; gap: var(--s4) }
+  .book .spread { margin: var(--s5) 0 }
+  .extra .cta, .close .cta { justify-self: stretch; align-items: stretch } .extra .cta .small, .close .cta .small { text-align: center }
+  .btn { width: 100% }
+  .hero .cta { width: 100%; max-width: 360px }
+  .rest { height: 85svh }
+  .buybar { display: flex; position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; gap: var(--s2); align-items: center; justify-content: space-between;
+    padding: 12px var(--pad) calc(12px + env(safe-area-inset-bottom)); background: rgba(15, 6, 8, .94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--rule-d); transform: translateY(110%); transition: transform .5s cubic-bezier(.2, .7, .1, 1) }
+  .buybar.on { transform: none }
+  .buybar span { font-size: 15px; color: var(--on-2); line-height: 1.3 }
+  .buybar .btn { width: auto; flex: none; white-space: nowrap; min-height: 48px; padding: 0 22px; font-size: 15px }
+}
+@media (prefers-reduced-motion: reduce) { .bb, .note { opacity: 1 } .note::before, .bb.no .x { transform: none } .buybar { transition: none } }
+</style>
+</head>
+<body>
+<main>
+
+<section class="hero grain" id="top">
+  <div class="frame" aria-hidden="true"></div>
+  <div class="top"><a href="https://www.instagram.com/thedecodeher"><img src="img/logo.jpg" alt="">@thedecodeher</a></div>
+  <div class="stack">
+    <h1><span class="ink">Decode Her</span></h1>
+    <p class="sub">The Texting Playbook</p>
+    <div class="rule" aria-hidden="true"></div>
+    <p class="lede reveal">Twenty-five texts that keep men up at night, read honestly, with exactly what to send back.</p>
+    <div class="cta reveal">
+      <a class="btn" href="CHECKOUT_URL">Get the playbook <span class="price">$9</span></a>
+      <p class="small">73 pages. Instant download.</p>
+    </div>
+  </div>
+</section>
+
+<section class="problem light">
+  <div class="inner grid">
+    <div>
+      <h2 class="split">She replied “we’ll see.” You’ve read it <em>eleven times.</em></h2>
+      <p class="lede reveal">You’ve checked when she was last online. You’ve typed a reply, deleted it, typed it again. You’ve asked a friend, who guessed.</p>
+      <p class="lede reveal">Most of the stress in dating lives right here, in a few words on a screen. This book takes those words one at a time and tells you what they usually mean, and what to send back.</p>
+    </div>
+    <figure>
+      <div class="plate wipe"><img src="img/part1.jpg" alt="A bronze bust in a dark museum, lit only by a phone screen on its plinth" width="1024" height="1536"></div>
+      <figcaption class="small">The hardest part of a text is the silence after it.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="decoder dark grain" id="try">
+  <div class="inner">
+    <div class="head">
+      <h2 class="split">Tap her text. <em>We’ll read it with you.</em></h2>
+      <p class="lede reveal">Four situations from the book. Pick the one that sounds like her and watch it get decoded.</p>
+    </div>
+    <div class="picks" role="group" aria-label="Choose her message">
+      <button class="pick" data-i="0" aria-pressed="true"><b>“We’ll see 😊”</b><span>You asked her to dinner</span></button>
+      <button class="pick" data-i="1" aria-pressed="false"><b>“This week is crazy, sorry!”</b><span>You asked her out</span></button>
+      <button class="pick" data-i="2" aria-pressed="false"><b>“haha”</b><span>Her whole reply to your joke</span></button>
+      <button class="pick" data-i="3" aria-pressed="false"><b>Warm Monday, cold Thursday</b><span>She’s hot and cold</span></button>
+    </div>
+    <div class="stage" aria-live="polite">
+      <div class="phone">
+        <div class="bar"><span class="av" id="av">M</span><span><span class="nm" id="nm">Maya</span><span class="st">online</span></span></div>
+        <div class="thread" id="thread"></div>
+      </div>
+      <div class="notes">
+        <div class="note" id="n-read"><h3>The read</h3><p id="t-read"></p></div>
+        <div class="note" id="n-move"><h3>The move</h3><p id="t-move"></p></div>
+        <div class="note bad" id="n-dont"><h3>Never send</h3><p id="t-dont"></p></div>
+      </div>
+    </div>
+    <div class="dec-foot">
+      <p>That’s one of twenty-five. The book has the rest, two pages each.</p>
+      <a class="textlink" href="CHECKOUT_URL">Get the playbook, $9</a>
+    </div>
+  </div>
+</section>
+
+<section class="book light">
+  <div class="inner">
+    <div class="head">
+      <h2 class="split">Twenty-five texts. <em>Two pages each.</em></h2>
+      <p class="lede reveal">The left page is the read: what she sent and what it usually means. The right page is the move: the exact reply, the one to never send, and what to do if she answers or goes quiet.</p>
+    </div>
+    <div class="spread"><img src="img/2-inside.jpg" alt="Two inside pages: She’s dry texting, the read and the move" width="1600" height="1200"></div>
+    <div class="toc">
+      <div><h3>The opening</h3><ol class="stagger">
+        <li><span>The first text after getting her number</span><span>11</span></li><li><span>Asking her out over text</span><span>13</span></li>
+        <li><span>She’s dry texting</span><span>15</span></li><li><span>She takes hours to reply</span><span>17</span></li>
+        <li><span>She left you on read</span><span>19</span></li><li><span>She only sends a short laughing reply</span><span>21</span></li></ol></div>
+      <div><h3>Plans and excuses</h3><ol class="stagger">
+        <li><span>“I’m busy”</span><span>24</span></li><li><span>“We’ll see”</span><span>26</span></li>
+        <li><span>She cancelled the date</span><span>28</span></li><li><span>She wants to reschedule</span><span>30</span></li></ol></div>
+      <div><h3>Mixed signals</h3><ol class="stagger">
+        <li><span>She’s hot and cold</span><span>33</span></li><li><span>She watches your stories but never texts</span><span>35</span></li>
+        <li><span>She only texts you late at night</span><span>37</span></li><li><span>“I need space”</span><span>39</span></li>
+        <li><span>Mixed signals</span><span>41</span></li><li><span>She never starts conversations</span><span>43</span></li>
+        <li><span>You double texted and got silence</span><span>45</span></li></ol></div>
+      <div><h3>After you meet</h3><ol class="stagger">
+        <li><span>After a great first date</span><span>48</span></li><li><span>After a so-so date</span><span>50</span></li>
+        <li><span>She likes you, but “wants to be friends”</span><span>52</span></li><li><span>She ghosted, then came back</span><span>54</span></li>
+        <li><span>She asks, “What are we?”</span><span>56</span></li><li><span>She teases you</span><span>58</span></li>
+        <li><span>She sends a long emotional message</span><span>60</span></li><li><span>She’s distant after you opened up</span><span>62</span></li></ol></div>
+    </div>
+    <div class="extra">
+      <p class="reveal">Plus twelve messages you should never send, thirty openers that turn a chat into a plan, and a cheat sheet for your phone.</p>
+      <div class="cta reveal">
+        <a class="btn" href="CHECKOUT_URL">Get the playbook <span class="price">$9</span></a>
+        <p class="small">Instant PDF download.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="approach dark grain">
+  <div class="inner grid">
+    <figure><div class="plate wipe"><img src="img/part4.jpg" alt="Two bronze statues, a man and a woman, facing each other in a dark gallery" width="1024" height="1536"></div></figure>
+    <div>
+      <h2 class="split">Nothing in here <em>is a trick.</em></h2>
+      <p class="lede reveal">This isn’t a book of lines. It’s a way of reading her honestly and being clear about yourself, so the right person can actually say yes.</p>
+      <ul class="vows stagger">
+        <li>No making her jealous. No silence used as punishment.</li>
+        <li>No lines designed to make her feel small.</li>
+        <li>A respectful exit counts as a strong move, not a loss.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="rest dark" aria-label="Read her honestly">
+  <img class="push" src="img/back.jpg" alt="A phone lying face-down on black marble beside a single red rose" width="1024" height="1536">
+  <h2 class="split">Read her honestly. Be clear about yourself.</h2>
+</section>
+
+<section class="close light">
+  <div class="inner">
+    <div class="grid">
+      <div>
+        <p class="what reveal"><b>Decode Her: The Texting Playbook.</b> A 73-page PDF, set for reading on a phone, delivered the moment you pay. Secure checkout by Polar.</p>
+        <div class="cta reveal">
+          <a class="btn" href="CHECKOUT_URL">Get the playbook <span class="price">$9</span></a>
+          <p class="small">One-time payment. Yours to keep.</p>
+        </div>
+      </div>
+      <dl class="faq reveal">
+        <div><dt>How do I get it?</dt><dd>Right after paying, you get a download link on screen and by email.</dd></div>
+        <div><dt>Will it read well on my phone?</dt><dd>Yes. The page size and type were chosen for phones, so there’s no zooming.</dd></div>
+        <div><dt>Is this about manipulating women?</dt><dd>No. It’s about reading texts honestly, asking clearly and respecting her answer.</dd></div>
+        <div><dt>Is it professional advice?</dt><dd>No. It’s general communication and dating advice. Use your own judgement and respect her choices.</dd></div>
+      </dl>
+    </div>
+    <div class="endbar">
+      <a href="https://www.instagram.com/thedecodeher"><img src="img/logo.jpg" alt="">@thedecodeher</a>
+      <span>© 2026 DecodeHer</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="buybar" aria-hidden="true"><span>The Texting Playbook</span><a class="btn" href="CHECKOUT_URL" tabindex="-1">Get it <span class="price">$9</span></a></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  /* sticky buy bar: shows after the hero, hides at the closing section */
+  const bar = $(".buybar"), hero = $(".hero"), close = $(".close");
+  const io = new IntersectionObserver(() => {
+    const hb = hero.getBoundingClientRect().bottom, ct = close.getBoundingClientRect().top;
+    bar.classList.toggle("on", hb < 0 && ct > innerHeight * .6);
+  }, { threshold: [0, .1, .5, 1] });
+  io.observe(hero); io.observe(close);
+  addEventListener("scroll", () => { const hb = hero.getBoundingClientRect().bottom, ct = close.getBoundingClientRect().top; bar.classList.toggle("on", hb < 0 && ct > innerHeight * .6); }, { passive: true });
+
+  /* the decoder: the book's own content */
+  const CASES = [
+    { who: "Maya", thread: [["out", "Want to get dinner this week?"], ["in", "We’ll see 😊"]],
+      read: "A maybe, and maybes lean both ways. Sometimes she’s checking her week. Sometimes it’s a soft way to avoid saying no. What she does next tells you which.",
+      move: "Sounds good. Let me know if you’re up for it.", moveNote: "Take the pressure off and leave it with her. Then actually leave it.",
+      dont: "We’ll see? Is that a yes or a no?", dontNote: "Pushing for a yes right after a maybe usually gets you a no." },
+    { who: "Zoe", thread: [["out", "Free for a drink this week?"], ["in", "This week is crazy, sorry!"]],
+      read: "Two very different things. She’s busy and would like to see you, or she’s not interested enough to make room. Busy is a schedule. Vague is an answer.",
+      move: "No stress. Would next Thursday evening work, or is Sunday better?", moveNote: "Two clear options. She only has to pick one.",
+      dont: "No worries, just let me know when you’re free!", dontNote: "It hands her the whole job of planning, so the date just sits there and dies." },
+    { who: "Leah", thread: [["out", "So that’s why I can never go back to that café"], ["in", "haha"]],
+      read: "Usually a polite way to close a message that has nothing left to answer. Jokes get laughs. Questions get conversations.",
+      move: "Okay, serious question. What’s the best thing you’ve eaten this month?", moveNote: "Stop joking for a second and ask her something real.",
+      dont: "[another meme]", dontNote: "Each one gets another short laugh, and the chat turns into you performing for an audience of one." },
+    { who: "Ava", thread: [["in", "omg that’s hilarious, tell me everything 😂"], ["in", "sorry, crazy day"]],
+      read: "Warm Monday, cold Thursday. It can be mixed feelings, her schedule, or low commitment. Unpredictable attention feels intense, but the feeling isn’t proof of anything.",
+      move: "I like talking to you. Let’s get dinner Friday?", moveNote: "Be warm when she’s warm, don’t chase when she’s cold, and make a real plan in a warm moment.",
+      dont: "Why are you so different this week? Did I do something?", dontNote: "It turns her mood into your problem to solve." },
+  ];
+  const thread = $("#thread"), picks = $$(".pick");
+  let run = 0;
+  const time = (k) => `9:${String(14 + k).padStart(2, "0")} pm`;
+  const bubble = (side, text, k, extra = "") => {
+    const b = document.createElement("div"); b.className = `bb ${side} ${extra}`;
+    b.innerHTML = `<span class="tx"></span><span class="t">${time(k)}${side === "out" && !extra ? '<span class="tk">✓✓</span>' : ""}</span>${extra ? '<span class="x"></span>' : ""}`;
+    b.querySelector(".tx").textContent = text; thread.appendChild(b); return b;
+  };
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function play(i) {
+    const id = ++run, c = CASES[i];
+    picks.forEach((p, j) => p.setAttribute("aria-pressed", String(j === i)));
+    $("#nm").textContent = c.who; $("#av").textContent = c.who[0];
+    thread.innerHTML = ""; $$(".note").forEach((n) => { n.style.opacity = 0; n.style.setProperty("--d", 0); });
+    $("#t-read").textContent = c.read; $("#t-move").textContent = c.moveNote; $("#t-dont").textContent = c.dontNote;
+    if (RM || !window.gsap) {
+      c.thread.forEach(([s, t], k) => { bubble(s, t, k).style.opacity = 1; });
+      bubble("out", c.move, 3).style.opacity = 1; const d = bubble("out", c.dont, 4, "no"); d.style.opacity = 1;
+      $$(".note").forEach((n) => { n.style.opacity = 1; n.style.setProperty("--d", 1); }); return;
+    }
+    for (const [k, [s, t]] of c.thread.entries()) {
+      const b = bubble(s, t, k); gsap.fromTo(b, { opacity: 0, y: 14, scale: .96 }, { opacity: 1, y: 0, scale: 1, duration: .5, ease: "back.out(1.6)" });
+      await wait(650); if (id !== run) return;
+    }
+    const show = (n, d = 0) => { gsap.to(n, { opacity: 1, duration: .5, delay: d }); gsap.to(n, { "--d": 1, duration: .8, delay: d, ease: "power2.out" }); };
+    show($("#n-read")); await wait(1500); if (id !== run) return;
+    const typing = document.createElement("div"); typing.className = "typing"; typing.innerHTML = "<i></i><i></i><i></i>"; thread.appendChild(typing);
+    gsap.fromTo(typing.children, { y: 0 }, { y: -4, duration: .3, yoyo: true, repeat: 5, stagger: .12, ease: "sine.inOut" });
+    await wait(1100); if (id !== run) return; typing.remove();
+    const mv = bubble("out", "", 3), tx = mv.querySelector(".tx"); gsap.set(mv, { opacity: 1 });
+    for (let k = 0; k <= c.move.length; k++) { tx.textContent = c.move.slice(0, k); await wait(22); if (id !== run) return; }
+    show($("#n-move")); await wait(1200); if (id !== run) return;
+    const d = bubble("out", c.dont, 4, "no"); gsap.fromTo(d, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .45, ease: "power2.out" });
+    await wait(500); if (id !== run) return;
+    gsap.to(d.querySelector(".x"), { scaleX: 1, duration: .6, ease: "power3.inOut" }); show($("#n-dont"), .2);
+  }
+  picks.forEach((p) => p.addEventListener("click", () => play(+p.dataset.i)));
+  picks.forEach((c) => c.addEventListener("pointermove", (e) => { const r = c.getBoundingClientRect(); c.style.setProperty("--mx", `${e.clientX - r.left}px`); c.style.setProperty("--my", `${e.clientY - r.top}px`); }));
+
+  if (RM || !window.gsap) { play(0); return; }
+
+  gsap.registerPlugin(ScrollTrigger);
+  const lenis = new Lenis({ lerp: .09, smoothWheel: true });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+
+  function splitLines(el) {   // masked lines, measured after fonts load so the breaks are real
+    el.innerHTML = el.innerHTML.replace(/(<em>.*?<\/em>|[^\s<]+)/g, (m) => m.startsWith("<em>")
+      ? m.replace(/<\/?em>/g, "").split(/\s+/).map((w) => `<span class="wd em" style="display:inline-block">${w}</span>`).join(" ")
+      : `<span class="wd" style="display:inline-block">${m}</span>`);
+    const lines = []; let top = null;
+    $$(".wd", el).forEach((w) => { const t = w.getBoundingClientRect().top; if (top === null || Math.abs(t - top) > 6) { lines.push([]); top = t; } lines[lines.length - 1].push(w.classList.contains("em") ? `<em>${w.textContent}</em>` : w.textContent); });
+    el.innerHTML = lines.map((l) => `<span class="ml"><span>${l.join(" ")}</span></span>`).join("");
+  }
+
+  // hero: frame settles, the title draws in left to right, the rest follows
+  const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+  tl.from(".hero .frame", { opacity: 0, scale: 1.02, duration: 2 }, 0)
+    .fromTo("h1 .ink", { clipPath: "inset(-10% 100% -10% 0%)" }, { clipPath: "inset(-10% 0% -10% 0%)", duration: 1.8, ease: "power3.inOut" }, .2)
+    .from(".hero .sub", { opacity: 0, y: 10, duration: 1.2 }, 1)
+    .from(".hero .rule", { scaleX: 0, duration: 1.2 }, 1.1)
+    .from(".hero .reveal", { opacity: 0, y: 18, duration: 1, stagger: .12 }, 1.2)
+    .from(".hero .top", { opacity: 0, duration: 1 }, 1.4);
+  gsap.to(".hero .stack", { yPercent: -8, opacity: .25, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+
+  document.fonts.ready.then(() => {
+    $$(".split").forEach((el) => {
+      splitLines(el);
+      gsap.from($$(".ml > span", el), { yPercent: 105, duration: 1.2, ease: "expo.out", stagger: .08, scrollTrigger: { trigger: el, start: "top 86%" } });
+    });
+    ScrollTrigger.refresh();
+  });
+  $$("section:not(.hero) .reveal").forEach((el) => gsap.from(el, { y: 22, opacity: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 88%" } }));
+  $$(".stagger").forEach((list) => gsap.from(list.children, { y: 12, opacity: 0, duration: .7, ease: "power3.out", stagger: .04, scrollTrigger: { trigger: list, start: "top 88%" } }));
+  $$(".plate.wipe").forEach((p) => {
+    gsap.fromTo(p, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "expo.inOut", scrollTrigger: { trigger: p, start: "top 82%" } });
+    gsap.fromTo($("img", p), { scale: 1.14 }, { scale: 1, duration: 2.2, ease: "expo.out", scrollTrigger: { trigger: p, start: "top 82%" } });
+  });
+  gsap.fromTo(".book .spread", { rotateX: 22, y: 60, opacity: .4, scale: .95 }, { rotateX: 0, y: 0, opacity: 1, scale: 1, ease: "none", scrollTrigger: { trigger: ".book .spread", start: "top 95%", end: "center 55%", scrub: 1 } });
+  gsap.fromTo(".rest .push", { scale: 1.12, yPercent: -4 }, { scale: 1, yPercent: 4, ease: "none", scrollTrigger: { trigger: ".rest", start: "top bottom", end: "bottom top", scrub: true } });
+  ScrollTrigger.create({ trigger: ".stage", start: "top 75%", once: true, onEnter: () => play(0) });
+})();
+</script>
+</body>
+</html>
