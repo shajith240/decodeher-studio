@@ -43,3 +43,7 @@ search returns results), for each: remove "parked", move logs/queued/<slug> asid
   tools for @zoltium anyway. Owner will send saved Zoltium reel VIDEOS on Telegram. TODO: the bot only takes Pinterest links
   DONE 10-18: videos sent to the bot → Drive only (gdrive:DecodeHer/research/zoltium, laptop keeps no copy);
   (never used in reels), then run the measure script (scratchpad tools/measure.py, rewrite into tools/) + analysis + skill.
+- PLANNED (owner OK'd 10-18, build ~Tue after w9-w11 are produced): Drive as the clip database. Laptop keeps only
+  fingerprints (reels/_pool/emb.json + clip .json); factory ranks by fingerprint, downloads the ~100 candidates per reel,
+  deletes after render. Frees ~700 MB. FIRST: owner's own Google Drive client_id for rclone (shared one is retiring in 2026);
+  keep laptop copies of owner clips until the Drive path has made a few reels cleanly.
