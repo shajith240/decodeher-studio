@@ -38,7 +38,7 @@ Keep speed 1.05 and the cue "[casual, storytelling, like talking to a close frie
 hook turn and between the three moves, and "…" where a speaker would breathe. Never slow the speed setting itself.
 
 ## LOCKED RECIPE (owner approved 10-16: "the research recipe one sounds good and natural")
-Reference: deliverables/voice-tests/hindi-v7-research-recipe-LOUD.mp3; research: brain/research/hindi-voice.md.
+Reference: deliverables/hindi/hindi-voice-final.mp3; research: brain/research/hindi-voice.md.
 - Script: one thought per sentence (6-12 words, cap 18), each ends in "।" / "?" / "!", "…" for breaths, casual register
   (देखो, ना, यार, सच बताऊँ तो), loanwords in Devanagari, Indian examples only. Saved per line: brain/content/drafts/*-lines.txt.
 - Voice: Fish janam 2f4654989a3147b0a775db4f9a13ae74, ONE whole take, NO tags at all (Fish tags aren't built for Hindi),
@@ -56,8 +56,8 @@ Reference: deliverables/voice-tests/hindi-v7-research-recipe-LOUD.mp3; research:
 - Sentence pauses added in post: ~0.2 s inside a section, ~0.45 s at section breaks (after the hook turn, after the verdict
   line, after each move, after the payoff), ±40 ms jitter, none inside the opening question.
 - Final pass caps EVERY silence at 0.6 s (the longest natural beat in conversation), then mastering (chain above).
-Reference: deliverables/voice-tests/hindi-FINAL-hot-and-cold.mp3.
+Reference: deliverables/hindi/hindi-voice-final.mp3.
 
 ## Tool (10-17): `tools/hindi_vo.py <lines.txt> <out_base>` does the whole LOCKED recipe in one go
 (the 10-16 version lived in a temp folder and was lost on reboot). Blank line in lines.txt = section break (longer pause).
-Writes out_base.wav/.mp3 + .json (each line's start/end for captions). First output: deliverables/voice-tests/hindi-hot-and-cold-tool.mp3.
+Writes out_base.wav/.mp3 + .json (each line's start/end for captions). (first test outputs were cleaned up 10-18)
