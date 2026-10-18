@@ -65,6 +65,11 @@ shows the queue. Never read or print `.env` or `.relay.json`.
   SEND vs SAVE (w8 batch, read ~10-23).
 - **Batches:** w7 (6, producing/booking), w8 (6, send/save experiment, producing). Telegram pin intake is live
   (tools/pin_intake.py via manager; AI names each clip). Laptop-offline alert on Telegram after 15 min (campus Wi-Fi login).
+- **Clip Library** (10-18): http://localhost:4317/library (button on the studio; laptop only). Play/add/edit/move/delete clips,
+  7-day undo bin (tools/library.py, tools/library_routes.js). New shelf "visual hooks" (library/hook-pool/visual) = non-AI-woman
+  openers, ≤ 1 reel in 4 (pick_hook.py, reel.json hookType). Keyword SEO: brain/growth/keywords.md + tactics/keyword-seo.md;
+  writer uses one bank phrase in caption line 1 + title card + first sentence; 3 hashtags.
+- Mixer fix 10-18: the 12 dB voice limit muted the music at every sentence end (all reels 10-16→10-18); fixed in reel_mix.py.
 - Open work: see `brain/NEXT-SESSION.md`.
 
 ## Gotchas learned the hard way
