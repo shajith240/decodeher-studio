@@ -50,7 +50,7 @@ for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z
            "titleCard": meta.get("titleCard", title), "bubble": meta.get("bubble", ""), "rehookAt": rehook,
            "gaps": gaps, "tail": 0.6, "lead": 0.08, "music": "auto", "drops": [why], "ctaLine": n - 1, "speed": 1.0,
            "accent": [], "voice_chain": 2,
-           "coverKicker": meta.get("series", series), "coverHeadline": meta.get("titleCard", title)}
+           "coverKicker": re.sub(r"\s*#\d+\s*$", "", meta.get("series", series)), "coverHeadline": meta.get("titleCard", title)}
     if RC.get("frame") == "lens":   # 10-16 owner-approved format (sample w6-01): colour + soft lens edges + paper texture, no re-hook flash,
         # the hook-end riser/impact on line 1 and on the "Here's how…" turn; snaps are chosen later by tools/peak_points.py
         how = next((i for i, l in enumerate(lines) if re.match(r"^(here'?s how|so here'?s what|here'?s what)", clean(l), re.I)), min(5, n - 3))
