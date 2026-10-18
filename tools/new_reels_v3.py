@@ -71,3 +71,7 @@ for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z
     open(os.path.join(ROOT, f"brain/content/captions/{prefix}-{num}-{slug}.txt"), "w").write(caption)
     made.append(os.path.relpath(R, ROOT))
 if not DRY: json.dump(made, open(os.path.join(ROOT, f"reels/{prefix}-batch.json"), "w"), indent=1); print(f"{len(made)} reels → reels/{prefix}-batch.json")
+# 10-19 owner: every reel opens on its AI-woman hook clip. The factory never picks one, so do it here, before the batch can render
+if not DRY and RC.get("frame") == "lens":
+    import subprocess
+    for r in made: subprocess.run([sys.executable, os.path.join(ROOT, "tools/pick_hook.py"), r], cwd=ROOT, timeout=300)
