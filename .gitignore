@@ -50,3 +50,4 @@ library/pin-registry.json.lock
 library/research/
 brain/content/products/pdf/fonts/
 brain/content/products/pdf/out/
+brain/content/products/pdf/art/*.png
