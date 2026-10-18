@@ -8,6 +8,7 @@ log(){ echo "$(date +%H:%M:%S)  $*" >> logs/activity.log; }; log "Picking clips 
 { uv run -q --offline --with rapidocr_onnxruntime python -W ignore tools/clip_text.py "$R" || uv run -q --with rapidocr_onnxruntime python -W ignore tools/clip_text.py "$R"; } | head -1
 python3 tools/clippick.py "$R" | grep -cE "fallback|NO CLIP" | sed 's/^/weak or missing shots: /' || true
 python3 tools/clipcut.py "$R" | cut -c1-60
+python3 tools/pool_prune.py || true   # 10-18 owner: drop pool clips that failed the style check or carry text (never usable)
 python3 tools/peak_points.py "$R" || true   # 10-16: snaps/laughs only at the narration peaks
 { uv run -q --offline --with numpy --with scipy --with soundfile --with pyloudnorm --with librosa python -W ignore tools/reel_mix.py "$R" || uv run -q --with numpy --with scipy --with soundfile --with pyloudnorm --with librosa python -W ignore tools/reel_mix.py "$R"; } | cut -c1-160   # 10-16: offline first (flaky internet broke a mix)
 free_tmp=$(df --output=avail -k /tmp | tail -1); if [ "$free_tmp" -lt 1500000 ]; then rm -rf "/tmp/hyperframes-extract-cache-$(id -u)" 2>/dev/null || true; log "Temp space low · cleared the render cache before $slug"; fi
