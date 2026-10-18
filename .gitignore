@@ -47,3 +47,6 @@ library/_thumbs/
 library/.drive-list.json*
 library/.drive.lock
 library/pin-registry.json.lock
+library/research/
+brain/content/products/pdf/fonts/
+brain/content/products/pdf/out/
