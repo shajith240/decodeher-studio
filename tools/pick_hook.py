@@ -21,7 +21,7 @@ pi = importlib.util.module_from_spec(spec); sys.argv = [sys.argv[0], "none"]; sp
 # 10-18 owner: other visual hooks (library/hook-pool/visual, added on the Clip Library page) join as a test: a reel may open on one
 # only if none of the last 3 reels did (≈ 1 in 4 at most) and it fits the first line clearly better than every AI-woman clip
 recent_types = [(json.load(open(rj)) or {}).get("hookType", "ai") for rj in sorted(glob.glob("reels/*/reel.json"), key=os.path.getmtime)[-4:] if os.path.dirname(rj) != R][-3:]
-VIS_OK = "visual" not in recent_types
+VIS_OK = "visual" not in recent_types and json.load(open("config.json")).get("reels", {}).get("visualHooks", False)   # owner 10-18: off until planned (config reels.visualHooks) and json.load(open("config.json")).get("reels", {}).get("visualHooks", False)   # owner 10-18: off until planned (config reels.visualHooks)
 pool = []
 for mp4 in sorted(glob.glob("library/hook-pool/ai/*.mp4")) + (sorted(glob.glob("library/hook-pool/visual/*.mp4")) if VIS_OK else []):
     js = mp4[:-4] + ".json"; meta = json.load(open(js)) if os.path.exists(js) else {}
