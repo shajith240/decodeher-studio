@@ -187,6 +187,13 @@ def run():
     reg = load_reg(); index(reg)
     for it in box["items"]:
         if it.get("kind") == "research": research(it); continue
+        if it.get("kind") == "tip":   # 10-18: YouTube / Instagram growth advice the owner shared → fact-checked (tools/tip_intake.py)
+            import tip_intake   # one source per item (HQ splits a message with several links), so one reply per video
+            res = tip_intake.handle(it, lambda t: hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": t}))
+            ok, text = res[0] if res else (False, "⚠️ Nothing to check in that message.")
+            hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if ok else "failed", "text": text})
+            log(f"Growth tip · {'fact-checked' if ok else 'could not check'}")
+            continue
         kind = it.get("kind") or "dark"; added, dups, bad, photo_box = [], [], [], []; total_n = len(it["urls"]); done_lines = []
         def progress(i, step, frac=0.0):   # 10-16: live progress — HQ edits the bot's first reply; moves per STEP, not per link
             pct = min(100, int(100 * (i + frac) / max(1, total_n))); bar = "▓" * (pct // 10) + "░" * (10 - pct // 10)

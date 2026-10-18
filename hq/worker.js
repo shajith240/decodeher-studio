@@ -133,7 +133,12 @@ function unfinished(snap) {
 const PIN_RE = /https?:\/\/(?:pin\.it\/[A-Za-z0-9]+|(?:[a-z]{2,3}\.)?(?:www\.)?pinterest\.[a-z.]+\/pin\/[A-Za-z0-9_-]+\/?)/gi;
 const pinLinks = (t) => [...new Set((String(t).match(PIN_RE) || []).map((u) => u.replace(/\/+$/, "")))].slice(0, 30);
 const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.test(t) ? "hook" : /\b(dark|psych\w*|story|clip|scene|b-?roll)\b/i.test(t) ? "dark" : null;
-const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the Zoltium study (research only, never used in our reels)" };
+const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the Zoltium study (research only, never used in our reels)",
+  tip: "a growth-tip fact-check" };
+// 10-18 owner: YouTube videos / Instagram reels about growing on Instagram → fact-checked growth tips (laptop tools/tip_intake.py)
+const TIP_RE = /https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?[^\s]*v=|shorts\/|live\/)[\w-]{6,}[^\s]*|youtu\.be\/[\w-]{6,}[^\s]*|(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(?:reels?|p|tv)\/[\w-]{5,}[^\s]*)/gi;
+const tipLinks = (t) => [...new Set((String(t).match(TIP_RE) || []).map((u) => u.replace(/[).,]+$/, "")))].slice(0, 10);
+const videoKind = (t) => /\b(zoltium|study|research|reference)\b/i.test(t) ? "research" : /\b(tip|tips|growth|grow|advice|trick|tricks)\b/i.test(t) ? "tip" : null;
 async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop (JPEG, base64)
   if (!env.TELEGRAM_BOT_TOKEN || !env.OWNER_CHAT_ID) return { ok: false };
   const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), f = new FormData();
@@ -151,7 +156,9 @@ const HELP = `Here's what I can do:
 /make – start the factory now
 /help – this list
 
-📌 Send me Pinterest links (pin.it/…) any time — AI-girl hooks or dark-psychology clips. Add "ai girl" or "dark" to skip my question. I download them, check we don't have them already, and add them to the library.
+📌 Pinterest links (pin.it/…): AI-girl hooks or dark-psychology clips. Add "ai girl" or "dark" to skip my question.
+💡 YouTube or Instagram reel links about growing on Instagram: I fact-check the advice (what works, what's hype) and the good tips go into our growth plan.
+🎞 Video files: I ask whether it's for the Zoltium study or a growth tip (write "zoltium" or "tip" in the caption to skip the question).
 
 Or just type what you want changed (for example "make the captions bigger") and I'll get to work and send you a preview to approve.`;
 
@@ -273,6 +280,8 @@ export class HQ extends DurableObject {
     const cmd = text.startsWith("/") ? text.split(/\s+/)[0].slice(1).split("@")[0].toLowerCase() : null;
     const pins = cmd ? [] : pinLinks(text);
     if (pins.length) return this.onPins(text, pins);
+    const tips = cmd ? [] : tipLinks(text);
+    if (tips.length) return this.onTips(tips);
     if (cmd === "start" || cmd === "help") return say(this.env, esc(HELP));
     if (cmd === "status") return say(this.env, await this.statusText());
     if (cmd === "queue") return say(this.env, await this.queueText());
@@ -312,14 +321,28 @@ export class HQ extends DurableObject {
     if (Number(v.file_size || 0) > 20e6) return say(this.env, "⚠️ That video is over 20 MB, and Telegram won't let the bot download files that big. Please send a shorter or smaller copy.");
     const inbox = await this.get("pinInbox", []), group = m.media_group_id ? String(m.media_group_id) : null;
     const file = { file_id: v.file_id, uid: v.file_unique_id || "", name: v.file_name || "", size: v.file_size || 0, caption: String(m.caption || "").slice(0, 500) };
-    const same = group && inbox.find((x) => x.group === group && x.state === "queued");
+    const same = group && inbox.find((x) => x.group === group && ["queued", "asking"].includes(x.state));
     if (same) { same.files.push(file); await this.put("pinInbox", inbox); return { ok: true }; }   // one reply per album
-    const id = newId("v"); inbox.push({ id, urls: [], files: [file], kind: "research", group, state: "queued", at: Date.now() });
+    const kind = videoKind(m.caption || ""), id = newId("v");
+    inbox.push({ id, urls: [], files: [file], kind, group, state: kind ? "queued" : "asking", at: Date.now() });
     await this.put("pinInbox", inbox.slice(-300));
-    await this.note("activity", "Owner sent reel video(s) for the Zoltium study");
-    const r = await say(this.env, `📚 Got it, saving for <b>${KIND_SAY.research}</b>.\n⏳ The laptop picks it up within a few minutes…`);
+    await this.note("activity", `Owner sent a video${kind ? ` (${KIND_SAY[kind]})` : ""}`);
+    if (!kind) return say(this.env, "🎞 Got the video. What is it for?", { reply_markup: { inline_keyboard: [[
+      { text: "📚 Zoltium study", callback_data: `pin:research:${id}` }, { text: "💡 Growth tip", callback_data: `pin:tip:${id}` }]] } });
+    const r = await say(this.env, `📥 Got it → <b>${KIND_SAY[kind]}</b>.\n⏳ The laptop picks it up within a few minutes…`);
     const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
     return r;
+  }
+  async onTips(urls) {   // one inbox item per link: each video gets its own live progress and its own verdict
+    for (const u of urls) {
+      const id = newId("t"), inbox = await this.get("pinInbox", []);
+      inbox.push({ id, urls: [u], files: [], kind: "tip", state: "queued", at: Date.now() }); await this.put("pinInbox", inbox.slice(-300));
+      const src = /instagram/i.test(u) ? "Instagram reel" : "YouTube video";
+      const r = await say(this.env, `💡 Got the ${src} → <b>${KIND_SAY.tip}</b>.\n⏳ The laptop watches it and checks every claim (a few minutes)…`);
+      const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
+    }
+    await this.note("activity", `Owner shared ${urls.length} growth-tip link${urls.length > 1 ? "s" : ""}`);
+    return { ok: true };
   }
   async pinInbox() {   // the laptop manager asks for work
     const inbox = await this.get("pinInbox", []);
@@ -354,14 +377,15 @@ export class HQ extends DurableObject {
   async onButton(cq) {
     const parts = String(cq.data || "").split(":"), answer = (text) => tg(this.env, "answerCallbackQuery", { callback_query_id: cq.id, text });
     if (parts[0] === "pin") {   // which library the links go to
-      const kind = parts[1] === "hook" ? "hook" : "dark", inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === parts[2]);
+      const kind = ["hook", "dark", "research", "tip"].includes(parts[1]) ? parts[1] : "dark", inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === parts[2]);
       if (!it) return answer("I can't find those links any more.");
       if (it.state !== "asking") return answer("Already on it.");
       it.kind = kind; it.state = "queued"; await this.put("pinInbox", inbox);
       const chat = cq.message && cq.message.chat && cq.message.chat.id, mid = cq.message && cq.message.message_id;
       if (chat && mid) await tg(this.env, "editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } });
       await answer(KIND_SAY[kind]);
-      const r = await say(this.env, `👍 ${it.urls.length} link${it.urls.length > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>.\n⏳ Waiting for the factory to pick them up (within a few minutes)…`);
+      const n = it.urls.length || (it.files || []).length, what = it.urls.length ? "link" : "video";
+      const r = await say(this.env, `👍 ${n} ${what}${n > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>.\n⏳ Waiting for the factory to pick them up (within a few minutes)…`);
       if (r.ok) { const box = await this.get("pinInbox", []), x = box.find((y) => y.id === it.id); if (x) { x.msg = r.result.message_id; await this.put("pinInbox", box); } }
       return r;
     }
