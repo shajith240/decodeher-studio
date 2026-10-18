@@ -45,8 +45,6 @@
   --pad: clamp(24px, 5vw, 72px); --max: 1180px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0 }
-html.lenis, html.lenis body { height: auto }
-.lenis.lenis-smooth { scroll-behavior: auto !important }
 body { background: var(--void); color: var(--on); font: 400 17px/1.62 var(--text); font-variant-numeric: lining-nums; -webkit-font-smoothing: antialiased; overflow-x: hidden }
 @media (min-width: 900px) { body { font-size: 19px } }
 img { display: block; max-width: 100%; height: auto }
@@ -58,7 +56,7 @@ a { color: inherit }
 section { position: relative }
 .dark { background: var(--void); color: var(--on) }
 .light { background: var(--paper); color: var(--ink) }
-.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") }
 
 h2 { font: 500 clamp(26px, 3.6vw, 50px)/1.15 var(--disp); letter-spacing: .01em; text-transform: uppercase; max-width: 20ch }
@@ -211,6 +209,15 @@ figcaption { margin-top: var(--s2) }
 .promise { margin-top: var(--s5); max-width: 760px; color: var(--on-2) }
 .promise b { color: var(--on) }
 @media (max-width: 900px) { .tiers { grid-template-columns: 1fr; gap: var(--s5) } .tier.best { order: -1 } .tier { padding: var(--s5) var(--s3) var(--s4) } .tier .btn { padding: 0 18px; font-size: 15px; gap: 12px } }
+details.more { margin-top: var(--s5) }
+details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: 48px; font-weight: 600 }
+details > summary::-webkit-details-marker { display: none }
+details > summary::after { content: "+"; font: 400 24px/1 var(--text); color: var(--gold-ink); transition: transform .3s }
+details[open] > summary::after { transform: rotate(45deg) }
+details.more > summary { display: inline-flex; border-bottom: 1px solid currentColor; min-height: 44px }
+details.more[open] .toc { margin-top: var(--s4) }
+.faq { gap: 0 } .faq details { border-top: 1px solid var(--rule-l) } .faq details:last-child { border-bottom: 1px solid var(--rule-l) }
+.faq summary { padding: var(--s2) 0 } .faq details p { padding-bottom: var(--s3); color: var(--ink-2) }
 .buybar { display: none }
 @media (max-width: 900px) {
   .problem, .decoder, .book, .approach { padding: var(--s7) 0 }
@@ -229,7 +236,7 @@ figcaption { margin-top: var(--s2) }
   .hero .cta { width: 100%; max-width: 360px }
   .rest { height: 85svh }
   .buybar { display: flex; position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; gap: var(--s2); align-items: center; justify-content: space-between;
-    padding: 12px var(--pad) calc(12px + env(safe-area-inset-bottom)); background: rgba(15, 6, 8, .94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 12px var(--pad) calc(12px + env(safe-area-inset-bottom)); background: rgba(15, 6, 8, .94); 
     border-top: 1px solid var(--rule-d); transform: translateY(110%); transition: transform .5s cubic-bezier(.2, .7, .1, 1) }
   .buybar.on { transform: none }
   .buybar span { font-size: 15px; color: var(--on-2); line-height: 1.3 }
@@ -248,7 +255,7 @@ figcaption { margin-top: var(--s2) }
     <h1><span class="ink">Decode Her</span></h1>
     <p class="sub">The Texting Playbook</p>
     <div class="rule" aria-hidden="true"></div>
-    <p class="lede reveal">Twenty-five texts that keep men up at night, read honestly, with exactly what to send back.</p>
+    <p class="lede reveal">What her text really means. What to send back.</p>
     <div class="cta reveal">
       <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
       <p class="small">73 pages. Instant download.</p>
@@ -260,12 +267,10 @@ figcaption { margin-top: var(--s2) }
   <div class="inner grid">
     <div>
       <h2 class="split">She replied “we’ll see.” You’ve read it <em>eleven times.</em></h2>
-      <p class="lede reveal">You’ve checked when she was last online. You’ve typed a reply, deleted it, typed it again. You’ve asked a friend, who guessed.</p>
-      <p class="lede reveal">Most of the stress in dating lives right here, in a few words on a screen. This book takes those words one at a time and tells you what they usually mean, and what to send back.</p>
+      <p class="lede reveal">Typed, deleted, typed again. This book ends the guessing.</p>
     </div>
     <figure>
       <div class="plate wipe"><picture><source type="image/webp" srcset="img/opt/part1-640.webp 640w, img/opt/part1-1024.webp 1024w" sizes="(max-width: 900px) 100vw, 45vw"><img src="img/part1.jpg" alt="A bronze bust in a dark museum, lit only by a phone screen on its plinth" width="1024" height="1536" loading="lazy" decoding="async"></picture></div>
-      <figcaption class="small">The hardest part of a text is the silence after it.</figcaption>
     </figure>
   </div>
 </section>
@@ -274,7 +279,7 @@ figcaption { margin-top: var(--s2) }
   <div class="inner">
     <div class="head">
       <h2 class="split">Tap her text. <em>We’ll read it with you.</em></h2>
-      <p class="lede reveal">Four situations from the book. Pick the one that sounds like her and watch it get decoded.</p>
+      <p class="lede reveal">Pick the one that sounds like her.</p>
     </div>
     <div class="picks" role="group" aria-label="Choose her message">
       <button class="pick" data-i="0" aria-pressed="true"><b>“We’ll see 😊”</b><span>You asked her to dinner</span></button>
@@ -294,7 +299,7 @@ figcaption { margin-top: var(--s2) }
       </div>
     </div>
     <div class="dec-foot">
-      <p>That’s one of twenty-five. The book has the rest, two pages each.</p>
+      <p>One of twenty-five.</p>
       <a class="textlink" href="#get">Get the playbook, from $9</a>
     </div>
   </div>
@@ -304,30 +309,30 @@ figcaption { margin-top: var(--s2) }
   <div class="inner">
     <div class="head">
       <h2 class="split">Twenty-five texts. <em>Two pages each.</em></h2>
-      <p class="lede reveal">The left page is the read: what she sent and what it usually means. The right page is the move: the exact reply, the one to never send, and what to do if she answers or goes quiet.</p>
+      <p class="lede reveal">Left page: what it means. Right page: what to send.</p>
     </div>
     <div class="spread"><picture><source type="image/webp" srcset="img/opt/2-inside-640.webp 640w, img/opt/2-inside-1080.webp 1080w, img/opt/2-inside-1600.webp 1600w" sizes="(max-width: 1200px) 100vw, 1100px"><img src="img/2-inside.jpg" alt="Two inside pages: She’s dry texting, the read and the move" width="1600" height="1200" loading="lazy" decoding="async"></picture></div>
-    <div class="toc">
-      <div><h3>The opening</h3><ol class="stagger">
+    <details class="more"><summary>See all 25 situations</summary><div class="toc">
+      <div><h3>The opening</h3><ol>
         <li><span>The first text after getting her number</span><span>11</span></li><li><span>Asking her out over text</span><span>13</span></li>
         <li><span>She’s dry texting</span><span>15</span></li><li><span>She takes hours to reply</span><span>17</span></li>
         <li><span>She left you on read</span><span>19</span></li><li><span>She only sends a short laughing reply</span><span>21</span></li></ol></div>
-      <div><h3>Plans and excuses</h3><ol class="stagger">
+      <div><h3>Plans and excuses</h3><ol>
         <li><span>“I’m busy”</span><span>24</span></li><li><span>“We’ll see”</span><span>26</span></li>
         <li><span>She cancelled the date</span><span>28</span></li><li><span>She wants to reschedule</span><span>30</span></li></ol></div>
-      <div><h3>Mixed signals</h3><ol class="stagger">
+      <div><h3>Mixed signals</h3><ol>
         <li><span>She’s hot and cold</span><span>33</span></li><li><span>She watches your stories but never texts</span><span>35</span></li>
         <li><span>She only texts you late at night</span><span>37</span></li><li><span>“I need space”</span><span>39</span></li>
         <li><span>Mixed signals</span><span>41</span></li><li><span>She never starts conversations</span><span>43</span></li>
         <li><span>You double texted and got silence</span><span>45</span></li></ol></div>
-      <div><h3>After you meet</h3><ol class="stagger">
+      <div><h3>After you meet</h3><ol>
         <li><span>After a great first date</span><span>48</span></li><li><span>After a so-so date</span><span>50</span></li>
         <li><span>She likes you, but “wants to be friends”</span><span>52</span></li><li><span>She ghosted, then came back</span><span>54</span></li>
         <li><span>She asks, “What are we?”</span><span>56</span></li><li><span>She teases you</span><span>58</span></li>
         <li><span>She sends a long emotional message</span><span>60</span></li><li><span>She’s distant after you opened up</span><span>62</span></li></ol></div>
-    </div>
+    </div></details>
     <div class="extra">
-      <p class="reveal">Plus twelve messages you should never send, thirty openers that turn a chat into a plan, and a cheat sheet for your phone.</p>
+      <p class="reveal">Plus 12 texts never to send, and 30 openers.</p>
       <div class="cta reveal">
         <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
         <p class="small">Instant PDF download.</p>
@@ -341,7 +346,6 @@ figcaption { margin-top: var(--s2) }
     <figure><div class="plate wipe"><picture><source type="image/webp" srcset="img/opt/part4-640.webp 640w, img/opt/part4-1024.webp 1024w" sizes="(max-width: 900px) 100vw, 45vw"><img src="img/part4.jpg" alt="Two bronze statues, a man and a woman, facing each other in a dark gallery" width="1024" height="1536" loading="lazy" decoding="async"></picture></div></figure>
     <div>
       <h2 class="split">Nothing in here <em>is a trick.</em></h2>
-      <p class="lede reveal">This isn’t a book of lines. It’s a way of reading her honestly and being clear about yourself, so the right person can actually say yes.</p>
       <ul class="vows stagger">
         <li>No making her jealous. No silence used as punishment.</li>
         <li>No lines designed to make her feel small.</li>
@@ -360,7 +364,7 @@ figcaption { margin-top: var(--s2) }
   <div class="inner">
     <div class="head">
       <h2 class="split">Choose <em>your copy.</em></h2>
-      <p class="lede reveal">Launch price for the first 100 copies, counted by the checkout. After that it goes to the full price on its own.</p>
+      <p class="lede reveal">Launch price for the first 100 copies.</p>
     </div>
     <div class="tiers stagger">
       <article class="tier">
@@ -394,19 +398,13 @@ figcaption { margin-top: var(--s2) }
   <div class="inner">
     <div class="grid">
       <div>
-        <p class="what reveal"><b>Decode Her: The Texting Playbook.</b> PDFs set for reading on a phone, delivered the moment you pay. Secure checkout by Polar. 30-day refund.</p>
+        <p class="what reveal"><b>Instant download.</b> Secure checkout by Polar.</p>
         <div class="cta reveal">
           <a class="btn" href="#get">Get the playbook <span class="price">from $9</span></a>
           <p class="small">One-time payment. Yours to keep.</p>
         </div>
       </div>
-      <dl class="faq reveal">
-        <div><dt>How do I get it?</dt><dd>Right after paying, you get a download link on screen and by email.</dd></div>
-        <div><dt>Will it read well on my phone?</dt><dd>Yes. The page size and type were chosen for phones, so there’s no zooming.</dd></div>
-        <div><dt>Is this about manipulating women?</dt><dd>No. It’s about reading texts honestly, asking clearly and respecting her answer.</dd></div>
-        <div><dt>Can I get a refund?</dt><dd>Yes. Within 30 days, no questions asked. Reply to your receipt email.</dd></div>
-        <div><dt>Is it professional advice?</dt><dd>No. It’s general communication and dating advice. Use your own judgement and respect her choices.</dd></div>
-      </dl>
+      <div class="faq reveal"><details><summary>How do I get it?</summary><p>Right after paying, you get a download link on screen and by email.</p></details><details><summary>Will it read well on my phone?</summary><p>Yes. The page size and type were chosen for phones, so there’s no zooming.</p></details><details><summary>Is this about manipulating women?</summary><p>No. It’s about reading texts honestly, asking clearly and respecting her answer.</p></details><details><summary>Can I get a refund?</summary><p>Yes. Within 30 days, no questions asked. Reply to your receipt email.</p></details><details><summary>Is it professional advice?</summary><p>No. It’s general communication and dating advice. Use your own judgement and respect her choices.</p></details></div>
     </div>
     <div class="endbar">
       <a href="https://www.instagram.com/thedecodeher"><img src="img/logo-64.jpg" alt="" width="32" height="32">@thedecodeher</a>
@@ -420,7 +418,6 @@ figcaption { margin-top: var(--s2) }
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 addEventListener("DOMContentLoaded", () => {
   const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -496,10 +493,8 @@ addEventListener("DOMContentLoaded", () => {
   if (RM || !window.gsap) { play(0); return; }
 
   gsap.registerPlugin(ScrollTrigger);
-  const lenis = new Lenis({ lerp: .09, smoothWheel: true });
-  lenis.on("scroll", ScrollTrigger.update);
-  $$('a[href="#get"]').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); lenis.scrollTo("#get", { offset: -8, duration: 1.4 }); history.replaceState(null, "", "#get"); }));
-  gsap.ticker.add((t) => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+  const go = (e) => { e.preventDefault(); document.getElementById("get").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); history.replaceState(null, "", "#get"); };
+  $$('a[href="#get"]').forEach((a) => a.addEventListener("click", go));
 
   function splitLines(el) {   // masked lines, measured after fonts load so the breaks are real
     el.innerHTML = el.innerHTML.replace(/(<em>.*?<\/em>|[^\s<]+)/g, (m) => m.startsWith("<em>")
