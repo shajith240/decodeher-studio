@@ -33,3 +33,13 @@ Re-run the switch-over: `bash /tmp/claude-1000/-home-shajith-Projects-dark-psyco
 requeue:true + parked. Their current videos stay booked. When Pinterest search works again (test: gallery-dl --simulate a
 search returns results), for each: remove "parked", move logs/queued/<slug> aside; the factory re-searches, renders
 (OCR-checked) and swaps the new video into the same slot. Old pieces: scratchpad redo-1017 (temporary).
+
+## 10-18 ~08:00 IST: state when the owner went to sleep
+- Production running: w9, w10, w11 (18 reels, AI-woman openers, keyword rule) fill Tue 10-20 → Sun 10-25. Remakes of w8-02
+  "Three hours" (18:30 today) and w8-04 "Double text" (22:00 today) re-searching clips; they swap into their slots.
+- s1 / s2 test reels: approval pending (owner).
+- Visual hooks: 25 clips on the shelf (library/hook-pool/visual), OFF (config reels.visualHooks=false) until the owner plans it.
+- Zoltium study: blocked. Brave is logged in as @thedecodeher (do NOT scrape with our own account); Instagram refuses all
+  tools for @zoltium anyway. Owner will send saved Zoltium reel VIDEOS on Telegram. TODO: the bot only takes Pinterest links
+  (hq/worker.js PIN_RE, KIND_SAY) — add video-file intake with a "📚 Research (Zoltium)" kind → library/research/zoltium/
+  (never used in reels), then run the measure script (scratchpad tools/measure.py, rewrite into tools/) + analysis + skill.
