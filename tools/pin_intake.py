@@ -215,7 +215,29 @@ def images(it):
     hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
     log(f"Carousel images · {len(got)} {label}s saved, {len(bad)} failed")
 
+def learn_links(it):
+    """Owner-shared video links (Instagram / YouTube / TikTok) → download, transcribe, add to the viral bank as owner picks."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import tip_intake
+    got, bad = [], []; have = {json.loads(l).get("url") for l in open(OWNER_BANK)} if os.path.exists(OWNER_BANK) else set()
+    for i, u in enumerate(it["urls"]):
+        hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": f"⏳ {i + 1}/{len(it['urls'])} 🎧 downloading and listening…"})
+        if u in have: got.append(f"already learned: {u}"); continue
+        try:
+            with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "library")) as tmp: meta, tx, problem = tip_intake.from_url(u, tmp)
+        except Exception as e: meta, tx, problem = {}, "", str(e)[:80]
+        if problem or len(tx.split()) < 15: bad.append(f"{u} ({problem or 'no speech in it'})"); continue
+        hook = re.split(r"(?<=[.?!])\s", tx, 1)[0][:160]
+        row = {"platform": "telegram-link", "source": "owner", "url": u, "title": meta.get("title"), "views": meta.get("view_count"),
+               "duration_s": meta.get("duration"), "hook": hook, "transcript": tx, "added": time.strftime("%F"), "used_by": None, "owner_pick": True}
+        open(OWNER_BANK, "a").write(json.dumps(row, ensure_ascii=False) + "\n")
+        v = meta.get("view_count"); got.append(f"🧠 “{hook}” ({len(tx.split())} words{f', {v / 1e6:.1f}M views' if v and v >= 1e5 else ''})")
+    lines = [f"🧠 <b>Learned {len([g for g in got if g.startswith('🧠')])} video{'s' if len(it['urls']) != 1 else ''}</b>. They're first in line for the next reels."] + [f"• {g}" for g in got]
+    if bad: lines += ["", f"⚠️ Couldn't learn ({len(bad)}):"] + [f"• {b}" for b in bad]
+    hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
+    log(f"Learn links · {len(got)} learned, {len(bad)} failed")
+
 def research(it):
+    if it.get("urls"): return learn_links(it)
     os.makedirs(RESEARCH, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
     for f in it.get("files", []):
         out = f"{RESEARCH}/{time.strftime('%Y%m%d')}-{re.sub(r'[^A-Za-z0-9_-]', '', f.get('uid') or f['file_id'][-12:])}.mp4"
@@ -250,7 +272,7 @@ def run():
         if it.get("kind") == "tip":   # 10-18: YouTube / Instagram growth advice the owner shared → fact-checked (tools/tip_intake.py)
             import tip_intake   # one source per item (HQ splits a message with several links), so one reply per video
             res = tip_intake.handle(it, lambda t: hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": t}))
-            ok, text = res[0] if res else (False, "⚠️ Nothing to check in that message.")
+            ok, text = (any(r[0] for r in res), "\n\n".join(r[1] for r in res)) if res else (False, "⚠️ Nothing to check in that message.")
             hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if ok else "failed", "text": text})
             log(f"Growth tip · {'fact-checked' if ok else 'could not check'}")
             continue

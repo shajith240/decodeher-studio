@@ -136,9 +136,9 @@ const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.tes
 const KIND_SAY = { cover: "carousel covers", cref: "carousel design references", hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the viral bank (I watch it and learn from it)",
   tip: "a growth-tip fact-check" };
 // 10-18 owner: YouTube videos / Instagram reels about growing on Instagram → fact-checked growth tips (laptop tools/tip_intake.py)
-const TIP_RE = /https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?[^\s]*v=|shorts\/|live\/)[\w-]{6,}[^\s]*|youtu\.be\/[\w-]{6,}[^\s]*|(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(?:reels?|p|tv)\/[\w-]{5,}[^\s]*)/gi;
+const TIP_RE = /https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?[^\s]*v=|shorts\/|live\/)[\w-]{6,}[^\s]*|youtu\.be\/[\w-]{6,}[^\s]*|(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(?:reels?|p|tv)\/[\w-]{5,}[^\s]*|(?:(?:www|vm|vt|m)\.)?tiktok\.com\/[^\s]+)/gi;
 const tipLinks = (t) => [...new Set((String(t).match(TIP_RE) || []).map((u) => u.replace(/[).,]+$/, "")))].slice(0, 10);
-const videoKind = (t) => /\b(zoltium|study|research|reference)\b/i.test(t) ? "research" : /\b(tip|tips|growth|grow|advice|trick|tricks)\b/i.test(t) ? "tip" : null;
+const videoKind = (t) => /\b(zoltium|study|research|reference|learn|bank|remix|copy|steal)\b/i.test(t) ? "research" : /\b(tip|tips|growth|grow|advice|trick|tricks)\b/i.test(t) ? "tip" : null;
 async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop (JPEG, base64)
   if (!env.TELEGRAM_BOT_TOKEN || !env.OWNER_CHAT_ID) return { ok: false };
   const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)), f = new FormData();
@@ -284,7 +284,7 @@ export class HQ extends DurableObject {
     const pins = cmd ? [] : pinLinks(text);
     if (pins.length) return this.onPins(text, pins);
     const tips = cmd ? [] : tipLinks(text);
-    if (tips.length) return this.onTips(tips);
+    if (tips.length) return this.onVideoLinks(text, tips);
     if (cmd === "start" || cmd === "help") return say(this.env, esc(HELP));
     if (cmd === "status") return say(this.env, await this.statusText());
     if (cmd === "queue") return say(this.env, await this.queueText());
@@ -348,6 +348,21 @@ export class HQ extends DurableObject {
     const r = await say(this.env, `📥 Got it → <b>${KIND_SAY[kind]}</b>.\n⏳ The laptop picks it up within a few minutes…`);
     const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
     return r;
+  }
+  async onVideoLinks(text, urls) {   // owner 10-19: "I'll send the links only — you download them and learn from them"
+    const kind = videoKind(text.replace(TIP_RE, " "));
+    if (kind === "tip") return this.onTips(urls);
+    const id = newId("l"), inbox = await this.get("pinInbox", []);
+    inbox.push({ id, urls, files: [], kind: kind || null, state: kind ? "queued" : "asking", at: Date.now() }); await this.put("pinInbox", inbox.slice(-300));
+    await this.note("activity", `Owner shared ${urls.length} video link${urls.length > 1 ? "s" : ""}`);
+    const n = `${urls.length} video link${urls.length > 1 ? "s" : ""}`;
+    if (kind) {
+      const r = await say(this.env, `🧠 Got ${n} → <b>${KIND_SAY[kind]}</b>.\n⏳ The laptop downloads and studies ${urls.length > 1 ? "them" : "it"} (a few minutes)…`);
+      const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
+      return r;
+    }
+    return say(this.env, `🎞 Got ${n}. What ${urls.length > 1 ? "are they" : "is it"} for?`, { reply_markup: { inline_keyboard: [[
+      { text: "🧠 Learn from it (viral bank)", callback_data: `pin:research:${id}` }, { text: "💡 Growth tip", callback_data: `pin:tip:${id}` }]] } });
   }
   async onTips(urls) {   // one inbox item per link: each video gets its own live progress and its own verdict
     for (const u of urls) {
