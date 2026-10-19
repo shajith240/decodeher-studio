@@ -146,12 +146,6 @@ def handle(item, progress=lambda t: None):
             except Exception as e: meta, tx, problem = {}, "", f"couldn't get that video ({str(e)[:80]})"
         if problem or len(tx.split()) < 25:
             out.append((False, f"⚠️ {problem or 'That video has almost no speech, so there is nothing to fact-check.'}")); continue
-        try:   # 10-19 owner: "learn from what I share" — every shared video/link with speech also joins the viral bank as an owner pick
-            row = {"platform": "telegram-link" if kind == "url" else "telegram", "source": "owner", "url": src if kind == "url" else f"telegram:{(src or {}).get('file_id', '')[-16:]}",
-                   "title": meta.get("title"), "views": meta.get("view_count"), "duration_s": meta.get("duration"),
-                   "hook": re.split(r"(?<=[.?!])\s", tx, 1)[0][:160], "transcript": tx, "added": time.strftime("%F"), "used_by": None, "owner_pick": True}
-            open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "brain/research/viral-bank/owner.jsonl"), "a").write(json.dumps(row, ensure_ascii=False) + "\n")
-        except Exception as e: print("owner bank add failed:", e)
         progress(f"⏳ {label} 🔎 fact-checking {len(tx.split())} words of advice (a few minutes)…")
         a, err = analyse(meta, src if kind == "url" else "", tx)
         if not a: out.append((False, f"⚠️ The fact-check didn't finish ({err[:120]}). I'll keep the link; send it again later.")); continue

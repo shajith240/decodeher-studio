@@ -133,7 +133,7 @@ function unfinished(snap) {
 const PIN_RE = /https?:\/\/(?:pin\.it\/[A-Za-z0-9]+|(?:[a-z]{2,3}\.)?(?:www\.)?pinterest\.[a-z.]+\/pin\/[A-Za-z0-9_-]+\/?)/gi;
 const pinLinks = (t) => [...new Set((String(t).match(PIN_RE) || []).map((u) => u.replace(/\/+$/, "")))].slice(0, 30);
 const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.test(t) ? "hook" : /\b(dark|psych\w*|story|clip|scene|b-?roll)\b/i.test(t) ? "dark" : null;
-const KIND_SAY = { cover: "carousel covers", cref: "carousel design references", hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the viral bank (I watch it and learn from it)",
+const KIND_SAY = { cover: "carousel covers", cref: "carousel design references", hook: "AI-girl hooks", dark: "dark-psychology clips", research: "learning (I watch it: reels to remake go to the viral bank, advice gets fact-checked into our rules)",
   tip: "a growth-tip fact-check" };
 // 10-18 owner: YouTube videos / Instagram reels about growing on Instagram → fact-checked growth tips (laptop tools/tip_intake.py)
 const TIP_RE = /https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?[^\s]*v=|shorts\/|live\/)[\w-]{6,}[^\s]*|youtu\.be\/[\w-]{6,}[^\s]*|(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(?:reels?|p|tv)\/[\w-]{5,}[^\s]*|(?:(?:www|vm|vt|m)\.)?tiktok\.com\/[^\s]+)/gi;
@@ -339,7 +339,7 @@ export class HQ extends DurableObject {
     const file = { file_id: v.file_id, uid: v.file_unique_id || "", name: v.file_name || "", size: v.file_size || 0, caption: String(m.caption || "").slice(0, 500) };
     const same = group && inbox.find((x) => x.group === group && ["queued", "asking"].includes(x.state));
     if (same) { same.files.push(file); await this.put("pinInbox", inbox); return { ok: true }; }   // one reply per album
-    const kind = videoKind(m.caption || ""), id = newId("v");
+    const kind = videoKind(m.caption || "") || "research", id = newId("v");   // owner 10-19: every video is studied, no question
     inbox.push({ id, urls: [], files: [file], kind, group, state: kind ? "queued" : "asking", at: Date.now() });
     await this.put("pinInbox", inbox.slice(-300));
     await this.note("activity", `Owner sent a video${kind ? ` (${KIND_SAY[kind]})` : ""}`);
@@ -350,7 +350,7 @@ export class HQ extends DurableObject {
     return r;
   }
   async onVideoLinks(text, urls) {   // owner 10-19: "I'll send the links only — you download them and learn from them"
-    const kind = videoKind(text.replace(TIP_RE, " "));
+    const kind = videoKind(text.replace(TIP_RE, " ")) || "research";   // owner 10-19: no question — the laptop decides (remake vs advice)
     if (kind === "tip") return this.onTips(urls);
     const id = newId("l"), inbox = await this.get("pinInbox", []);
     inbox.push({ id, urls, files: [], kind: kind || null, state: kind ? "queued" : "asking", at: Date.now() }); await this.put("pinInbox", inbox.slice(-300));

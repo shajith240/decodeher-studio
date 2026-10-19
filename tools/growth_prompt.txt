@@ -43,3 +43,6 @@ c) Rewrite brain/growth/content-rules.md, the living rulebook every script write
    remix of a proven post (same hook, points, order, examples; ours = "Listen" + closing line), AI-woman opener with no text.
 d) next-batch-plan.md: list the next sources from `python3 tools/pick_sources.py 8` (owner picks first, then the viral bank,
    Dark Needle only if the bank is empty) and apply content-rules.md. Skip skits/street interviews (no narration to keep).
+e) Advice the owner shared (inbox notes from tools/tip_intake.py: growth, carousels, hooks, editing, scripts, posting) is
+   folded into the matching rulebook: reels → brain/growth/content-rules.md, carousels → brain/growth/carousel-rules.md
+   (create it if missing), growth/posting → playbook.md. Keep only what survived the fact-check; note the source.

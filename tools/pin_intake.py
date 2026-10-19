@@ -165,6 +165,8 @@ def learn(path, secs, f):
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import tip_intake
         text = tip_intake.whisper(path)
         if len(text.split()) < 15: return None   # no real speech (music/text-only reel): keep the Drive-only path
+        kind, about = classify(text, f.get("caption", ""))
+        if kind == "advice": return f"💡 advice ({about}): " + advice({"title": f.get("caption") or f.get("name") or "Telegram video"}, "", text)
         hook = re.split(r"(?<=[.?!])\s", text, 1)[0][:160]
         row = {"platform": "telegram", "source": "owner", "url": f"{RDRIVE}/{os.path.basename(path)}", "caption": f.get("caption", ""),
                "duration_s": round(secs, 1), "hook": hook, "transcript": text, "added": time.strftime("%F"), "used_by": None, "owner_pick": True}
@@ -215,6 +217,25 @@ def images(it):
     hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
     log(f"Carousel images · {len(got)} {label}s saved, {len(bad)} failed")
 
+def classify(tx, title=""):
+    """Cheap Haiku call: is this a reel to remix (content for our men's dating page) or advice (growth / carousels / hooks / editing / scripts)?"""
+    prompt = ("Below is the transcript of a short video the owner of a men's dating-psychology Instagram page shared. Answer with JSON only: "
+              '{"type": "content" or "advice", "about": "2-4 words"}. "content" = a video whose message we could remake for our audience '
+              '(dating, women, attraction, texting, psychology). "advice" = tips for creators (growing on social media, carousels, hooks, '
+              f"editing, scripts, posting, monetising).\nTitle: {title}\nTranscript: {tx[:2500]}")
+    try:
+        out = subprocess.run([os.environ.get("CLAUDE_BIN", "claude"), "-p", prompt, "--model", "haiku", "--output-format", "text"], capture_output=True, text=True, timeout=180).stdout
+        j = json.loads(re.search(r"\{.*\}", out, re.S).group(0)); return ("advice" if j.get("type") == "advice" else "content"), str(j.get("about", ""))[:40]
+    except Exception: return "content", ""
+
+def advice(meta, url, tx):
+    """Fact-check advice with tip_intake and save the note for the daily learning session. Returns the Telegram line."""
+    import tip_intake
+    a, err = tip_intake.analyse(meta, url, tx)
+    if not a: return f"⚠️ advice, but the fact-check didn't finish ({err[:80]})"
+    note = tip_intake.write_note(meta, url, a, tx)
+    return tip_intake.telegram_text(meta, a, note)
+
 def learn_links(it):
     """Owner-shared video links (Instagram / YouTube / TikTok) → download, transcribe, add to the viral bank as owner picks."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import tip_intake
@@ -226,12 +247,15 @@ def learn_links(it):
             with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "library")) as tmp: meta, tx, problem = tip_intake.from_url(u, tmp)
         except Exception as e: meta, tx, problem = {}, "", str(e)[:80]
         if problem or len(tx.split()) < 15: bad.append(f"{u} ({problem or 'no speech in it'})"); continue
+        kind, about = classify(tx, meta.get("title") or "")
+        if kind == "advice": got.append(f"💡 advice ({about}): " + advice(meta, u, tx)); continue
         hook = re.split(r"(?<=[.?!])\s", tx, 1)[0][:160]
         row = {"platform": "telegram-link", "source": "owner", "url": u, "title": meta.get("title"), "views": meta.get("view_count"),
                "duration_s": meta.get("duration"), "hook": hook, "transcript": tx, "added": time.strftime("%F"), "used_by": None, "owner_pick": True}
         open(OWNER_BANK, "a").write(json.dumps(row, ensure_ascii=False) + "\n")
         v = meta.get("view_count"); got.append(f"🧠 “{hook}” ({len(tx.split())} words{f', {v / 1e6:.1f}M views' if v and v >= 1e5 else ''})")
-    lines = [f"🧠 <b>Learned {len([g for g in got if g.startswith('🧠')])} video{'s' if len(it['urls']) != 1 else ''}</b>. They're first in line for the next reels."] + [f"• {g}" for g in got]
+    nc, na = len([g for g in got if g.startswith("🧠")]), len([g for g in got if g.startswith("💡")])
+    lines = [f"🧠 <b>Studied {len(it['urls'])} video{'s' if len(it['urls']) != 1 else ''}</b>: {nc} to remake (first in line for the next reels), {na} advice (fact-checked; the morning session folds it into our rules)."] + [f"• {g}" for g in got]
     if bad: lines += ["", f"⚠️ Couldn't learn ({len(bad)}):"] + [f"• {b}" for b in bad]
     hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
     log(f"Learn links · {len(got)} learned, {len(bad)} failed")
