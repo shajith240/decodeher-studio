@@ -1,0 +1,114 @@
+# Viral bank sources for tools/viral_bank_yt.py: one per line. "search: <query>" or a YouTube channel URL (its /shorts tab is read).
+# Searches rotate: each run takes a slice of them (all-time + this-year Shorts results); channels are read every run.
+search: signs she likes you #shorts
+search: why she pulls away #shorts
+search: texting psychology #shorts
+search: dark psychology women #shorts
+search: female psychology facts #shorts
+search: mixed signals girl #shorts
+search: why women test men #shorts
+search: how to text a girl #shorts
+search: psychology facts about girls #shorts
+search: why she ignores you #shorts
+search: how to make her miss you #shorts
+search: when a girl ignores you #shorts
+search: she left me on read #shorts
+search: dating advice for men #shorts
+search: signs she is losing interest #shorts
+search: red flags in a girl #shorts
+search: dry texting girl #shorts
+search: hot and cold girl #shorts
+search: attraction psychology #shorts
+search: how to make her chase you #shorts
+search: how to know if a girl likes you #shorts
+search: psychology of attraction women #shorts
+search: why she stopped texting #shorts
+search: what her texts really mean #shorts
+search: female psychology dating #shorts
+search: why girls play hard to get #shorts
+search: girl psychology facts #shorts
+search: body language she likes you #shorts
+search: dark psychology tricks attraction #shorts
+search: why women lose attraction #shorts
+search: shit test women #shorts
+search: how to reply when she #shorts
+search: signs she wants you to make a move #shorts
+search: why she friendzoned you #shorts
+search: she sends dry texts #shorts
+# channels (dating / attraction / psychology shorts)
+https://www.youtube.com/@charismaoncommand
+https://www.youtube.com/@CourtneyRyan
+https://www.youtube.com/@Psych2go
+https://www.youtube.com/@JimmyonRelationships
+https://www.youtube.com/@BobbyRio
+https://www.youtube.com/@OliviaAlexa
+https://www.youtube.com/channel/UC9HGzFGt7BLmWDqooUbWGBg
+https://www.youtube.com/channel/UChNN7VBxPTiNrqjUaQd9bxA
+https://www.youtube.com/channel/UCfMX1py0agQyBcOKjt2VSzA
+https://www.youtube.com/channel/UCSduXBjCHkLoo_y9ss2xzXw
+https://www.youtube.com/channel/UCPBO9gLGy8ujsJ7xjARI7ow
+https://www.youtube.com/channel/UCir93b_ftqInEaDpsWYbo_g
+https://www.youtube.com/channel/UCs5uUgvYrLwUvbwrGCK-nNw
+https://www.youtube.com/channel/UCBWXHMMzHUIFzRdl2fD8qXg
+https://www.youtube.com/channel/UCBroV3o2hGFi_m3Q49emMIA
+https://www.youtube.com/channel/UCvfFSglPLATxxDNN8Lmb63w
+https://www.youtube.com/channel/UC6ZX2XlkiJStCGrDRl8x0jw
+https://www.youtube.com/channel/UCCgrWW6fsUVdRD7xI52xhnQ
+https://www.youtube.com/channel/UCqKR1r9dR6hYNHhTTX4YkZQ
+https://www.youtube.com/channel/UCTs7GzajwkIGleSDfnJwaKw
+https://www.youtube.com/channel/UC4aSRZ3bUbT2R01TEbA36ow
+https://www.youtube.com/channel/UCBsw7ciK68Umg4wNnfRdE3w
+https://www.youtube.com/channel/UC3KimKBrzN6uoUbxva2joVQ
+https://www.youtube.com/channel/UCMn-zv1SE-2y6vyewscfFqw
+https://www.youtube.com/channel/UCkKh0mX-A5uTbk60YutGFxg
+https://www.youtube.com/channel/UCI0AW5Y_4br_91PzmxTJ8-Q
+https://www.youtube.com/channel/UClnMjKH0Jl3GLMj4pW4jpLg
+https://www.youtube.com/channel/UCEXc1tzE3VPoi5uc7CoOc1A
+https://www.youtube.com/channel/UCSNdh3JaCS6OqNyJqUWIs2w
+https://www.youtube.com/channel/UCeovcmqzOxXAtXCUx62e9Xw
+https://www.youtube.com/channel/UCxV481r2KQwvqtEpbY48oeQ
+https://www.youtube.com/channel/UClHVl2N3jPEbkNJVx-ItQIQ
+https://www.youtube.com/channel/UCodkb-qBktJI5NrUsPYpf7g
+https://www.youtube.com/channel/UCyYTkZ_ACRrbE1OV0rPngXw
+https://www.youtube.com/channel/UCCgGlPGDME05HjA2nV30qhw
+https://www.youtube.com/channel/UC2oNJv2Tc3ctbJB0JoQ130w
+# channels behind the 10-19 winners
+https://www.youtube.com/channel/UC1hxWo9Ue-P1zmbvRJLNK5w  # Steph Speaks
+https://www.youtube.com/channel/UC2HQ0KRiBgNXCP--KazLSTA  # MindZenX
+https://www.youtube.com/channel/UC7NxCZXG5kENlZ-kibGfqIw  # Daily Facts
+https://www.youtube.com/channel/UCAmeRvn2lncdEBoByc5B-5Q  # QuickMindFacts
+https://www.youtube.com/channel/UCdga11a_dZ0d-_IYMcblsmA  # Coach Kyle
+https://www.youtube.com/channel/UCDmGeekdOsBPjBO17jf5LAw  # Daily Facts Worth
+https://www.youtube.com/channel/UCdSCodrH7DSemQMY9yzne4Q  # Blaine Anderson • Matchmaker & Dating Coach
+https://www.youtube.com/channel/UCE1QKpja5deK-wZhAXDaLRA  # Motivational Insights
+https://www.youtube.com/channel/UCf07eBo_ZzNmhVeTRyJDJ3g  # Iron Man Lifestyle
+https://www.youtube.com/channel/UCf7k_CRPu1ufFYXBCPHEt4g  # 1 Minute Talk Show
+https://www.youtube.com/channel/UCl4yv6grUK9tM8OQGcPeB9w  # Billie Rae Brandt
+https://www.youtube.com/channel/UCLDQMM-C4yOtjQuZkdC0ydQ  # MindHacker_X
+https://www.youtube.com/channel/UCLjFj03yrdSd2X4Uqo7KXSw  # HamzaUniverse
+https://www.youtube.com/channel/UClMIeRUWKeuhD-i9SzSjQww  # RSH MindTree
+https://www.youtube.com/channel/UCoDKTXGLONajQUm_xDupArw  # Motivational Hub 
+https://www.youtube.com/channel/UCPKkGx0ofpuzEFqDHlMSIYQ  # Mind Over Shadows
+https://www.youtube.com/channel/UCsCWxHukxMUxJABZglzzOdA  # Content Machine
+https://www.youtube.com/channel/UCt3JQxbVvISjkwR26iHBdBA  # SilentFlix
+https://www.youtube.com/channel/UCvKlra4p9V4eCNjJXWOVhnw  # How to Beast Talks
+https://www.youtube.com/channel/UCW4wnirSSCH9viT-NhqVMVg  # Revers Hub
+https://www.youtube.com/channel/UCwoYvMucW8QperzBDZD_Q2A  # Niki Patton
+https://www.youtube.com/channel/UCxFlqjsQfGw2OMVlqClo5rQ  # psychology facts
+https://www.youtube.com/channel/UCyhByy48wtE4CB49gN3LU4w  # Limitless Real Factzz
+# skip: off-niche shorts the filter let through (comedy skits, music trends, food, anime). Never re-proposed.
+skip: N2F_MsuZswA U9NyrcueA5A Wwm0z1URvyQ XHlN4GghbBs rmckGuwghE0 ayt5fSjJQVI KRqPXgqUys4 Clw5cOOt5Ds
+skip: 0cEAQRwxqx4 d7Jlpqdw7r8 3S-2o0VUv_U _3211ysh5KA Ikumw9XxOWA QVm0D_0go4w dDJEFoK9bHo 3QtKh9Cigb0
+skip: A993Rh8K4aw qV-_LehWa28 3BCwdv5gZuM 76LBLaBASZg S5BXx_68dHw AZH2NWtgbvI NMe6Lc10kYs wDvnESPd6Z0
+skip: EragbhX_Zqg dIIBuCkgq4M fKLt3VWb6K4 6NmCtp3LYok eebQN-GWyfY qC6joptWyLo ObYqenCkrl0 cJALIMMmtik
+skip: pFczYXVSdFg C51nW0HndwU 5fgpjP_dxmU gD4JI1RFJ_Q jcpVCQEtU8o 4UYOGIqqRR4 sXmJge3eUvQ jFelP1CSP68
+skip: QsPhwW5MyRc pbIvhq0uHe0 nwol0vXKxPI QKl2nYhGl5I UqOtQBFj7M0 CVPcKd6dwbE gktX1zCJQXY w-y7fg8-gi4
+skip: 3JpSzVYZTqU wdJjAxD62Dk Z1PLhAtJlDg YWI-yzmUxyo 9xABoYA_0Eo SJ8GBRLTdkc lE6i9Y6qFxQ cBwecZQzwRA
+skip: UK15P5AjwIw 82nxDHZnsIg pIQNTnodB8o ST12I-3ODgY JdYi6MWLCP4 IR02SHUbjiE RMZPXjVo-ho WFI2cFkOlsE
+skip: 1EehslYVfkI xenUMgjDmG0 pyBHQNnHTZ0 rRha6xmfAJE nivJ5rtANl0 f03vftCgjng FemZctOJ1Dg N25smLK21bw
+skip: oRSbuxRwBSk 9SmtCpH2PTY 9Qnl7g5sPJM iO2Q5Z9UFOY i7anjsIVL_Q J48nrrN_9Zg HP1wh4FTfEE nmO3nF7xx0M
+skip: fpILOXfijos yxDwdEc9DjE EQZBHvJTvr4 cubTPOB-oq4 C0onOtkZaug i0PZlMOCCo4 dERy_HszhF8 laxa0Y6U4f0
+skip: iucgWPp-uFw 9q8I3dvsrz8 us_YFjT7Hw4 5a9sr-FhBRY v059lmcLqF0 odoPQ0j2W98 zK6Y6QoqSpU 7sczr5ZcY0A
+skip: 7Q4gTVdSIP4 RIl8nkB4uXc iO3z0ou9m5w 2UWgQAvbzdI
+skip: CBjvA6WjFUU -rmcmjaJEHA
+skip: Pg3LbH2Ryvs

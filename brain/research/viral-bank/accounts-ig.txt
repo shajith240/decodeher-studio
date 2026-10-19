@@ -1,0 +1,54 @@
+# Viral bank sources for tools/viral_bank_ig.py (Instagram, read anonymously; never logged in).
+# To add an account: put its handle (without @) on a new line. To add a topic page: a line "topic: <slug>" from
+# instagram.com/popular/<slug>/. Lines starting with # are ignored; text after # is a note.
+# Built 2026-10-19. Accounts marked "hidden" are not shown to logged-out visitors; the script falls back to search + embed.
+
+# --- men's dating / female-psychology pages (faceless unless noted) ---
+femalephilosophy        # "Impress your crush" series, pinned reel 10.5M plays
+psychounfold            # "Dark psychology: how to attract any girl" (reposted by memestime.in, 35M)
+bookswithswapnil_       # "Most men misunderstand women..." caption-carousel reels
+bookwises               # "Most guys don't understand her... so they lose her"
+the1stwealth            # "How to make a girl regret losing you" 12.7M
+moneymindedman          # texting with intention, quiet-people psychology 22.9M
+revolverise             # numbered psychology lists, 9M
+psychologyupgrade       # "Dark side of female psychology" 11.2M
+earnvalue_              # "Signs she's interested in you"
+masculinityforge_       # signs someone is into you
+brainhex_               # psychology facts / crush signs
+successtheory.co        # "Dark attraction psychology"
+psycheofattraction      # attraction stages
+jeremy_sarter1x         # texts that give her butterflies (face)
+mindvarta               # "Girls mind decode" daily series (Hindi/English)
+datingwithgracie        # face-on woman coaching men; many 1M+ texting/signs reels
+datingbyblaine          # face-on woman coaching men; IG-native leader
+lethimchase             # women-facing "mixed signals" decoder; flip the angle for men
+manly_pinnacle          # carousels (analysed: brain/research/carousels/manly-pinnacle-analysis.md)
+thealphamakerx          # masculinity / dating psychology carousels, 126K
+zoltium                 # hidden: our named competitor (dark psychology, 1.2M)
+
+# --- topic pages (top reels for the topic, with real play counts) ---
+topic: female-psychology
+topic: female-psychology-facts
+topic: psychology-of-female-attraction
+topic: psychological-facts-about-women
+topic: psychology-facts-about-girls
+topic: girl-psychology
+topic: girls-psychology
+topic: women-psychology
+topic: signs-she-likes-you
+topic: signs-a-girl-likes-you
+topic: signs-that-she-secretly-likes-you
+topic: sign-that-she-likes-you
+topic: signs-she-dont-like-you
+topic: mixed-signals
+topic: mixed-signals-in-communication
+topic: texting-tips
+topic: texting
+topic: attraction-psychology
+topic: psychology-of-attraction
+topic: instant-attraction-psychology
+topic: dark-psychology-of-eye-contact-in-attraction
+topic: dating-psychology
+topic: dating-psychology-tips
+topic: the-psychology-of-attraction-and-relationships
+topic: the-psychology-of-female-infidelity
