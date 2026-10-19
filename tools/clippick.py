@@ -47,7 +47,7 @@ for nn, e in idx.items():
     if str(int(nn)) in pick: continue
     jf = f"{R}/clips/judge/{nn}.json"; j = json.load(open(jf))["clips"] if os.path.exists(jf) else {}
     rows = sorted(((v["meaning"] + 0.4 * v.get("style", 5) + 0.3 * v.get("quality", 5), c, v) for L, c in e["clips"].items() if (v := j.get(L))
-                   and v.get("meaning", 0) >= 4 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text") and os.path.basename(c["file"]) not in TEXTED and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
+                   and v.get("meaning", 0) >= 2 and v.get("style", 0) >= 5 and v.get("quality", 0) >= 4 and not v.get("text")   # 10-19 owner: "use clips with some connection, don't overdo it" and os.path.basename(c["file"]) not in TEXTED and os.path.exists(f"{R}/clips/cand/{c['file']}") and c["pin"] not in used), key=lambda r: -r[0])
     if rows:
         sc, c, v = rows[0]; used.add(c["pin"])
         pick[str(int(nn))] = {"file": c["file"], "start": c["start"], "style": c["style"], "meaning": v["meaning"], "shows": v["shows"] + "  [fallback]", "q": idx[nn]["q"]}

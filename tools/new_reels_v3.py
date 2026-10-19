@@ -54,7 +54,7 @@ for m in re.finditer(r"^## (\d+) · ([^·\n]+?) · \"([^\"]+)\"\n(.*?)(?=^## |\Z
     if RC.get("frame") == "lens":   # 10-16 owner-approved format (sample w6-01): colour + soft lens edges + paper texture, no re-hook flash,
         # the hook-end riser/impact on line 1 and on the "Here's how…" turn; snaps are chosen later by tools/peak_points.py
         how = next((i for i, l in enumerate(lines) if re.match(r"^(here'?s how|so here'?s what|here'?s what)", clean(l), re.I)), min(5, n - 3))
-        cfg.update({"frame": "lens", "colour": True, "rehookAt": None, "drops": sorted({1, how})})
+        cfg.update({"frame": "lens", "colour": True, "rehookAt": None, "drops": sorted({1, how}), "clip_round": 2})   # 10-19 owner: one search, then use the clips we have (no second search round)
     if meta.get("lang", "en").lower() == "hi": cfg["lang"] = "hi"   # Hinglish reel: Devanagari script + English loanwords; tagline stays English
     tags = " ".join(re.findall(r"#\w+", meta.get("caption tags", "#datingadviceformen #datingtips"))[:5])
     caption = "\n".join(x for x in [meta.get("caption hook", ""), meta.get("caption body", ""), "", meta.get("caption prompt", ""),
