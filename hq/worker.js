@@ -153,12 +153,11 @@ const HELP = `Here's what I can do:
 /stats – how the reels are performing
 /pause – stop posting (nothing is lost)
 /resume – start posting again
-/make – start the factory now
 /help – this list
 
-📌 Pinterest links (pin.it/…): AI-girl hooks or dark-psychology clips. Add "ai girl" or "dark" to skip my question.
-💡 YouTube or Instagram reel links about growing on Instagram: I fact-check the advice (what works, what's hype) and the good tips go into our growth plan.
-🎞 Video files: I ask whether it's for the Zoltium study or a growth tip (write "zoltium" or "tip" in the caption to skip the question).
+🧠 Any video link (Instagram, YouTube, TikTok) or video file: I download it and study it. Reels worth remaking go into the viral bank, first in line for our next reels. Advice (growth, carousels, hooks, editing) gets fact-checked and goes into our rules.
+📌 Pinterest links: I ask if it's an AI-girl hook, a dark-psychology clip or a carousel cover, and add it to that library.
+🖼 Pictures: I ask if it's a carousel cover or a design reference.
 
 Or just type what you want changed (for example "make the captions bigger") and I'll get to work and send you a preview to approve.`;
 
