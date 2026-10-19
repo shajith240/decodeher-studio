@@ -20,6 +20,7 @@ const R = fs.existsSync(path.join(ROOT, ".relay.json")) ? JSON.parse(fs.readFile
   : process.env.RELAY_URL && process.env.RELAY_KEY ? { url: process.env.RELAY_URL.replace(/\/+$/, ""), key: process.env.RELAY_KEY }
   : (() => { console.error("⛔ no relay config: .relay.json or RELAY_URL + RELAY_KEY"); process.exit(1); })();
 const SLOTS = ["08:30", "18:30", "22:00"];   // IST — 10-16 growth brain: 08:30 India morning / US late evening, 18:30 = US morning (9 am ET), 22:00 = US lunch + India night (brain/research/audience-location.md); was 08:30/14:00/21:00
+const CSLOTS = ["04:30", "20:00"];   // IST — 10-19 owner: 2 carousels a day; 04:30 = 7 pm US Eastern, 20:00 = 10:30 am US Eastern
 const IST = 330;                          // minutes ahead of UTC
 const START = Date.UTC(2026, 9, 14, 3, 0);   // slots from 14 Oct 2026 08:30 IST (= 03:00 UTC); reel 1 went out 13 Oct (owner: "start today")
 
@@ -31,9 +32,9 @@ const api = async (method, p, body, type = "application/json") => {
 const fmt = (ms) => new Date(ms + IST * 60e3).toISOString().replace("T", " ").slice(0, 16) + " IST";
 
 // every slot from START onward, in order
-function* slots() {
+function* slots(list = SLOTS) {
   const d0 = new Date(START + IST * 60e3); let day = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), d0.getUTCDate());
-  for (;; day += 86400e3) for (const s of SLOTS) { const [h, m] = s.split(":").map(Number); const t = day + (h * 60 + m - IST) * 60e3; if (t >= START) yield t; }
+  for (;; day += 86400e3) for (const s of list) { const [h, m] = s.split(":").map(Number); const t = day + (h * 60 + m - IST) * 60e3; if (t >= START) yield t; }
 }
 
 (async () => {
@@ -50,6 +51,27 @@ function* slots() {
     return;
   }
   if (cmd === "pause" || cmd === "resume") return console.log(await api("POST", `/${cmd}`));
+  if (cmd === "carousel") {   // 10-19: book a rendered carousel (<dir>/NN.jpg + caption.txt) into the next free carousel slot (CSLOTS)
+    const dir = path.resolve(arg), imgs = fs.readdirSync(dir).filter((f) => /^\d+\.jpe?g$/i.test(f)).sort();
+    if (imgs.length < 2 || imgs.length > 10) throw new Error(`a carousel needs 2-10 slides as NN.jpg, found ${imgs.length}`);
+    const title = "C-" + path.basename(dir), queue = await fullQueue();
+    if (queue.some((q) => q.title === title && !["failed", "skipped"].includes(q.status))) return console.log(`= ${title} already queued`);
+    const caption = fs.readFileSync(path.join(dir, "caption.txt"), "utf8").trim();
+    const taken = new Set(queue.filter((q) => q.type === "carousel" && !["failed", "skipped"].includes(q.status)).map((q) => q.at));
+    const free = slots(CSLOTS), now = Date.now(); let at; do at = free.next().value; while (taken.has(at) || at < now + 15 * 60e3);
+    const keys = [];
+    for (const f of imgs) {
+      const key = `${crypto.randomBytes(12).toString("hex")}.jpg`, bytes = fs.readFileSync(path.join(dir, f));
+      await api("PUT", `/media/${key}`, bytes, "image/jpeg");
+      const head = await fetch(`${R.url}/m/${key}`, { method: "HEAD" });
+      if (!head.ok || Number(head.headers.get("content-length")) !== bytes.length) throw new Error(`hosted slide ${f} is not reachable`);
+      keys.push(key);
+    }
+    const fresh = await fullQueue();
+    fresh.push({ id: `c-${path.basename(dir).slice(0, 10)}-${keys[0].slice(0, 4)}`, type: "carousel", title, keys, key: keys[0], at, caption, status: "queued" });
+    fresh.sort((a, b) => a.at - b.at); await api("PUT", "/queue", JSON.stringify(fresh));
+    return console.log(`+ ${fmt(at)}  ${title}  (${keys.length} slides)`);
+  }
   if (cmd === "ids") {   // id, status, slot and title of every reel (for remove)
     for (const q of await fullQueue()) console.log(`${q.id.padEnd(16)} ${q.status.padEnd(9)} ${fmt(q.at)}  ${q.title}`);
     return;
@@ -57,13 +79,13 @@ function* slots() {
   if (cmd === "remove") {
     const s = await api("GET", "/status"), it = s.queue.find((q) => q.id === arg);
     if (!it || it.status !== "queued") throw new Error(`no queued reel "${arg}"`);
-    await api("DELETE", `/media/${it.key}`);
+    for (const k of (it.keys || [it.key])) await api("DELETE", `/media/${k}`);   // a carousel hosts one image per slide
     const full = await fullQueue(); await api("PUT", "/queue", JSON.stringify(full.filter((q) => q.id !== arg)));
     return console.log(`removed ${it.title}`);
   }
   if (cmd === "reslot") {   // re-pack the still-queued reels, in order, into the earliest free slots
-    const queue = await fullQueue(), fixed = new Set(queue.filter((q) => q.status !== "queued").map((q) => q.at)), free = slots(), now = Date.now();
-    for (const q of queue.filter((q) => q.status === "queued").sort((a, b) => a.at - b.at)) { let at; do at = free.next().value; while (fixed.has(at) || at < now + 15 * 60e3); q.at = at; }
+    const queue = await fullQueue(), fixed = new Set(queue.filter((q) => q.status !== "queued" && q.type !== "carousel").map((q) => q.at)), free = slots(), now = Date.now();
+    for (const q of queue.filter((q) => q.status === "queued" && q.type !== "carousel").sort((a, b) => a.at - b.at)) {   /* carousels keep their own slots */ let at; do at = free.next().value; while (fixed.has(at) || at < now + 15 * 60e3); q.at = at; }
     queue.sort((a, b) => a.at - b.at); await api("PUT", "/queue", JSON.stringify(queue));
     return console.log("re-slotted");
   }

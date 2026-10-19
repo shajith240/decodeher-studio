@@ -1,7 +1,7 @@
 """Render a carousel spec (brain/content/carousels/<slug>.json) to 1080x1350 PNG slides in deliverables/carousels/<slug>/.
 Format (owner 10-19, copied from @manly_pinnacle's winning layout, our brand): slide 1 = photo fading to black + capitals headline
 with [bracketed] words in gold; slides 2+ = plain dark text cards with our bronze-bust avatar, numbered bold points.
-Usage: uv run -q --with playwright python tools/carousel_render.py brain/content/carousels/<slug>.json"""
+Usage: uv run -q --with playwright --with opencv-python-headless==4.10.0.84 python tools/carousel_render.py brain/content/carousels/<slug>.json"""
 import asyncio, html, json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -19,8 +19,9 @@ CSS = f"""
 * {{ margin: 0; padding: 0; box-sizing: border-box }}
 html, body {{ width: 1080px; height: 1350px; overflow: hidden; background: #0f0608 }}
 .cover {{ position: relative; width: 1080px; height: 1350px }}
-.cover .ph {{ position: absolute; inset: 0 0 auto 0; height: 1000px; background-size: cover }}
-.cover .fade {{ position: absolute; left: 0; right: 0; top: 560px; height: 460px; background: linear-gradient(180deg, rgba(15,6,8,0), #0f0608 92%) }}
+.cover #ph {{ position: absolute; left: 0; top: 0; width: 1080px }}
+.cover .fade {{ position: absolute; left: 0; right: 0; top: 560px; height: 460px; background: linear-gradient(180deg, rgba(15,6,8,0), #0f0608 88%) }}
+.cover .below {{ position: absolute; left: 0; right: 0; bottom: 0; background: #0f0608 }}
 .cover .txt {{ position: absolute; left: 70px; right: 70px; bottom: 120px; text-align: center }}
 .cover h1 {{ font: 500 76px/1.12 ZX, sans-serif; text-transform: uppercase; color: #f6efe3; letter-spacing: .005em; text-wrap: balance }}
 .cover h1 b {{ font-weight: 500; color: #e2bd6a }}
@@ -33,18 +34,46 @@ html, body {{ width: 1080px; height: 1350px; overflow: hidden; background: #0f06
 .pt {{ margin-bottom: 60px }}
 .pt h2 {{ font: 600 54px/1.22 ZS, sans-serif; color: #e8c372; margin-bottom: 18px; letter-spacing: -.005em }}
 .pt p {{ font: 500 47px/1.38 ZS, sans-serif; color: #fbf7f0; letter-spacing: -.003em }}
+.card.solo .pt {{ margin: auto 0 }} .card.solo .pt h2 {{ font-size: 62px; margin-bottom: 28px }} .card.solo .pt p {{ font-size: 54px; line-height: 1.4 }}
 .close {{ margin-top: auto; padding-top: 34px; border-top: 2px solid rgba(201,164,92,.45); font: 600 46px/1.3 ZS, sans-serif; color: #e8c372 }}
 """
 def headline(t): return re.sub(r"\[([^\]]+)\]", lambda m: "<b>" + m.group(1).replace(" ", "&nbsp;") + "</b>", e(t))   # gold phrases never break across lines
 pages = []
 c = spec["cover"]
-pages.append(f'<div class="cover"><div class="ph" style="background-image:url(file://{ROOT}/{c["image"]});background-position:{c.get("focus","50% 30%")}"></div>'
-             f'<div class="fade"></div><div class="txt"><h1>{headline(c["headline"])}</h1>' + (f'<div class="sub">{e(c["sub"])}</div>' if c.get("sub") else "") + "</div></div>")
+pages.append(f'<div class="cover"><img id="ph" src="file://{ROOT}/{c["image"]}">'
+             f'<div class="fade" id="fade"></div><div class="below" id="below"></div><div class="txt"><h1>{headline(c["headline"])}</h1>' + (f'<div class="sub">{e(c["sub"])}</div>' if c.get("sub") else "") + "</div></div>")
 for i, pts in enumerate(spec["slides"]):
     last = i == len(spec["slides"]) - 1
     body = "".join(f'<div class="pt"><h2>{e(h)}</h2><p>{e(p)}</p></div>' for h, p in pts)
-    pages.append(f'<div class="card"><div class="who"><img src="{LOGO}"><div><b>DecodeHer</b><span>@thedecodeher</span></div></div>{body}'
+    pages.append(f'<div class="card{" solo" if len(pts) == 1 else ""}"><div class="who"><img src="{LOGO}"><div><b>DecodeHer</b><span>@thedecodeher</span></div></div>{body}'
                  + (f'<div class="close">{e(spec["closing"])}</div>' if last and spec.get("closing") else "") + "</div>")
+def face_box(img):
+    """10-19 owner: the headline must never cover the girl's face — find the face (largest frontal face, OpenCV) in source pixels."""
+    try:
+        import cv2
+        g = cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2GRAY)
+        f = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml").detectMultiScale(g, 1.1, 5, minSize=(60, 60))
+        if len(f): x, y, w, h = max(f, key=lambda r: r[2] * r[3]); return [int(x), int(y), int(w), int(h)]
+    except Exception as ex: print("face detection unavailable:", ex)
+    return None
+
+# place the photo so the face (incl. chin) sits above the headline with a gap; shrink the headline if the photo can't move enough
+PLACE = """async (face) => {
+  const img = document.getElementById('ph'); if (!img) return null; await img.decode().catch(() => {});
+  const s = 1080 / img.naturalWidth, H = img.naturalHeight * s, h1 = document.querySelector('.cover h1');
+  for (let k = 0; k < 8; k++) {
+    const t = document.querySelector('.cover .txt').getBoundingClientRect().top;
+    const fb = face ? (face[1] + face[3] * 1.35) * s : 0.45 * H;   // face bottom incl. chin and a little neck
+    let top = Math.min(0, (t - 50) - fb); top = Math.max(top, (t + 30) - H);
+    img.style.top = top + 'px';
+    const fade = document.getElementById('fade'); fade.style.top = Math.max(0, t - 380) + 'px'; fade.style.height = '420px';
+    document.getElementById('below').style.top = (t + 40) + 'px';
+    const lines = Math.round(h1.getBoundingClientRect().height / parseFloat(getComputedStyle(h1).lineHeight));
+    // owner 10-19: the headline size and text area are FIXED — a title that doesn't fit is rewritten shorter, never shrunk
+    return { top, t, lines, faceClear: !face || top + fb <= t - 40, ...(lines > 4 ? { warn: 'title over 4 lines: write it shorter' } : {}) };
+  }
+}"""
+
 async def main():
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
@@ -53,7 +82,8 @@ async def main():
             hf = f"{OUT}/.slide.html"; open(hf, "w").write(f"<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>{body}</body></html>")
             await pg.goto(f"file://{hf}"); await pg.wait_for_load_state("load")
             await pg.evaluate("document.fonts.ready"); await pg.wait_for_timeout(250)
-            over = await pg.evaluate("document.body.scrollHeight > 1350 || [...document.querySelectorAll('.card')].some(c => c.scrollHeight > 1350)")
+            if i == 1: print("cover placement:", await pg.evaluate(PLACE, face_box(os.path.join(ROOT, spec["cover"]["image"]))))
+            over = await pg.evaluate("[...document.querySelectorAll('.card')].some(c => c.scrollHeight > 1350)")
             await pg.screenshot(path=f"{OUT}/{i:02d}.png"); print(f"{i:02d}.png{'  OVERFLOW' if over else ''}")
         await b.close()
     open(f"{OUT}/caption.txt", "w").write(spec.get("caption", "")); os.path.exists(f"{OUT}/.slide.html") and os.remove(f"{OUT}/.slide.html")

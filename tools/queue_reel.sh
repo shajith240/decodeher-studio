@@ -23,7 +23,9 @@ title="$n-W2-$(echo "$slug" | cut -d- -f3- | cut -c1-28)"
 # the relay is the truth: if it already holds this reel (a run died after the upload, before the marker), just write the marker
 part="-W2-$(echo "$slug" | cut -d- -f3- | cut -c1-28)"
 # the title card (0-2 s) is the cover when the reel has one
-export THUMB_MS=$(python3 -c "import json,sys; print(600 if json.load(open(sys.argv[1])).get('titleCard') else 1500)" "$R/reel.json")
+# 10-19 owner + growth call: a reel with an AI-woman hook uses HER FACE as the cover (frame at 1.0 s: before any text), no designed cover
+HOOKFACE=$(python3 -c "import json,sys; print(1 if json.load(open(sys.argv[1])).get('hookClip') else 0)" "$R/reel.json")
+export THUMB_MS=$(python3 -c "import json,sys; c=json.load(open(sys.argv[1])); print(1000 if c.get('hookClip') else 600 if c.get('titleCard') else 1500)" "$R/reel.json")
 onrelay=$(echo "$IDS" | awk '$2=="queued"{print $NF}' | grep -- "^[0-9]*$part\$" | head -1 || true)
 if [ -n "$onrelay" ] && python3 -c "import json,sys; sys.exit(0 if json.load(open(sys.argv[1])).get('requeue') else 1)" "$R/reel.json"; then
   # a RE-MADE reel (reel.json "requeue": owner 10-15 re-voice + new ending): swap the new video into its existing slot, same caption
@@ -33,7 +35,9 @@ if [ -n "$onrelay" ] && python3 -c "import json,sys; sys.exit(0 if json.load(ope
   ffprobe -v error -show_entries format=duration -of csv=p=0 "$tmp/$onrelay-FINAL.mp4" | grep -q . || { echo "re-encode broken: $slug" >&2; exit 1; }
   node tools/ig_queue.js replace "$tmp" | tee /dev/stderr | grep -q "video replaced" || { echo "replace failed: $slug" >&2; exit 1; }
   mkdir -p "$Q/booked"; cp "$tmp/$onrelay-FINAL.mp4" "$Q/booked/$onrelay-FINAL.mp4"   # audit M8: never in the folder `add` uploads
-  if [ "$THUMB_MS" = 600 ] && [ ! -f "deliverables/covers-royal/$slug.jpg" ]; then   # audit M3: a swap keeps the approved royal cover; frame only when there is none
+  if [ "$HOOKFACE" = 1 ]; then id=$(node tools/ig_queue.js ids 2>/dev/null | awk -v t="$onrelay" '$2=="queued" && $NF==t {print $1}' | head -1)
+    [ -n "$id" ] && node tools/ig_queue.js cover "$id" frame=1000 || true
+  elif [ "$THUMB_MS" = 600 ] && [ ! -f "deliverables/covers-royal/$slug.jpg" ]; then   # audit M3: a swap keeps the approved royal cover; frame only when there is none
     id=$(node tools/ig_queue.js ids 2>/dev/null | awk -v t="$onrelay" '$2=="queued" && $NF==t {print $1}' | head -1)
     [ -n "$id" ] && node tools/ig_queue.js cover "$id" frame=600 || true; fi
   python3 -c "import json,sys; p=sys.argv[1]; c=json.load(open(p)); c.pop('requeue',None); json.dump(c,open(p,'w'),indent=1,ensure_ascii=False)" "$R/reel.json"
@@ -74,7 +78,8 @@ out=$(node tools/ig_queue.js add "$Q" 2>&1); echo "$out" | grep -E "^\+|saved|�
 if echo "$out" | grep -q "^+ .*$title" && echo "$out" | grep -q "queue saved"; then
   mkdir -p logs/queued; date "+%F %T" > "logs/queued/$slug"; echo "$out" | grep "^+ .*$title" | sed "s/^+ /$(date +%H:%M:%S)  Queued · /" >> logs/activity.log
   cov="deliverables/covers-royal/$slug.jpg"   # owner 10-15: the approved royal cover (tools/make_royal_cover.py) on every post
-  if [ ! -f "$cov" ]; then   # v3 reels: make it from reel.json coverKicker / coverHeadline (series + title)
+  [ "$HOOKFACE" = 1 ] && cov="/nonexistent-hook-face-cover"   # 10-19: hook reels keep the face frame (THUMB_MS) — no royal cover
+  if [ "$HOOKFACE" != 1 ] && [ ! -f "$cov" ]; then   # v3 reels: make it from reel.json coverKicker / coverHeadline (series + title)
     ck=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('coverKicker',''))" "$R/reel.json")
     ch=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('coverHeadline',''))" "$R/reel.json")
     [ -n "$ch" ] && python3 tools/make_royal_cover.py "$R" "$ck" "$ch" >/dev/null 2>&1 || true

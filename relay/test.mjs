@@ -69,4 +69,13 @@ ok(rp.ok && rp.id === "R9" && /message=chill/.test(mode.lastReply), "/comments/r
 const rb = await R("/comments/reply", { method: "POST", body: JSON.stringify({ commentId: "999", message: "hi" }) });
 ok(rb.status === 502 && (await rb.json()).error.includes("comment not found"), "Graph error comes back as JSON, no throw");
 ok((await R("/comments/reply", { method: "POST", body: "{}" })).status === 400, "reply validates input");
+// 10-19 carousels: one image item per slide, one CAROUSEL container, publish, all slide images dropped
+await s.putMedia("s1.jpg", new ArrayBuffer(10)); await s.putMedia("s2.jpg", new ArrayBuffer(10));
+mode = { status: "IN_PROGRESS" }; calls = [];
+mem.set("queue", [{ id: "car", type: "carousel", title: "C-test", keys: ["s1.jpg", "s2.jpg"], key: "s1.jpg", caption: "cap", status: "queued", at: Date.now() - 1000 }]);
+await s.runTick("https://x");
+const creates = calls.filter((u) => u.endsWith("/U/media")).length;
+ok(creates === 3 && /media_type=CAROUSEL/.test(mode.lastCreate) && /children=C1%2CC1/.test(mode.lastCreate) && Q()[0].status === "processing", "carousel: 2 slide items + 1 CAROUSEL container");
+mode = { status: "FINISHED" }; await s.runTick("https://x");
+ok(Q()[0].status === "posted" && !(await s.getMeta("s1.jpg")) && !(await s.getMeta("s2.jpg")), "carousel published, slide images dropped");
 fs.unlinkSync(tmp); console.log(fails ? `${fails} FAILED` : "ALL PASSED"); process.exit(fails ? 1 : 0);

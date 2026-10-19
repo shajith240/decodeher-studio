@@ -7,7 +7,7 @@ import { DurableObject } from "cloudflare:workers";
 //     due → REELS container → (next tick) FINISHED → media_publish → permalink → media deleted
 // Authenticated API (Bearer RELAY_KEY): PUT/DELETE /media/<key>, PUT /ig-token, GET /status, GET|PUT /queue, POST /pause|/resume
 // Comments (10-15, owner-approved auto-replies; the HQ does the thinking): GET /comments?days=N, POST /comments/reply {commentId, message}
-// Public: GET/HEAD /m/<key>.mp4
+// Public: GET/HEAD /m/<key>.mp4 (reels) and /m/<key>.jpg (carousel slides; a queue item {type:"carousel", keys:[...]} posts them as one carousel)
 
 const GRAPH = "https://graph.instagram.com/v25.0";
 const CH = 1.5 * 1024 * 1024;
@@ -103,11 +103,11 @@ async function tick(env, origin, s) {   // runs INSIDE the Durable Object (s = t
           await persist();   // audit H2: save "posted" the moment it is true, before anything else can fail
           const p = await ig("GET", done.id, { fields: "permalink" }, tok.token).catch(() => ({}));
           mark(it, { permalink: p.permalink || null });
-          await s.dropMedia(it.key);
+          for (const k of (it.keys || [it.key])) await s.dropMedia(k);
           await log(s, `POSTED ${it.title} → ${p.permalink || done.id}`);
         } else if (st.status_code === "PUBLISHED") {   // audit H2: it already went live (the publish answer was lost) — never "failed"
           mark(it, { status: "posted", postedAt: Date.now(), tries: 0 });
-          await s.dropMedia(it.key);
+          for (const k of (it.keys || [it.key])) await s.dropMedia(k);
           await log(s, `POSTED ${it.title} (container already published)`);
         } else if (st.status_code === "ERROR" || st.status_code === "EXPIRED" || Date.now() - it.startedAt > 3 * 3600e3) {
           mark(it, { status: "failed", error: `${st.status_code}: ${st.status || "timed out"}` });
@@ -115,6 +115,14 @@ async function tick(env, origin, s) {   // runs INSIDE the Durable Object (s = t
         }
       } else if (it.status === "queued" && !started && it.at <= Date.now()) {
         if (Date.now() - it.at > 12 * 3600e3) { it.status = "skipped"; await log(s, `SKIPPED ${it.title}: more than 12 h late`); continue; }
+        if (it.type === "carousel") {   // 10-19 owner: 2 carousels a day — one image item per slide (JPEG), then one CAROUSEL container
+          const kids = [];
+          for (const k of it.keys) kids.push((await ig("POST", `${uid}/media`, { image_url: `${origin}/m/${k}`, is_carousel_item: "true" }, tok.token)).id);
+          const c = await ig("POST", `${uid}/media`, { media_type: "CAROUSEL", children: kids.join(","), caption: Array.from(it.caption).slice(0, 2200).join("") }, tok.token);
+          mark(it, { status: "processing", container: c.id, startedAt: Date.now(), tries: 0 });
+          started = true; await log(s, `carousel container ${c.id} (${kids.length} slides) for ${it.title}`);
+          continue;
+        }
         const c = await ig("POST", `${uid}/media`, { media_type: "REELS", video_url: `${origin}/m/${it.key}`, caption: Array.from(it.caption).slice(0, 2200).join(""),
           share_to_feed: "true", thumb_offset: String(it.thumbMs ?? 1500),
           ...(it.noAiFlag ? {} : { is_ai_generated: "true" }),   // AI-info label (API param per Meta changelog 06-2026)
