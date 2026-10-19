@@ -173,6 +173,48 @@ def learn(path, secs, f):
     except Exception as e:
         log(f"learn failed: {e}"); return None
 
+IMG_DEST = {"cover": "library/carousel-covers", "cref": "library/research/carousel-refs"}   # 10-19 owner: photos sent on Telegram
+def images(it):
+    """Owner-sent photos / Pinterest image links → carousel cover library (or design references), each with a short AI description."""
+    kind = it["kind"]; dest = IMG_DEST[kind]; os.makedirs(dest, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
+    srcs = [("file", f) for f in it.get("files", [])] + [("url", u) for u in it.get("urls", [])]
+    for kind_, src in srcs:
+        try:
+            with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "library")) as d:
+                if kind_ == "file":
+                    req = urllib.request.Request(f"{url}/api/tgfile?file_id={src['file_id']}", headers={"Authorization": f"Bearer {key}", "User-Agent": "decodeher-pin-intake/1.0"})
+                    raw = os.path.join(d, "in.img"); open(raw, "wb").write(urllib.request.urlopen(req, timeout=120).read())
+                else:
+                    subprocess.run(["uv", "run", "-q", "--with", "gallery-dl", "gallery-dl", "-D", d, "--range", "1", src], capture_output=True, timeout=300)
+                    raw = next(iter(sorted(glob.glob(f"{d}/*.jpg") + glob.glob(f"{d}/*.png") + glob.glob(f"{d}/*.webp"))), None)
+                    if not raw:   # a video pin: use a sharp frame from it as the picture
+                        vid = next(iter(sorted(glob.glob(f"{d}/*.mp4") + glob.glob(f"{d}/*.m3u8"))), None)
+                        if not vid:
+                            subprocess.run(["uv", "run", "-q", "--with", "gallery-dl", "--with", "yt-dlp", "gallery-dl", "-o", "extractor.pinterest.videos=ytdl", "-D", d, "--range", "1", src], capture_output=True, timeout=300)
+                            vid = next(iter(sorted(glob.glob(f"{d}/*.mp4"))), None)
+                        if not vid: raise ValueError("no image or video at that link")
+                        raw = os.path.join(d, "frame.jpg"); subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1.0", "-i", vid, "-frames:v", "1", "-q:v", "2", raw], check=True)
+                jpg = os.path.join(d, "img.jpg"); subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", raw, "-q:v", "2", jpg], check=True)
+                what = ("a photo to use as the cover of an Instagram carousel for men about dating psychology (note subject, face, mood, setting, framing)"
+                        if kind == "cover" else "a carousel slide/cover from another creator, saved as a design reference (note layout, text style, image, colours)")
+                prompt = (f"Read the image {jpg}. It is {what}. Answer with JSON only: "
+                          '{"slug": "3-5 lowercase words joined by hyphens, no names", "description": "one plain sentence", "tags": ["5-8 short tags"]}')
+                out = subprocess.run([os.environ.get("CLAUDE_BIN", "claude"), "-p", prompt, "--model", "haiku", "--allowedTools", "Read", "--output-format", "text"],
+                                     capture_output=True, text=True, timeout=120).stdout
+                m = re.search(r"\{.*\}", out, re.S); j = json.loads(m.group(0)) if m else {}
+                slug = re.sub(r"[^a-z0-9]+", "-", str(j.get("slug", "")).lower()).strip("-")[:40] or "image"
+                name = f"{time.strftime('%Y%m%d-%H%M%S')}-{slug}"; shutil.copy(jpg, f"{dest}/{name}.jpg")
+                json.dump({"from": "owner via Telegram", "at": time.strftime("%F %T"), "caption": (src.get("caption", "") if kind_ == "file" else src),
+                           "description": j.get("description", ""), "tags": j.get("tags", []), "used_by": None}, open(f"{dest}/{name}.json", "w"), indent=1, ensure_ascii=False)
+                got.append(f"{slug} — {j.get('description', '')[:80]}")
+        except Exception as e: bad.append(str(e)[:60])
+    label = "carousel cover" if kind == "cover" else "carousel design reference"
+    lines = [f"🖼 <b>{len(got)} {label}{'s' if len(got) != 1 else ''}</b> saved."] + [f"• {g}" for g in got]
+    if bad: lines += ["", f"⚠️ Couldn't save ({len(bad)}):"] + [f"• {b}" for b in bad]
+    lines += ["", f"Library: {len(glob.glob(dest + '/*.jpg'))} images."]
+    hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
+    log(f"Carousel images · {len(got)} {label}s saved, {len(bad)} failed")
+
 def research(it):
     os.makedirs(RESEARCH, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
     for f in it.get("files", []):
@@ -204,6 +246,7 @@ def run():
     reg = load_reg(); index(reg)
     for it in box["items"]:
         if it.get("kind") == "research": research(it); continue
+        if it.get("kind") in IMG_DEST: images(it); continue
         if it.get("kind") == "tip":   # 10-18: YouTube / Instagram growth advice the owner shared → fact-checked (tools/tip_intake.py)
             import tip_intake   # one source per item (HQ splits a message with several links), so one reply per video
             res = tip_intake.handle(it, lambda t: hq("POST", "/api/inbox", {"id": it["id"], "state": "working", "text": t}))

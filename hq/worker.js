@@ -133,7 +133,7 @@ function unfinished(snap) {
 const PIN_RE = /https?:\/\/(?:pin\.it\/[A-Za-z0-9]+|(?:[a-z]{2,3}\.)?(?:www\.)?pinterest\.[a-z.]+\/pin\/[A-Za-z0-9_-]+\/?)/gi;
 const pinLinks = (t) => [...new Set((String(t).match(PIN_RE) || []).map((u) => u.replace(/\/+$/, "")))].slice(0, 30);
 const pinKind = (t) => /\b(ai|girl|hook|woman|women|model|dance|dancing)\b/i.test(t) ? "hook" : /\b(dark|psych\w*|story|clip|scene|b-?roll)\b/i.test(t) ? "dark" : null;
-const KIND_SAY = { hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the Zoltium study (research only, never used in our reels)",
+const KIND_SAY = { cover: "carousel covers", cref: "carousel design references", hook: "AI-girl hooks", dark: "dark-psychology clips", research: "the viral bank (I watch it and learn from it)",
   tip: "a growth-tip fact-check" };
 // 10-18 owner: YouTube videos / Instagram reels about growing on Instagram → fact-checked growth tips (laptop tools/tip_intake.py)
 const TIP_RE = /https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?[^\s]*v=|shorts\/|live\/)[\w-]{6,}[^\s]*|youtu\.be\/[\w-]{6,}[^\s]*|(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(?:reels?|p|tv)\/[\w-]{5,}[^\s]*)/gi;
@@ -275,6 +275,9 @@ export class HQ extends DurableObject {
     // owner 10-18: saved reels (e.g. @zoltium) sent as video files → the laptop's research library, never used in our reels
     const vid = m.video || (m.document && /^video\//.test(m.document.mime_type || "") ? m.document : null);
     if (vid) return this.onVideo(m, vid);
+    // owner 10-19: photos (carousel covers / design references) → ask what they are, the laptop stores them in the right library
+    const ph = (m.photo && m.photo.length) ? m.photo[m.photo.length - 1] : (m.document && /^image\//.test(m.document.mime_type || "") ? m.document : null);
+    if (ph) return this.onPhoto(m, ph);
     const text = String(m.text || m.caption || "").trim();
     if (!text) return say(this.env, "I can only read text for now. Type what you'd like, or /help.");
     const cmd = text.startsWith("/") ? text.split(/\s+/)[0].slice(1).split("@")[0].toLowerCase() : null;
@@ -315,7 +318,20 @@ export class HQ extends DurableObject {
       return r;
     }
     return say(this.env, `📥 Got ${n}. What are they?`, { reply_markup: { inline_keyboard: [[
-      { text: "💃 AI girl hook", callback_data: `pin:hook:${id}` }, { text: "🌑 Dark-psychology clip", callback_data: `pin:dark:${id}` }]] } });
+      { text: "💃 AI girl hook", callback_data: `pin:hook:${id}` }, { text: "🌑 Dark-psychology clip", callback_data: `pin:dark:${id}` }],
+      [{ text: "🖼 Carousel cover", callback_data: `pin:cover:${id}` }]] } });
+  }
+  async onPhoto(m, p) {
+    const inbox = await this.get("pinInbox", []), group = m.media_group_id ? String(m.media_group_id) : null;
+    const file = { file_id: p.file_id, uid: p.file_unique_id || "", name: p.file_name || "", size: p.file_size || 0, caption: String(m.caption || "").slice(0, 500) };
+    const same = group && inbox.find((x) => x.group === group && ["queued", "asking"].includes(x.state));
+    if (same) { same.files.push(file); await this.put("pinInbox", inbox); return { ok: true }; }   // one question per album
+    const id = newId("i");
+    inbox.push({ id, urls: [], files: [file], kind: null, group, state: "asking", at: Date.now() });
+    await this.put("pinInbox", inbox.slice(-300));
+    await this.note("activity", "Owner sent a photo");
+    return say(this.env, "🖼 Got the picture. What is it?", { reply_markup: { inline_keyboard: [[
+      { text: "🖼 Carousel cover", callback_data: `pin:cover:${id}` }, { text: "📐 Carousel design reference", callback_data: `pin:cref:${id}` }]] } });
   }
   async onVideo(m, v) {
     if (Number(v.file_size || 0) > 20e6) return say(this.env, "⚠️ That video is over 20 MB, and Telegram won't let the bot download files that big. Please send a shorter or smaller copy.");
@@ -328,7 +344,7 @@ export class HQ extends DurableObject {
     await this.put("pinInbox", inbox.slice(-300));
     await this.note("activity", `Owner sent a video${kind ? ` (${KIND_SAY[kind]})` : ""}`);
     if (!kind) return say(this.env, "🎞 Got the video. What is it for?", { reply_markup: { inline_keyboard: [[
-      { text: "📚 Zoltium study", callback_data: `pin:research:${id}` }, { text: "💡 Growth tip", callback_data: `pin:tip:${id}` }]] } });
+      { text: "🧠 Learn from it (viral bank)", callback_data: `pin:research:${id}` }, { text: "💡 Growth tip", callback_data: `pin:tip:${id}` }]] } });
     const r = await say(this.env, `📥 Got it → <b>${KIND_SAY[kind]}</b>.\n⏳ The laptop picks it up within a few minutes…`);
     const box = await this.get("pinInbox", []), it = box.find((x) => x.id === id); if (it && r.ok) { it.msg = r.result.message_id; await this.put("pinInbox", box); }
     return r;
@@ -377,14 +393,14 @@ export class HQ extends DurableObject {
   async onButton(cq) {
     const parts = String(cq.data || "").split(":"), answer = (text) => tg(this.env, "answerCallbackQuery", { callback_query_id: cq.id, text });
     if (parts[0] === "pin") {   // which library the links go to
-      const kind = ["hook", "dark", "research", "tip"].includes(parts[1]) ? parts[1] : "dark", inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === parts[2]);
+      const kind = ["hook", "dark", "research", "tip", "cover", "cref"].includes(parts[1]) ? parts[1] : "dark", inbox = await this.get("pinInbox", []), it = inbox.find((x) => x.id === parts[2]);
       if (!it) return answer("I can't find those links any more.");
       if (it.state !== "asking") return answer("Already on it.");
       it.kind = kind; it.state = "queued"; await this.put("pinInbox", inbox);
       const chat = cq.message && cq.message.chat && cq.message.chat.id, mid = cq.message && cq.message.message_id;
       if (chat && mid) await tg(this.env, "editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } });
       await answer(KIND_SAY[kind]);
-      const n = it.urls.length || (it.files || []).length, what = it.urls.length ? "link" : "video";
+      const n = it.urls.length || (it.files || []).length, what = it.urls.length ? "link" : (it.id || "").startsWith("i") ? "picture" : "video";
       const r = await say(this.env, `👍 ${n} ${what}${n > 1 ? "s" : ""} → <b>${KIND_SAY[kind]}</b>.\n⏳ Waiting for the factory to pick them up (within a few minutes)…`);
       if (r.ok) { const box = await this.get("pinInbox", []), x = box.find((y) => y.id === it.id); if (x) { x.msg = r.result.message_id; await this.put("pinInbox", box); } }
       return r;
