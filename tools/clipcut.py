@@ -64,6 +64,9 @@ for n, s in enumerate(shots):
     t0 = 0.0 if n == 0 else s["t"]; t1 = HOOK_END if (n == 0 and HOOK_END) else shots[n + 1]["t"]; d = round(t1 - t0, 3)
     p = pick.get(str(n))
     out = f"{S}/{n:02d}.mp4"
+    if not p and prev and _hk and prev.get("file") == pick["0"]["file"]:   # 10-19 owner: the AI-woman hook NEVER continues under captions —
+        _nx = next((pick[str(m)] for m in range(n + 1, len(shots)) if pick.get(str(m)) and shots[m]["q"] != "OUTRO"), None)   # borrow the next line's clip
+        if _nx: p = dict(_nx)
     if not p and prev:   # no clip for this line (owner 10-14: black gaps look like a bug) — the previous shot simply CONTINUES
         p = dict(prev); p["start"] = round(prev["start"] + prev_d, 2)
         # 10-16: a continued clip can run into its own fade-to-black ending (2 s of black under the closing words) — if the
