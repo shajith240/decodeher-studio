@@ -28,9 +28,23 @@ prompt = ("Choose the cover photo for an Instagram carousel for men about dating
           "woman → warm, wholesome, soft, traditional; attraction / signs she likes you → flirty, playful, inviting eye contact. Prefer an "
           "OWNER PICK when it fits as well as a pool one. Reply with JSON only: {\"pick\": \"<exact name>\", \"why\": \"<short>\"}.\n\n"
           f"Title: {title}\nPoints: {pts}\n\nCandidates (name | source | look | tags):\n{rows}")
-out = subprocess.run([os.environ.get("CLAUDE_BIN", "claude"), "-p", prompt, "--model", "haiku", "--output-format", "text"], capture_output=True, text=True, timeout=300).stdout
-try: j = json.loads(re.search(r"\{.*\}", out, re.S).group(0)); c = next(x for x in cands if x["name"] == j["pick"])
-except Exception: sys.exit(f"no valid pick: {out[:300]}")
+import cv2
+_cas = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+def has_face(src):   # 10-19 owner: covers show the girl's FACE (like the hook) — a back / silhouette clip is never a cover
+    for t in (0.5, 1.5, 2.5, 3.5):
+        f = f"/tmp/pick_face_{os.getpid()}.jpg"
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(t), "-i", src, "-frames:v", "1", "-pix_fmt", "yuvj420p", "-q:v", "3", f], capture_output=True)
+        im = cv2.imread(f)
+        if im is not None and len(_cas.detectMultiScale(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY), 1.1, 6, minSize=(80, 80))): return True
+    return False
+for _try in range(4):
+    out = subprocess.run([os.environ.get("CLAUDE_BIN", "claude"), "-p", prompt, "--model", "haiku", "--output-format", "text"], capture_output=True, text=True, timeout=300).stdout
+    try: j = json.loads(re.search(r"\{.*\}", out, re.S).group(0)); c = next(x for x in cands if x["name"] == j["pick"])
+    except Exception: sys.exit(f"no valid pick: {out[:300]}")
+    if c["kind"] == "owner" or has_face(c["src"]): break
+    print(f"no clear face in {c['name']}, asking again"); cands = [x for x in cands if x is not c]
+    rows = "\n".join(f'{x["name"]} | {"OWNER PICK" if x["kind"] == "owner" else "pool"} | {x["look"][:160]} | {", ".join(x["tags"][:6])}' for x in cands)
+    prompt = prompt.split("Candidates (name")[0] + f"Candidates (name | source | look | tags):\n{rows}"
 
 dst = f"brain/content/carousels/{spec['slug']}-cover.jpg"
 if c["kind"] == "owner":
