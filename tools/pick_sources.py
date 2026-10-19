@@ -1,4 +1,5 @@
 """Pick the next sources for new reels (owner 10-19). Order:
+  0. videos the OWNER sent on Telegram (viral-bank/owner.jsonl), always first
   1. the VIRAL BANK (brain/research/viral-bank/yt-tiktok.jsonl + ig.jsonl): reels/shorts not yet used (used_by null), not marked
      off-niche (fits_us false), with a real script (>= 60 words of transcript), >= 1M views (or estimate), biggest first
   2. ONLY when the bank has run dry: the Dark Needle brain (Obsidian vault "YouTube Brains/The Dark Needle/Videos"), one KEY IDEA
@@ -11,7 +12,7 @@ Usage:
 import glob, json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")); os.chdir(ROOT)
-BANK = ["brain/research/viral-bank/yt-tiktok.jsonl", "brain/research/viral-bank/ig.jsonl"]
+BANK = ["brain/research/viral-bank/yt-tiktok.jsonl", "brain/research/viral-bank/ig.jsonl", "brain/research/viral-bank/owner.jsonl"]
 DN = os.path.expanduser("~/Documents/YouTube Brains/The Dark Needle/Videos")
 DN_USED = "brain/research/viral-bank/darkneedle-used.json"
 MIN_VIEWS = 1_000_000
@@ -35,9 +36,10 @@ def bank_pool():
     for p in BANK:
         for r in rows(p):
             text = r.get("transcript_en") or r.get("transcript") or ""
-            if r.get("used_by") or r.get("fits_us") is False or len(text.split()) < 60 or views(r) < MIN_VIEWS: continue
+            own = bool(r.get("owner_pick"))   # 10-19: videos the owner sent on Telegram — no view minimum, and they go first
+            if r.get("used_by") or r.get("fits_us") is False or len(text.split()) < (15 if own else 60) or (views(r) < MIN_VIEWS and not own): continue
             if r.get("type") == "carousel": continue
-            out.append({"source": "bank", "url": r["url"], "views": views(r), "title": r.get("title") or r.get("hook"),
+            out.append({"source": "owner" if own else "bank", "url": r["url"], "views": 10**12 if own else views(r), "title": r.get("title") or r.get("hook"),
                         "by": r.get("channel") or r.get("account"), "text": text})
     return sorted(out, key=lambda x: -x["views"])
 

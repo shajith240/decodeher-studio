@@ -158,6 +158,21 @@ def add_link(url, kind, reg, ui, total_n, progress, added, dups, bad, done_lines
 
 RESEARCH = "library/research/zoltium"   # 10-18 owner: saved @zoltium reels for the craft study — never used in our reels
 RDRIVE = "gdrive:DecodeHer/research/zoltium"   # owner 10-18: "store it directly in the Drive" — the laptop keeps no copy
+OWNER_BANK = "brain/research/viral-bank/owner.jsonl"   # 10-19: videos the owner sent — tools/pick_sources.py takes these FIRST
+def learn(path, secs, f):
+    """Transcribe an owner-sent video and add it to the viral bank as an owner pick. Returns the Telegram line, or None."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import tip_intake
+        text = tip_intake.whisper(path)
+        if len(text.split()) < 15: return None   # no real speech (music/text-only reel): keep the Drive-only path
+        hook = re.split(r"(?<=[.?!])\s", text, 1)[0][:160]
+        row = {"platform": "telegram", "source": "owner", "url": f"{RDRIVE}/{os.path.basename(path)}", "caption": f.get("caption", ""),
+               "duration_s": round(secs, 1), "hook": hook, "transcript": text, "added": time.strftime("%F"), "used_by": None, "owner_pick": True}
+        open(OWNER_BANK, "a").write(json.dumps(row, ensure_ascii=False) + "\n")
+        return f"🧠 learned ({secs:.0f} s, {len(text.split())} words): “{hook}” → first in line for the next batch"
+    except Exception as e:
+        log(f"learn failed: {e}"); return None
+
 def research(it):
     os.makedirs(RESEARCH, exist_ok=True); url, key = secret("HQ_URL").rstrip("/"), secret("HQ_KEY"); got, bad = [], []
     for f in it.get("files", []):
@@ -169,13 +184,15 @@ def research(it):
             open(out, "wb").write(data)
             json.dump({"from": "owner via Telegram", "at": time.strftime("%F %T"), "caption": f.get("caption", ""), "name": f.get("name", "")}, open(out[:-4] + ".json", "w"), indent=1, ensure_ascii=False)
             secs = dur(out)
+            learned = learn(out, secs, f)   # 10-19 owner: "I send a video on Telegram, you watch it and learn from it" → viral bank, first in line
+            if learned: got.append(learned); mv = subprocess.run(["rclone", "move", RESEARCH, RDRIVE, "--include", os.path.basename(out)[:-4] + ".*", "-q"], capture_output=True, timeout=600); continue
             mv = subprocess.run(["rclone", "move", RESEARCH, RDRIVE, "--include", os.path.basename(out)[:-4] + ".*", "-q"], capture_output=True, timeout=600)
             if mv.returncode != 0 or os.path.exists(out): raise RuntimeError("Drive upload failed, kept on the laptop for now")
             got.append(f"{os.path.basename(out)} ({secs:.0f} s)")
         except Exception as e: bad.append(f"{f.get('name') or 'video'} ({str(e)[:60]})")
     ls = subprocess.run(["rclone", "lsf", RDRIVE, "--include", "*.mp4"], capture_output=True, text=True, timeout=120).stdout
     total = len([l for l in ls.splitlines() if l.strip()])
-    lines = [f"📚 <b>{len(got)} reel{'s' if len(got) != 1 else ''}</b> saved to Google Drive for the Zoltium study (DecodeHer/research/zoltium; never used in our reels)."] + [f"• {g}" for g in got]
+    lines = [f"📚 <b>{len(got)} video{'s' if len(got) != 1 else ''}</b> watched and saved (Google Drive DecodeHer/research). The ones with speech are in the viral bank, first in line for the next reels."] + [f"• {g}" for g in got]
     if bad: lines += ["", f"⚠️ Couldn't save ({len(bad)}):"] + [f"• {b}" for b in bad]
     lines += ["", f"Study library: {total} reels."]
     hq("POST", "/api/inbox", {"id": it["id"], "state": "done" if got else "failed", "text": "\n".join(lines)})
