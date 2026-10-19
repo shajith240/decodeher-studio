@@ -75,7 +75,7 @@ for n, s in enumerate(shots):
         if os.path.exists(_src) and _dark(_src, p["start"], d): p["start"] = p.get("orig", prev["start"])
     if not p:   # nothing before it either (very first shot): a black hold, the caption carries it
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "lavfi", "-i", f"color=c=black:s=1080x1920:r=30:d={d}", "-c:v", "libx264", "-pix_fmt", "yuv420p", out], check=True)
-    if p and not os.path.exists(f"{R}/clips/cand/{p['file']}") and os.path.exists(out):
+    if p and str(n) in pick and not os.path.exists(f"{R}/clips/cand/{p['file']}") and os.path.exists(out):   # 10-19: only the shot's OWN pick may reuse an old piece (a stale piece once brought the AI woman back under captions)
         # 10-17 remake (e.g. only a new hook clip): the downloads were cleaned up after the first render, so keep the piece
         # already cut from it (same shot timings: the voice is unchanged)
         segs.append(out); prev, prev_d = (p if "orig" in p else {**p, "orig": p["start"]}), d; continue
