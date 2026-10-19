@@ -31,3 +31,15 @@ OWNER-SHARED TIPS (10-18): inbox files named *-owner-tip-*.md come from videos t
 fact-checked (tools/tip_intake.py: verdict per claim + "For @thedecodeher" actions). Don't re-research them. Treat "works"/"partly"
 claims with a high-priority action as strong candidates: adopt them into a tactic + the playbook (or the next experiment if they
 conflict with what we do now), ignore "myth"/"outdated". In your 5 owner lines, say which shared tip you adopted and why.
+
+LEARNING LOOP (owner 10-19: "learn from what I share and evolve day by day"). Every run ALSO:
+a) Read the rows added since the last run to brain/research/viral-bank/owner.jsonl (videos/links the owner shared — the strongest
+   signal of what he wants), any new brain/research/channels/*/playbook.md, and `python3 tools/pick_sources.py --left`.
+b) Compare OUR posts in performance.md by source (each reel's draft names its source URL + views in brain/content/drafts/viral*.md),
+   by hook pattern, by length and by closing line: which kinds of sources and hooks give us the most views, watch time, saves.
+c) Rewrite brain/growth/content-rules.md, the living rulebook every script writer must follow (max ~60 lines): winning hook
+   patterns with real first lines, best length and number of points, topics ranked, what to stop doing, what the owner's
+   shares are teaching us — every rule with its evidence (our numbers or a source with views). Keep the fixed rules: 95/5
+   remix of a proven post (same hook, points, order, examples; ours = "Listen" + closing line), AI-woman opener with no text.
+d) next-batch-plan.md: list the next sources from `python3 tools/pick_sources.py 8` (owner picks first, then the viral bank,
+   Dark Needle only if the bank is empty) and apply content-rules.md. Skip skits/street interviews (no narration to keep).
