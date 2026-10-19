@@ -83,9 +83,12 @@ if V3:
             _cl = float(_sp.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", os.path.join(R, cfg["hookClip"]["file"])]).decode())
             _max = min(4.0, _cl - float(cfg["hookClip"].get("start", 0)) - 0.1)
             cands = [i for i in range(1, len(sh)) if sh[i]["q"] != "OUTRO" and 2.5 <= sh[i]["t"] <= _max]
+            if not cands:   # 10-19: no shot starts in 2.5-4 s (first sentence ended early) — cut at the first one after 1.5 s, never leave it unset
+                cands = [i for i in range(1, len(sh)) if sh[i]["q"] != "OUTRO" and 1.5 <= sh[i]["t"] <= _max]
             ends = [i for i in cands if re.search(r"[.?!…]['\"”]?\s*$", sh[i - 1].get("say", ""))]
             k = (ends or cands or [None])[-1]
             if k: HOOK_END = round(sh[k]["t"], 3)
+            elif len(sh) > 1: HOOK_END = round(sh[1]["t"], 3)   # 10-19: no cut point — the hook runs the whole first shot, so captions wait for it
         except Exception as e: print("hook end: kept the default", e)
         if HOOK_END: cfg["hookEnd"] = HOOK_END
         else: cfg.pop("hookEnd", None)
@@ -107,7 +110,7 @@ if V3:
     if card:   # readable from frame 0 (only a 0.15 s scale pop, no fade-in); the word captions wait until the card has gone
         tl3 += ('  /*v3*/tl.fromTo("#v3card", { scale: 0.96 }, { scale: 1, duration: 0.15, ease: "power2.out" }, 0);'
                 ' tl.to("#v3card", { opacity: 0, duration: 0.2, ease: "power2.in" }, 2.0);'
-                ' tl.set("#caps", { opacity: 0 }, 0); tl.set("#caps", { opacity: 1 }, ' + (str(HOOK_END) if HOOK_END else "2.2") + ');/*/v3*/\n')
+                ' tl.set("#caps", { opacity: 0 }, 0); tl.set("#caps", { opacity: 1 }, ' + (str(round(HOOK_END + 0.15, 3)) if HOOK_END else "2.2") + ');/*/v3*/\n')
     if isinstance(cfg.get("rehookAt"), int):   # the re-hook line: a quick 0.15 s push-in on the film that relaxes back, and a faint flash
         i = cfg["rehookAt"]
         tl3 += (f'  /*v3*/tl.fromTo("#bg", {{ scale: 1 }}, {{ scale: 1.06, duration: 0.15, ease: "power2.out", immediateRender: false }}, T.vo[{i}]);'
