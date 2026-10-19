@@ -74,6 +74,9 @@ if V3:
     if title: title = title[0].upper() + title[1:].lower() if title.isupper() else title[0].upper() + title[1:]
     ts = 124 if len(title) <= 26 else 108 if len(title) <= 38 else 94           # max 2 balanced lines at ~2x the old 60 px title
     bs = 76 if len(bubble) <= 22 else 68 if len(bubble) <= 44 else 64          # her message, never under 64 px
+    if not cfg.get("hookClip") and RC.get("frame") == "lens":   # 10-19 safety net: a reel.json rewritten in a race lost its hook — pick it again
+        import subprocess as _sp0; _sp0.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "pick_hook.py"), R, "--force"], timeout=300)
+        cfg = json.load(open(f"{R}/reel.json"))
     HOOKV = bool(cfg.get("hookClip"))   # 10-16 owner: no text on the woman during the hook — title in the top band, captions wait
     HOOK_END = None
     if HOOKV:   # 10-16 owner: the hook shot is 2.5-4 s (not chopped, not 7-10 s), ending where a sentence ends; clipcut.py uses the same point
