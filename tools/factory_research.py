@@ -25,7 +25,7 @@ for k, q in new.items():
 json.dump(S, open(f"{R}/shots.json", "w"), indent=1, ensure_ascii=False)
 print("new searches:", new, flush=True)
 lines = ",".join(str(n) for n in weak)
-env = dict(os.environ, LINES=lines)
+env = dict(os.environ, LINES=lines, PLAIN="1")   # 10-19: plain "<scene> animation" search for the weak lines
 subprocess.run(["uv", "run", "-q", "--with", "gallery-dl", "--with", "yt-dlp", "--with", "secretstorage", "python", "tools/pinfetch.py", R, "10"], env=env, check=True)
 subprocess.run(["uv", "run", "-q", "--python", "3.11", "--with", "transformers", "--with", "torch", "--with", "pillow", "python", "-W", "ignore",
                 "tools/clipsheet.py", R], env=dict(env, HF_HUB_OFFLINE="1"), check=True)

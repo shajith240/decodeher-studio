@@ -20,7 +20,9 @@ for n, s in enumerate(shots):
     if again and n not in {int(x) for x in again.split(",")}: continue
     if not again and glob.glob(f"{d}/*.mp4"): continue
     before = set(glob.glob(f"{d}/*.mp4"))
-    q = urllib.parse.quote(f'{s["q"]} dark psychology')
+    # 10-19 owner ("why isn't it pulling clips?"): the second search (factory_research, env PLAIN=1) drops the moody suffix — for literal
+    # lines ("man doing push ups") "dark psychology" returns moody clips that don't show the action, and the judges reject them all
+    q = urllib.parse.quote(f'{s["q"]} animation' if os.environ.get("PLAIN") else f'{s["q"]} dark psychology')
     # --download-archive: a pin already fetched for an earlier line is not fetched again (owner 10-14: duplicates)
     subprocess.run(["gallery-dl", *COOKIES, "-o", "extractor.pinterest.videos=ytdl",
                     "--range", f"1-{N * 4}", "--download-archive", f"{R}/clips/seen.sqlite3", "--filter", "extension in ('mp4','m3u8')", "-D", d,
