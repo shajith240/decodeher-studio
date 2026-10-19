@@ -40,6 +40,10 @@ html, body {{ width: 1080px; height: 1350px; overflow: hidden; background: #0f06
 def headline(t): return re.sub(r"\[([^\]]+)\]", lambda m: "<b>" + m.group(1).replace(" ", "&nbsp;") + "</b>", e(t))   # gold phrases never break across lines
 pages = []
 c = spec["cover"]
+# owner 10-19: highlights carry the promise — at most 2, ONE word each, never next to each other (number + key action/outcome)
+_hl = re.findall(r"\[([^\]]+)\]", c["headline"])
+if len(_hl) > 2 or any(" " in w.strip() for w in _hl) or re.search(r"\]\s*\[", c["headline"]):
+    sys.exit(f"cover headline highlights break the rule (max 2 single words, not adjacent): {c['headline']}")
 pages.append(f'<div class="cover"><img id="ph" src="file://{ROOT}/{c["image"]}">'
              f'<div class="fade" id="fade"></div><div class="below" id="below"></div><div class="txt"><h1>{headline(c["headline"])}</h1>' + (f'<div class="sub">{e(c["sub"])}</div>' if c.get("sub") else "") + "</div></div>")
 for i, pts in enumerate(spec["slides"]):
@@ -59,19 +63,32 @@ def face_box(img):
 
 # place the photo so the face (incl. chin) sits above the headline with a gap; shrink the headline if the photo can't move enough
 PLACE = """async (face) => {
+  // 10-19 owner: the face is centred in the photo area above the headline, the whole head (with hair) stays in frame,
+  // the chin never reaches the text. The photo zooms a little (max 1.5x) when that is the only way to centre the face.
   const img = document.getElementById('ph'); if (!img) return null; await img.decode().catch(() => {});
-  const s = 1080 / img.naturalWidth, H = img.naturalHeight * s, h1 = document.querySelector('.cover h1');
-  for (let k = 0; k < 8; k++) {
-    const t = document.querySelector('.cover .txt').getBoundingClientRect().top;
-    const fb = face ? (face[1] + face[3] * 1.35) * s : 0.45 * H;   // face bottom incl. chin and a little neck
-    let top = Math.min(0, (t - 50) - fb); top = Math.max(top, (t + 30) - H);
-    img.style.top = top + 'px';
-    const fade = document.getElementById('fade'); fade.style.top = Math.max(0, t - 380) + 'px'; fade.style.height = '420px';
-    document.getElementById('below').style.top = (t + 40) + 'px';
-    const lines = Math.round(h1.getBoundingClientRect().height / parseFloat(getComputedStyle(h1).lineHeight));
-    // owner 10-19: the headline size and text area are FIXED — a title that doesn't fit is rewritten shorter, never shrunk
-    return { top, t, lines, faceClear: !face || top + fb <= t - 40, ...(lines > 4 ? { warn: 'title over 4 lines: write it shorter' } : {}) };
+  const h1 = document.querySelector('.cover h1'), t = document.querySelector('.cover .txt').getBoundingClientRect().top;
+  const area = t - 40, W0 = img.naturalWidth, H0 = img.naturalHeight;
+  let z = 1, s, top, left;
+  for (; z <= 1.25; z += 0.05) {
+    s = 1080 / W0 * z; const W = W0 * s, H = H0 * s;
+    if (!face) { left = (1080 - W) / 2; top = Math.min(0, Math.max(area - H, -0.12 * H)); break; }
+    const [fx, fy, fw, fh] = face.map((v) => v * s), headTop = fy - 0.45 * fh, chin = fy + 1.25 * fh, cx = fx + fw / 2;
+    top = area * 0.48 - (headTop + chin) / 2;                       // head centred a touch above the middle of the photo area
+    top = Math.min(top, 40 - headTop);                              // hair stays in frame
+    top = Math.max(top, -(chin - (area - 20)));                     // ...but the chin stays above the text
+    top = Math.min(0, Math.max(top, area + 80 - H));                // the photo covers the area
+    left = Math.min(0, Math.max(540 - cx, 1080 - W));               // face centred left-right as far as the photo allows
+    if (top + headTop >= 20 && top + chin <= area - 10) break;   // whole head in frame + chin clear: no more zoom (centring left-right is a bonus)
   }
+  if (z > 1.25 && face) {   // nothing fully fits (hair already cut in the source): fall back to no zoom, best vertical placement
+    z = 1; s = 1080 / W0; const H = H0 * s, [fx, fy, fw, fh] = face.map((v) => v * s), headTop = fy - 0.45 * fh, chin = fy + 1.25 * fh;
+    top = Math.min(0, Math.max(Math.min(area * 0.48 - (headTop + chin) / 2, 40 - headTop), -(chin - (area - 20)), area + 80 - H)); left = 0;
+  }
+  img.style.width = (W0 * s) + 'px'; img.style.top = top + 'px'; img.style.left = left + 'px';
+  const fade = document.getElementById('fade'); fade.style.top = Math.max(0, t - 380) + 'px'; fade.style.height = '420px';
+  document.getElementById('below').style.top = (t + 40) + 'px';
+  const lines = Math.round(h1.getBoundingClientRect().height / parseFloat(getComputedStyle(h1).lineHeight));
+  return { zoom: +z.toFixed(2), top: Math.round(top), left: Math.round(left), lines, ...(lines > 4 ? { warn: 'title over 4 lines: write it shorter' } : {}) };
 }"""
 
 async def main():

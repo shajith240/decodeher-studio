@@ -2,10 +2,14 @@
  "slug": "c2-girls-to-avoid",
  "source": "manly_pinnacle, '6 types of girls you should stay away from', 2,369 likes, https://www.instagram.com/p/DdMMN8vmw71/ (95/5; his post lists 5 types + an ad slide, so ours says 5)",
  "cover": {
-  "image": "brain/content/carousels/c2-cover.jpg",
+  "image": "brain/content/carousels/c2-girls-to-avoid-cover.jpg",
   "focus": "50% 20%",
-  "headline": "5 types of [girls] you should stay away from",
-  "sub": "(before they wreck your life)"
+  "headline": "[5] types of girls you should stay [away] from",
+  "sub": "(before they wreck your life)",
+  "picked": {
+   "src": "library/hook-pool/ai/ai-bored-attitude-sports-event-105375.mp4",
+   "why": "Unimpressed attitude, eyeroll-vibe, pouty expression—perfect opener for 'types to avoid.' Bold and scroll-stopping without trying."
+  }
  },
  "slides": [
   [
