@@ -52,6 +52,8 @@ Write the file {os.path.join(ROOT, out)}. Then reply with one line per reel: "<u
                         "--output-format", "text"], capture_output=True, text=True, timeout=1800)
     if not os.path.exists(out): log(f"no draft written ({(r.stdout or r.stderr)[-160:]})"); return
     used = re.findall(r"<!-- source:[^>]*?(https?://[^\s)]+)", open(out).read())   # the draft's own source lines (the reply format varies)
+    pol = subprocess.run([sys.executable, "tools/script_polish.py", out], capture_output=True, text=True, timeout=2000)   # 10-26: narration editor, mandatory
+    if pol.returncode != 0: log(f"draft v{k} not voiced: narration editor failed ({(pol.stdout + pol.stderr)[-160:]})"); return
     mk = subprocess.run([sys.executable, "tools/new_reels_v3.py", out, f"v{k}"], capture_output=True, text=True, timeout=1800)
     if mk.returncode != 0: log(f"batch v{k} failed: {mk.stderr[-200:]}"); return
     marks = [f"{u.rstrip('.,)')}=v{k}" for u in used if any(u.rstrip('.,)') == s["url"] for s in srcs)]

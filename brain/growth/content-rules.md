@@ -15,3 +15,6 @@ Started 2026-10-19. Evidence so far: owner rule + viral bank (81 YouTube Shorts,
 - Length 39-55 s: no pattern. Closing line: no data yet (send-vs-save test pending). Best shares 77/1k on "why chasing fails".
 - Owner share (robertmckeaveney reel): hook > build-up > pay-off, same as our format; keep the answer for the end. No views known, so a structure check, not a source.
 - Stop doing: topics built on texting words; hooks that only describe her with no viewer move; moves that make her insecure.
+5. (owner 10-26) 95/5 copies the IDEAS, never the format. A text-screenshot or on-screen-list source still becomes spoken narration:
+   every quoted text is framed in a full sentence ("If you text her '…', she'll …", "Instead, say '…'"), complete sentences linked
+   with so / because / but. tools/script_polish.py (the narration editor) runs on every draft before any voice is recorded.

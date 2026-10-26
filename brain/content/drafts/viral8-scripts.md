@@ -13,13 +13,14 @@ Only 5 usable sources in this pull, not 6. Number 05 is written for a male viewe
 ---
 ## 01 · Dark psychology #53 · "Six compliments"
 Here are six compliments that make a woman obsess over you. [pause] Listen.
-Number one. I've never seen anyone light up a room like you do. She has probably never heard that, and she'll be telling her mom about you.
-Number two. I can't get over how beautiful your smile is. No explanation needed. Say it and watch her blush.
-Number three. It's inspiring how passionate you are. It shows you actually listen to her.
-Number four. How do you always look so good? Simple, and very effective.
-Number five. You're not like any other girl I've met. Women love to feel special.
-Number six. I'm really proud of how hard you work. It goes beyond her looks, and she feels seen.
+Number one is "I've never seen anyone light up a room like you do." She has probably never heard that, so she'll be telling her mom about you.
+Number two is "I can't get over how beautiful your smile is." It needs no explanation, so just say it and watch her blush.
+Number three is "It's inspiring how passionate you are." It shows her that you actually listen to her.
+Number four is "How do you always look so good?" It's a simple line, but it works very well.
+Number five is "You're not like any other girl I've met." Women love to feel special, so this one lands.
+Number six is "I'm really proud of how hard you work." It goes beyond her looks, so she feels seen.
 [lower voice] Save this for the next time you talk to her.
+<!-- narration: framed 1, sentences 1, connectors 1, clear 1, content 1 -->
 <!-- source: datingwithgracie, 4.9M, https://www.instagram.com/reel/C_WuSTFsJYq/ (95/5: same 6 compliments, same order, same reasons) -->
 <!-- keyword: compliments for a girl -->
 <!-- arm: B save -->
@@ -34,10 +35,11 @@ caption tags="#complimentsforagirl #datingadviceformen #talkingtogirls" -->
 ---
 ## 02 · Dark psychology #54 · "Three questions, part 2"
 If you want a strong connection with a girl, ask her these three questions. [pause] Listen.
-The first question. When you're alone, what do you think about the most? It touches the hidden part of her heart. When she answers, hold her eyes and say: I want you to share all of it with me, without fear.
-The second question. What's something people never notice about you that you wish they would? It makes her feel special. Be honest and say: maybe I can be the first person who notices.
-The third question. If I gave you a feeling, which one would you choose? Whatever she says, listen closely, speak slowly, and tell her: I'll try to make you feel that every day.
+The first question is "When you're alone, what do you think about the most?" It touches the hidden part of her heart, so when she answers, hold her eyes and say "I want you to share all of it with me, without fear."
+The second question is "What's something people never notice about you that you wish they would?" It makes her feel special, so be honest and say "maybe I can be the first person who notices."
+The third question is "If I gave you a feeling, which one would you choose?" Whatever she says, listen closely and speak slowly, and then tell her "I'll try to make you feel that every day."
 [lower voice] Send this to the friend who never knows what to ask.
+<!-- narration: framed 1, sentences 1, connectors 1, clear 1, content 1 -->
 <!-- source: memestime.in, 7.9M, https://www.instagram.com/reel/DIToHPvSfYM/ (95/5: same 3 questions, same replies, same order; closing tag-line about "last thing" dropped, garbled) -->
 <!-- keyword: questions to ask a girl -->
 <!-- arm: A send -->
@@ -52,12 +54,13 @@ caption tags="#questionstoaskagirl #datingadviceformen #deepconversation" -->
 ---
 ## 03 · Dark psychology #55 · "Three signs she likes you"
 You can tell she likes you in three ways. [pause] Listen.
-The first sign. Her eyes soften when she looks at you.
-The second sign. Her eye contact lasts more than two seconds.
-The third sign. She backs away anyway. Even when she likes you, she can pull back. Maybe she's jealous, or her friends are watching, or she's nervous.
-Don't take that rejection personally. A lot of women won't say they're not ready. They say they're scared.
-So don't rush in. Wait, hold more eye contact, and let it happen.
+The first sign is that her eyes soften when she looks at you.
+The second sign is that her eye contact lasts more than two seconds.
+The third sign is that she backs away anyway. Even when she likes you, she can pull back, because maybe she's jealous, or her friends are watching, or she's nervous.
+So don't take that rejection personally, because a lot of women won't say they're not ready, but they will say they're scared.
+So don't rush in. Instead, wait, hold more eye contact, and let it happen.
 [lower voice] Save this for the next time she looks at you twice.
+<!-- narration: framed 1, sentences 1, connectors 1, clear 1, content 1 -->
 <!-- source: femalephilosophy, 10.5M, https://www.instagram.com/reel/DGNnlolAxqe/ (95/5: same signs, same reasons for backing away, same advice; garbled "third way" cleaned up to what the transcript shows) -->
 <!-- keyword: signs a girl likes you -->
 <!-- arm: B save -->
@@ -72,12 +75,13 @@ caption tags="#signsshelikesyou #datingadviceformen #eyecontact" -->
 ---
 ## 04 · Dark psychology #56 · "The big ask"
 Here's how women get what they want without ever seeming pushy. [pause] Listen.
-Step one. She asks for something big that can never be met. Say, your entire paycheck.
-Step two. She backs down and asks for what she wanted all along. Just a small part of it.
+Step one is that she asks for something big that you can never give, like your entire paycheck.
+Step two is that she backs down and asks for what she wanted all along, which is just a small part of it.
 Because the second ask sounds so reasonable next to the first, it's very easy to say yes.
-That's the whole move. A huge ask first, then the real one.
-Now you'll spot it, and you can decide on purpose.
+So that's the whole move, a huge ask first, and then the real one.
+Now you'll spot it, so you can decide on purpose.
 [lower voice] Send this to the friend who always says yes.
+<!-- narration: framed 1, sentences 1, connectors 1, clear 1, content 1 -->
 <!-- source: Kuldeep Singhania Shorts, 18.6M, https://www.youtube.com/shorts/1IxBTuN5-t0 (95/5: same paycheck example, same two-step ask; skit dialogue cut to the explanation, translated to plain English) -->
 <!-- keyword: how women get what they want -->
 <!-- arm: A send -->
@@ -91,12 +95,13 @@ caption tags="#womenpsychology #datingadviceformen #decodingwomen" -->
 
 ---
 ## 05 · Dark psychology #57 · "Don't teach him"
-Women say it all the time: don't teach a man how to be your man. [pause] Listen.
-She won't ask you to show her off. She won't ask you to text her. She won't ask you to care.
-She won't ask for random flowers. She won't ask you to plan the date.
-She believes the right man already knows what to do, and when to do it.
-So if she's waiting for you to figure it out, that's not a test of words. It's a test of effort.
+Women say it all the time, "don't teach a man how to be your man." [pause] Listen.
+She won't ask you to show her off, and she won't ask you to text her or to care.
+She won't ask for random flowers either, and she won't ask you to plan the date.
+That's because she believes the right man already knows what to do, and when to do it.
+So if she's waiting for you to figure it out, that's not a test of words, it's a test of effort.
 [lower voice] Save this before your next date.
+<!-- narration: framed 1, sentences 1, connectors 1, clear 1, content 1 -->
 <!-- source: olgasafari, 11.8M, https://www.instagram.com/reel/C1KnPSNvslt/ (95/5: same list of five things, same closing belief; source addresses women, here flipped to what she expects from a man; last line "All me from work. Bye." dropped) -->
 <!-- keyword: what women want from a man -->
 <!-- arm: B save -->
