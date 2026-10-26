@@ -51,6 +51,12 @@ function* slots(list = SLOTS) {
     return;
   }
   if (cmd === "pause" || cmd === "resume") return console.log(await api("POST", `/${cmd}`));
+  if (cmd === "postnow") {   // 10-26 owner: post a queued item right now (its slot moves to now; the relay posts it on this tick)
+    const fresh = await fullQueue(), it = fresh.find((q) => q.id === arg && q.status === "queued");
+    if (!it) throw new Error(`no queued item "${arg}"`);
+    it.at = Date.now() - 1000; fresh.sort((a, b) => a.at - b.at); await api("PUT", "/queue", JSON.stringify(fresh));
+    await api("POST", "/tick"); return console.log(`posting now: ${it.title}`);
+  }
   if (cmd === "carousel") {   // 10-19: book a rendered carousel (<dir>/NN.jpg + caption.txt) into the next free carousel slot (CSLOTS)
     const dir = path.resolve(arg), imgs = fs.readdirSync(dir).filter((f) => /^\d+\.jpe?g$/i.test(f)).sort();
     if (imgs.length < 2 || imgs.length > 10) throw new Error(`a carousel needs 2-10 slides as NN.jpg, found ${imgs.length}`);

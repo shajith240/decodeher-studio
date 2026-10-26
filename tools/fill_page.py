@@ -96,7 +96,14 @@ if V3:
         if HOOK_END: cfg["hookEnd"] = HOOK_END
         else: cfg.pop("hookEnd", None)
         json.dump(cfg, open(f"{R}/reel.json", "w"), indent=1, ensure_ascii=False)
-    css = (" /*v3*/" + ("#v3card{display:none !important} " if HOOKV else "") + "#v3card{position:absolute;left:70px;width:940px;top:" + ("150" if HOOKV else "560" if bubble else "700") + "px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 40%}\n"
+    HOOKTEXT_TOP = None
+    if HOOKV and cfg.get("hookText"):   # 10-26 owner sample: a text hook from frame 0, in the band where her face is NOT (above the head or below the chin)
+        try:
+            fb = json.loads(__import__("subprocess").check_output(["uv", "run", "-q", "--with", "opencv-python-headless==4.10.0.84", "python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "hook_face.py"), R], text=True) or "{}")
+        except Exception as e: fb = {}; print("hook face: not found", e)
+        if fb: HOOKTEXT_TOP = (fb["bottom"] + 50) if fb["bottom"] + 50 + 330 < 1750 else max(120, fb["top"] - 380)   # below the chin, else above the head
+        else: HOOKTEXT_TOP = 1330
+    css = (" /*v3*/" + ("#v3card{display:none !important} " if HOOKV and HOOKTEXT_TOP is None else "") + "#v3card{position:absolute;left:70px;width:940px;top:" + (str(HOOKTEXT_TOP) if HOOKTEXT_TOP is not None else "150" if HOOKV else "560" if bubble else "700") + "px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 40%}\n"
            " #v3meta{margin:0 0 14px 20px;font:500 30px/1 'Inter',sans-serif;letter-spacing:.01em;color:#d9d9de;text-shadow:0 1px 6px rgba(0,0,0,.85)}\n"
            " #v3meta b{font-weight:600;color:#fff}\n"
            " #v3msg{display:flex;flex-direction:column;align-items:flex-start;max-width:900px}\n"
@@ -112,7 +119,7 @@ if V3:
     tl3 = ""
     if card:   # readable from frame 0 (only a 0.15 s scale pop, no fade-in); the word captions wait until the card has gone
         tl3 += ('  /*v3*/tl.fromTo("#v3card", { scale: 0.96 }, { scale: 1, duration: 0.15, ease: "power2.out" }, 0);'
-                ' tl.to("#v3card", { opacity: 0, duration: 0.2, ease: "power2.in" }, 2.0);'
+                ' tl.to("#v3card", { opacity: 0, duration: 0.2, ease: "power2.in" }, ' + (str(max(0.2, HOOK_END - 0.2)) if (HOOKTEXT_TOP is not None and HOOK_END) else "2.0") + ');'
                 ' tl.set("#caps", { opacity: 0 }, 0); tl.set("#caps", { opacity: 1 }, ' + (str(round(HOOK_END + 0.15, 3)) if HOOK_END else "2.2") + ');/*/v3*/\n')
     if isinstance(cfg.get("rehookAt"), int):   # the re-hook line: a quick 0.15 s push-in on the film that relaxes back, and a faint flash
         i = cfg["rehookAt"]
