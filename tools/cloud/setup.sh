@@ -48,6 +48,9 @@ say "hyperframes warm-up"
 npx -y hyperframes --version >/dev/null
 npx -y hyperframes browser ensure >/dev/null 2>&1 || npx -y hyperframes browser ensure
 
+# 6b. Playwright Chromium for the carousel renderer (tools/carousel_render.py; cached in ~/.cache/ms-playwright) — 10-26
+if ! ls -d ~/.cache/ms-playwright/chromium-*/chrome-linux* >/dev/null 2>&1; then say "playwright chromium"; uv run -q --with playwright python -m playwright install chromium >/dev/null || echo "warn: playwright chromium install failed"; fi
+
 # 7. Python deps the `uv run --with …` steps pull: fetch once now so the first job is not slow (cached by actions/cache ~/.cache/uv)
 uv run -q --python 3.11 --with faster-whisper --with numpy --with scipy --with soundfile --with pyloudnorm --with librosa \
   --with gallery-dl --with yt-dlp --with secretstorage python -c "pass" >/dev/null 2>&1 || echo "warn: uv warm-up failed (steps will retry)"

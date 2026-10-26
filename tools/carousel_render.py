@@ -5,7 +5,8 @@ Usage: uv run -q --with playwright --with opencv-python-headless==4.10.0.84 pyth
 import asyncio, html, json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-CHROME = os.path.expanduser("~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome")
+import glob as _g   # any installed Playwright Chromium (laptop: chromium-1243; GitHub runners: whatever setup.sh installed)
+CHROME = next(iter(sorted(_g.glob(os.path.expanduser("~/.cache/ms-playwright/chromium-*/chrome-linux*/chrome")), reverse=True)), None)
 spec = json.load(open(sys.argv[1])); OUT = f"{ROOT}/deliverables/carousels/{spec['slug']}"; os.makedirs(OUT, exist_ok=True)
 F = f"file://{ROOT}/site/fonts"; LOGO = f"file://{ROOT}/site/img/logo.jpg"
 def e(s):   # typographic quotes/apostrophes (straight ones look cheap on a slide)
@@ -94,7 +95,7 @@ PLACE = """async (face) => {
 async def main():
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
-        b = await p.chromium.launch(executable_path=CHROME); pg = await b.new_page(viewport={"width": 1080, "height": 1350})
+        b = await p.chromium.launch(**({"executable_path": CHROME} if CHROME else {})); pg = await b.new_page(viewport={"width": 1080, "height": 1350})
         for i, body in enumerate(pages, 1):
             hf = f"{OUT}/.slide.html"; open(hf, "w").write(f"<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>{body}</body></html>")
             await pg.goto(f"file://{hf}"); await pg.wait_for_load_state("load")

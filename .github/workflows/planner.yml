@@ -5,7 +5,8 @@ name: planner
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # 05:30 IST
+    - cron: "0 0 * * *"    # 05:30 IST
+    - cron: "0 12 * * *"   # 17:30 IST (10-26 owner: production must never stop — second chance every day)
   workflow_dispatch:
 
 concurrency:
@@ -14,6 +15,7 @@ concurrency:
 
 permissions:
   contents: write         # commits brain/ (growth notes, playbook, new script drafts) back to the repo
+  actions: write          # starts a factory run right after a new batch is written
 
 jobs:
   plan:
@@ -37,7 +39,7 @@ jobs:
           HQ_KEY: ${{ secrets.HQ_KEY }}
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: timeout 3000 bash tools/growth_daily.sh
-      - name: Write the next batch if fewer than 6 reels are waiting
+      - name: Reels — write the next 95/5 batch when fewer than 4 days are booked or in production (tools/auto_planner.py)
         continue-on-error: true
         env:
           RELAY_URL: ${{ secrets.RELAY_URL }}
@@ -45,24 +47,14 @@ jobs:
           HQ_URL: ${{ secrets.HQ_URL }}
           HQ_KEY: ${{ secrets.HQ_KEY }}
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-        run: |
-          booked=$(node tools/ig_queue.js ids 2>/dev/null | grep -c " queued " || true)
-          unfinished=$(python3 - <<'EOF'
-          import glob, json, os
-          n = 0
-          for b in glob.glob("reels/*-batch.json"):
-              for r in json.load(open(b)):
-                  slug = os.path.basename(r)
-                  if os.path.isdir(r) and not os.path.exists(f"deliverables/week-2/{slug}.mp4") and not os.path.exists(f"logs/queued/{slug}"):
-                      n += 1
-          print(n)
-          EOF
-          )
-          echo "booked=$booked unfinished=$unfinished"
-          if [ $((booked + unfinished)) -lt 6 ]; then
-            claude -p "$(cat tools/cloud/writer_prompt.txt)" --model sonnet --allowedTools "Read" "Write" "Edit" "Glob" "Grep" "Bash(python3:*)" "Bash(ls:*)" --output-format text | tee logs/writer.log
-            python3 tools/cloud/report.py event done "New batch written: $(grep -v '^\s*$' logs/writer.log | head -8 | tr '\n' ' ' | cut -c1-900)" || true
-          fi
+        run: timeout 3000 python3 tools/auto_planner.py --min-days 4 --n 6
+      - name: Carousels — keep 2 days (4) booked (tools/carousel_daily.py)
+        continue-on-error: true
+        env:
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: timeout 3000 python3 tools/carousel_daily.py --n 2 --min-booked 4
       - name: Weekly Drive clean-up (Sundays)
         if: always()
         continue-on-error: true
@@ -81,3 +73,15 @@ jobs:
         run: |
           git config user.name "decodeher-planner"; git config user.email "planner@users.noreply.github.com"
           git add brain/ && git diff --cached --quiet || { git commit -q -m "Planner $(date +%F): growth notes, plan, scripts"; git push -q; }
+      - name: Snapshot to HQ + start the factory on the new reels
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          RELAY_URL: ${{ secrets.RELAY_URL }}
+          RELAY_KEY: ${{ secrets.RELAY_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/cloud/report.py || true
+          gh workflow run factory -f max_minutes=160 || true
