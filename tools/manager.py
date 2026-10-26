@@ -86,6 +86,7 @@ def disk():
     sh("python3 tools/pool_prune.py --cap 900", timeout=300)   # 10-18: unusable + oldest unused pool clips (permanent disk fix)
     sh("npm cache clean --force", timeout=120)   # the npm download cache refills to ~0.5 GB
     sh("rm -rf ~/.cache/hyperframes/history/*", timeout=120)   # not `uv cache prune`: it waits on the lock running jobs hold, and on btrfs frees ~nothing
+    sh("rm -rf ~/.cache/chromium-headless ~/.cache/BraveSoftware/Brave-Browser/Default/Cache", timeout=120)   # 10-26: ~2 GB of browser caches that refill; disk sat at 3.7 GB free
     now = shutil.disk_usage(ROOT).free / 1e9
     if now < DISK_LOW_GB - 2 and time.time() - S.get("disk_told", 0) > 6 * 3600:   # still too low: tell the owner (Telegram via HQ), max every 6 h
         S["disk_told"] = time.time()

@@ -19,6 +19,11 @@ done, change the first line to `STATUS: DONE`.
   tools/new_reels_v3.py now runs tools/pick_hook.py itself; fill_page.py hides the title when reel.json has hookClip.
   If a reel was built before its hookClip existed: `python3 tools/fill_page.py reels/<r>` and re-render.
 
+## Progress 07:40 IST 10-19 (auto-resume session)
+- Task 1 DONE: v5-batch exists; all v4/v5 reels have a hookClip. v4-01 had none: picked ai-bedroom-confident-over-shoulder-938334 and re-ran fill_page (it was at 'judge', so it renders with the hook). Not yet checked: that clip is acceptable (name says 'bedroom'; confirm adult, no nudity, via a frame).
+- Factory at 07:36: v4-01/v4-02 judge, v4-03 mix, v5 clips/plan. Nothing booked yet; the 08:30 slot may stay empty (fine: never post a wrong one).
+- Tasks 2-6 NOT started (need renders to finish first). Start at task 2 once `node tools/ig_queue.js ids` shows v4 booked.
+
 ## Tasks, in order
 1. Check v5 exists: `ls reels/v5-batch.json`. If missing, run
    `python3 tools/new_reels_v3.py brain/content/drafts/viral5-scripts.md v5` (it also picks the hook clips).

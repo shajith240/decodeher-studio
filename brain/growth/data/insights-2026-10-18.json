@@ -1,0 +1,112 @@
+{
+ "account": {
+  "username": "thedecodeher",
+  "followers_count": 31,
+  "media_count": 6,
+  "id": "39815642344686105"
+ },
+ "reels": [
+  {
+   "title": "1-Mon-busy-is-an-answer",
+   "permalink": "https://www.instagram.com/reel/DecQ5eZDlx8/",
+   "postedAt": 1791909832536,
+   "error": "17991215211061489/insights: Unsupported get request. Object with ID '17991215211061489' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "02-Tue-keep-yourself",
+   "permalink": "https://www.instagram.com/reel/Deet1FEDGwb/",
+   "postedAt": 1791992121803,
+   "error": "18130103299761138/insights: Unsupported get request. Object with ID '18130103299761138' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "03-W2-doesn-t-move-me",
+   "permalink": "https://www.instagram.com/reel/Def8iq3j338/",
+   "postedAt": 1792033386416,
+   "error": "18115934504133075/insights: Unsupported get request. Object with ID '18115934504133075' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "04-W2-your-plans-matter",
+   "permalink": "https://www.instagram.com/reel/DehSKUSjiXn/",
+   "postedAt": 1792078278236,
+   "error": "18119851756968674/insights: Unsupported get request. Object with ID '18119851756968674' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "16-W2-hot-and-cold",
+   "permalink": "https://www.instagram.com/reel/DeihYDykatC/",
+   "postedAt": 1792119811884,
+   "reach": 262,
+   "views": 319,
+   "likes": 7,
+   "comments": 0,
+   "shares": 5,
+   "saved": 6,
+   "ig_reels_avg_watch_time": 13627,
+   "ig_reels_video_view_total_time": 3883911
+  },
+  {
+   "title": "17-W2-seen-then-story",
+   "permalink": "https://www.instagram.com/reel/Dejm4BYiABF/",
+   "postedAt": 1792156780167,
+   "reach": 116,
+   "views": 142,
+   "likes": 5,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 8781,
+   "ig_reels_video_view_total_time": 1167959
+  },
+  {
+   "title": "18-W2-ask-her-a-favour",
+   "permalink": "https://www.instagram.com/reel/Dej93uFlCUw/",
+   "postedAt": 1792168301823,
+   "reach": 1119,
+   "views": 1411,
+   "likes": 26,
+   "comments": 0,
+   "shares": 9,
+   "saved": 47,
+   "ig_reels_avg_watch_time": 20465,
+   "ig_reels_video_view_total_time": 23616889
+  },
+  {
+   "title": "19-W2-why-chasing-fails",
+   "permalink": "https://www.instagram.com/reel/DelF_ojChpH/",
+   "postedAt": 1792206106867,
+   "reach": 1046,
+   "views": 1317,
+   "likes": 24,
+   "comments": 0,
+   "shares": 83,
+   "saved": 35,
+   "ig_reels_avg_watch_time": 15645,
+   "ig_reels_video_view_total_time": 16677613
+  },
+  {
+   "title": "20-W2-sometime",
+   "permalink": "https://www.instagram.com/reel/DemKm9OEQpL/",
+   "postedAt": 1792242622838,
+   "reach": 128,
+   "views": 159,
+   "likes": 5,
+   "comments": 0,
+   "shares": 1,
+   "saved": 5,
+   "ig_reels_avg_watch_time": 14547,
+   "ig_reels_video_view_total_time": 1992954
+  },
+  {
+   "title": "21-W2-she-stopped-asking",
+   "permalink": "https://www.instagram.com/reel/Demiom8AX9D/",
+   "postedAt": 1792254670609,
+   "reach": 260,
+   "views": 333,
+   "likes": 10,
+   "comments": 0,
+   "shares": 3,
+   "saved": 5,
+   "ig_reels_avg_watch_time": 17309,
+   "ig_reels_video_view_total_time": 4638893
+  }
+ ]
+}

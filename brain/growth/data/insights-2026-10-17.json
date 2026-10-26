@@ -1,0 +1,73 @@
+{
+ "account": {
+  "username": "thedecodeher",
+  "followers_count": 8,
+  "media_count": 3,
+  "id": "39815642344686105"
+ },
+ "reels": [
+  {
+   "title": "1-Mon-busy-is-an-answer",
+   "permalink": "https://www.instagram.com/reel/DecQ5eZDlx8/",
+   "postedAt": 1791909832536,
+   "error": "17991215211061489/insights: Unsupported get request. Object with ID '17991215211061489' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "02-Tue-keep-yourself",
+   "permalink": "https://www.instagram.com/reel/Deet1FEDGwb/",
+   "postedAt": 1791992121803,
+   "error": "18130103299761138/insights: Unsupported get request. Object with ID '18130103299761138' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "03-W2-doesn-t-move-me",
+   "permalink": "https://www.instagram.com/reel/Def8iq3j338/",
+   "postedAt": 1792033386416,
+   "error": "18115934504133075/insights: Unsupported get request. Object with ID '18115934504133075' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "04-W2-your-plans-matter",
+   "permalink": "https://www.instagram.com/reel/DehSKUSjiXn/",
+   "postedAt": 1792078278236,
+   "error": "18119851756968674/insights: Unsupported get request. Object with ID '18119851756968674' does not exist, cannot be loaded due to missing permissions, or does not support this operation"
+  },
+  {
+   "title": "16-W2-hot-and-cold",
+   "permalink": "https://www.instagram.com/reel/DeihYDykatC/",
+   "postedAt": 1792119811884,
+   "reach": 208,
+   "views": 249,
+   "likes": 7,
+   "comments": 0,
+   "shares": 3,
+   "saved": 2,
+   "ig_reels_avg_watch_time": 13025,
+   "ig_reels_video_view_total_time": 2943774
+  },
+  {
+   "title": "17-W2-seen-then-story",
+   "permalink": "https://www.instagram.com/reel/Dejm4BYiABF/",
+   "postedAt": 1792156780167,
+   "reach": 110,
+   "views": 135,
+   "likes": 5,
+   "comments": 0,
+   "shares": 0,
+   "saved": 0,
+   "ig_reels_avg_watch_time": 8605,
+   "ig_reels_video_view_total_time": 1024002
+  },
+  {
+   "title": "18-W2-ask-her-a-favour",
+   "permalink": "https://www.instagram.com/reel/Dej93uFlCUw/",
+   "postedAt": 1792168301823,
+   "reach": 166,
+   "views": 196,
+   "likes": 5,
+   "comments": 0,
+   "shares": 1,
+   "saved": 4,
+   "ig_reels_avg_watch_time": 10677,
+   "ig_reels_video_view_total_time": 1847236
+  }
+ ]
+}

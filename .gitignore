@@ -51,3 +51,9 @@ library/research/
 brain/content/products/pdf/fonts/
 brain/content/products/pdf/out/
 brain/content/products/pdf/art/*.png
+
+# the paid products (playbook + bonuses): private, never in the public repo (10-26); a copy lives in ~/Projects/decodeher-private
+brain/content/products/
+# stray scratch scripts
+/write_judge*.py
+/judge_writer.py

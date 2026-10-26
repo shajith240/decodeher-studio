@@ -9,4 +9,9 @@ Started 2026-10-19. Evidence so far: owner rule + viral bank (81 YouTube Shorts,
 4. Mainstream niche tactics are fine; hard line only at real abuse.
 
 ## Learned (updated daily)
-- (none yet — first reels from the bank post 10-19; compare by source after 3 days of numbers)
+- Data gap (10-26): performance.md and data/ stop at 10-19 (9 reels, all week-2 format). No bank-sourced reel has numbers yet, so no per-source ranking is possible. Do not invent one.
+- Our only evidence (9 reels, small): reels with watch >= 34% and avg watch >= 13 s reached 920-1,512; the other 5 stayed at 118-354. Hold people before 15 s, no dead lead-in.
+- Hook subject: viewer-move hooks 2 of 2 big (favour 1,143, chasing 1,108); her-behaviour hooks 2 of 7 big. Hint only.
+- Length 39-55 s: no pattern. Closing line: no data yet (send-vs-save test pending). Best shares 77/1k on "why chasing fails".
+- Owner share (robertmckeaveney reel): hook > build-up > pay-off, same as our format; keep the answer for the end. No views known, so a structure check, not a source.
+- Stop doing: topics built on texting words; hooks that only describe her with no viewer move; moves that make her insecure.
