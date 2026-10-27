@@ -124,7 +124,7 @@ test("free text becomes a change request → GitHub claude-task with the text", 
   assert.equal(gh[0].headers.Authorization, `Bearer ${SECRETS.GH_TOKEN}`); assert.ok(gh[0].headers["User-Agent"]);
   assert.equal(gh[0].body.event_type, "claude-task");
   assert.equal(gh[0].body.client_payload.text, "make the captions <bigger> & white"); assert.ok(gh[0].body.client_payload.request_id);
-  assert.match(lastText(w), /On it\. Claude is working in the cloud/);
+  assert.match(lastText(w), /Got it: .make the captions &lt;bigger&gt; &amp; white/);
   const reqs = await w.st.get("requests"); assert.equal(reqs.length, 1); assert.equal(reqs[0].state, "working");
 });
 
@@ -152,6 +152,15 @@ test("preview event → message with Approve / Reject buttons", async () => {
   const kb = m[0].body.reply_markup.inline_keyboard.flat();
   assert.deepEqual(kb.map((b) => b.callback_data), [`approve:${j.id}`, `reject:${j.id}`]);
   assert.match(kb[0].text, /Approve/); assert.match(kb[1].text, /Reject/);
+});
+
+test("'hi' / 'thanks' get an instant reply and start no cloud job; a real question still does", async () => {
+  const w = world();
+  await w.say("hi"); await w.say("Thanks!"); await w.say("ok 👍");
+  assert.equal(w.ghCalls().length, 0);
+  assert.match(w.tgCalls("sendMessage")[0].body.text, /I'm here/);
+  await w.say("hi, how did today's reel do?");
+  assert.equal(w.ghCalls().length, 1);
 });
 
 test("code-change preview → Approve dispatches code-merge with the request id (not the reel approve)", async () => {

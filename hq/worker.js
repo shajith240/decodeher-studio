@@ -147,6 +147,9 @@ async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop
   try { const r = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: "POST", body: f }); return { ok: r.ok }; } catch { return { ok: false }; }
 }
 
+// a whole message that is only a greeting / thanks / "ok" (no question, no request) — answered instantly, no cloud job
+const SMALL_TALK = /^(hi+|hii+|hello+|hey+|heya|yo|sup|hola|namaste|good (morning|afternoon|evening|night)|gm|gn|ok(ay)?|k|kk|cool|nice|great|thanks?|thank you|thx|ty|good job|👍|🙏|👋)[\s!.,🙂😊👍🙏👋]*$/i;
+
 const HELP = `Here's what I can do:
 /status – how the factory and posting are doing
 /queue – the posts that are booked
@@ -396,13 +399,20 @@ export class HQ extends DurableObject {
   }
 
   async onRequest(text) {   // free text = a task for Claude in the cloud (owner 10-27: run everything from the phone; .github/workflows/claude.yml)
+    // owner 10-27: "hi" started a whole cloud job and got the generic "On it" — greetings / small talk are answered here, instantly
+    if (SMALL_TALK.test(text.trim())) {
+      const thanks = /thank|thx|great|nice|cool|ok|okay|good job/i.test(text);
+      return say(this.env, thanks ? "👍 Anytime. I'm keeping the page running. Message me whenever you want something changed or checked."
+        : "Hey 👋 I'm here and the page is running. Ask me anything (\"how did today's reel do?\") or tell me what to change. /status gives a quick check.");
+    }
     const id = newId("r"), reqs = await this.get("requests", []);
     const r = await dispatch(this.env, "claude-task", { request_id: id, text: text.slice(0, 4000), kind: "owner" });
     reqs.push({ id, text: text.slice(0, 4000), at: Date.now(), state: r.ok ? "working" : "not-started", ...(r.ok ? {} : { error: r.error }) });
     await this.put("requests", reqs.slice(-100));
     await this.note("activity", r.ok ? `Owner request ${id}: working on it` : `Owner request ${id}: could not start (GitHub)`);
     await this.bump("requests");
-    return say(this.env, r.ok ? "🧠 On it. Claude is working in the cloud (a few minutes, longer for big jobs). I'll reply here when it's done." :
+    const gist = text.replace(/\s+/g, " ").trim(), short = gist.length > 70 ? `${gist.slice(0, 67)}…` : gist;
+    return say(this.env, r.ok ? `🧠 Got it: “${esc(short)}”\nI'm on it. Answers take about 5 minutes, bigger jobs longer. I'll reply right here.` :
       "⚠️ I saved your request, but I couldn't start the work just now (GitHub didn't answer). Please send it again in a few minutes.");
   }
 
