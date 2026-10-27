@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Owner tapped Approve on a preview: swap it into the reel's EXISTING post slot through tools/queue_reel.sh's requeue path
 # (same caption, same slot; a reel not booked yet is booked normally; a reel already posted is left alone).
-# Usage: tools/cloud/approve.sh <slug>      Needs deliverables/preview/<slug>.mp4 (rendered by manager-request, synced via Drive).
+# Usage: tools/cloud/approve.sh <slug>      Needs deliverables/preview/<slug>.mp4 (rendered by tools/cloud/preview.py in claude.yml, synced via Drive).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 slug="${1:-}"; [[ "$slug" =~ ^[a-z0-9][a-z0-9-]{2,80}$ ]] && [ -d "reels/$slug" ] || { echo "no such reel: '$slug'" >&2; exit 2; }

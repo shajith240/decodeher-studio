@@ -48,8 +48,10 @@ def main(argv):
         ap = argparse.ArgumentParser(prog="report.py event")
         ap.add_argument("type", choices=TYPES); ap.add_argument("text")
         ap.add_argument("--reel"); ap.add_argument("--preview-url"); ap.add_argument("--slot"); ap.add_argument("--request-id")
+        ap.add_argument("--code", action="store_true", help="a code change on branch claude/<request-id>: Approve merges it (code.yml)")
         a = ap.parse_args(argv[1:])
         ev = {"type": a.type, "text": a.text}
+        if a.code: ev["code"] = True
         if a.reel: ev["reel"] = a.reel
         if a.preview_url: ev["preview_url"] = a.preview_url
         if a.slot: ev["slot"] = a.slot

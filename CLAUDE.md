@@ -1,81 +1,53 @@
-# DecodeHer: project handoff (read first)
+# DecodeHer: project handbook (read first)
 
-Last updated 2026-10-16 06:45 IST. This file is the starting point for every new session. Use `brain/` (rules, pipeline, research) and the memory notes for depth.
+Last rewritten 2026-10-27. One page, current. Depth lives in `brain/` (rules, research, growth) and the memory notes;
+where an older note disagrees with this page, this page wins.
 
-**10-16 RESUME POINT: read `brain/NEXT-SESSION.md` first** (live hand-off plan; auto-resume after a Claude limit = `tools/resume_after_limit.sh at "YYYY-MM-DD HH:MM"`, a one-shot systemd timer that runs a headless Sonnet session on that plan).
+## What this is
+@thedecodeher: a faceless Instagram page about dating psychology for men (decoding women's behaviour and texting).
+Goal: 10,000 followers (10-27: 74 followers; reels land at ~120 or ~1,200 views, nothing higher yet).
+The owner gave Claude full control of content and growth: **decide, don't ask**; report what changed and why.
 
-## The project in one paragraph
-@thedecodeher is a faceless Instagram Reels page about dating psychology for men: decoding women's behaviour and texting.
-Reels are ~45–60 s (no length cap; value first). An AI narrator (Fish 86ac) runs over colour clips from Pinterest ("dark psychology"
-searches), one new image per 2–4-word caption group, opening on a realistic AI-woman hook clip (format: see Current state). Everything runs unattended on this laptop as three systemd **user** services:
-- `decodeher-factory` (`tools/factory.py`) moves each reel through voice → plan → clips → mix → sheets → judge → (research) → render → queue.
-- `decodeher-manager` (`tools/manager.py`) checks the line every 2 min. It fixes routine faults and runs a `claude -p` agent for real
-  incidents (`tools/manager_prompt.txt`).
-- `decodeher-board` (`tools/dashboard.js`) is the live studio board at http://localhost:4317 (cloud copy at https://decodeher-hq.shajith240.workers.dev; Telegram bot = the manager you talk to).
+## How it runs: cloud first, laptop not needed
+| Part | Where | What it does |
+|---|---|---|
+| Posting relay | Cloudflare `relay/worker.js` | posts booked reels (08:30, 18:30, 22:00 IST) and carousels (04:30, 20:00) |
+| Factory | GitHub `.github/workflows/factory.yml` (every 3 h) → `tools/factory.py` | voice → plan → clips → mix → sheets → judge → render → book |
+| Planner | GitHub `planner.yml` (05:30 + 17:30 IST) | growth stats + notes, viral bank collectors, next reel batch (`tools/auto_planner.py`), carousels |
+| Claude in the cloud | GitHub `claude.yml` → `tools/cloud/claude_task.sh` | any Telegram message from the owner = a full Claude session; replies on Telegram |
+| Self-repair | last steps of `factory.yml` | failed run / newly parked reels → starts `claude.yml` (kind=repair), max once per 6 h |
+| HQ + Telegram bot | Cloudflare `hq/worker.js` | the owner's phone interface, /status /queue /stats, board at https://decodeher-hq.shajith240.workers.dev |
+| Files | Google Drive `gdrive:decodeher/` via `tools/cloud/sync.sh` | reels, library, deliverables, logs (code is in git; the repo is PUBLIC, so no secrets or private notes in git) |
 
-Posting goes through our own Cloudflare relay (`relay/worker.js`) at 3 posts a day, 08:30, 18:30 and 22:00 IST (changed 10-16 to reach US mornings/lunch; brain/research/audience-location.md). `node tools/ig_queue.js ids|status|captions`
-shows the queue. Never read or print `.env` or `.relay.json`.
+`node tools/ig_queue.js ids` shows the queue. Never read or print `.env`, `.relay.json` or any secret.
+Laptop services (factory, manager, growth timers) are switched off on purpose; only the Clip Library board (localhost:4317) runs there.
+
+## The content rules (owner-approved, 10-27)
+- **Copy what is viral now (95/5).** Every reel/carousel remixes a proven viral post: same hook, points, order, examples.
+  Ours: "Listen." beat, closing line, our voice, AI-woman opener, our look. Prefer posts from the **last 60 days** in **our
+  faceless format** (face-to-camera, skits, podcasts don't carry over). `tools/pick_sources.py` ranks this way.
+- **Short:** max 85 spoken words (~30 s), max 3 points, no pause before "Listen." (`tools/script_polish.py` enforces it).
+- **Hook:** name her exact behaviour or a type of man, so the viewer asks "is that me?". Rulebook: `brain/growth/content-rules.md`.
+- **Narration:** complete, connected, framed sentences, never fragments. English only.
+- **Look:** colour Pinterest clips, lens frame, small white serif captions, AI-woman opener with no text on her face,
+  sound only from `library/rebel-pack`, music ≥ 12 dB under the voice, bronze-bust outro.
+- **Carousels:** 2 a day, AI-woman face cover matched to the message, text never on the face; the owner adds music in the app.
+- Ethics: decode / defend / honest attraction; only real abuse is off-limits.
 
 ## How to work with this owner
-- They're non-technical and dictate by voice, so messages are rough and sometimes angry. Read for intent and answer in plain words.
-  Their bar is premium and readable, with no "AI slop".
-- **Show before you ship.** Never attach anything visual to a live post (covers, outros, new styles) before the owner has seen it.
-  A generated cover went onto a post unseen on 10-15 and they were furious.
-- **Codex image generation is rationed.** Use it only when the owner explicitly asks. Generated covers were rejected outright.
-- They watch the competitor **Zoltium** and the Rebelvids "viral dark psychology reels" course closely (transcript:
-  brain/research/rebelvids-dark-psych-course-transcript.txt). Match that craft; our signature lives only in the outro.
-- Every message you send: short, plain words, clickable links to files, no jargon. They hate repeated bugs — verify the WHOLE
-  result (frame grid of the full reel, levels, ending) before showing anything.
-- Plan first and confirm the plan, then execute. Batch the work, use cheap subagents for research, and verify results
-  (frames, transcripts, ffprobe) before saying anything is done.
+- Non-technical, dictates by voice (rough, sometimes angry): read for intent, answer short and plain, no jargon.
+- **Show before you ship:** anything visual and new goes to the owner as a preview first.
+- Verify the whole result (frames, levels, ending, ffprobe) before saying anything is done. They hate repeated bugs.
+- Codex image generation only when the owner asks. Products: simple PDFs only, private-friendly.
 
-## Current state (10-16, 06:45) — supersedes everything written on 10-15
-- **Owner gave Claude full control** to run and grow the channel — DECIDE, don't ask for advice or permission on growth/content
-  choices (10-16: "this is your responsibility"); just report what changed and why. Still ask only for things that need the
-  owner's hands (logins, Instagram app actions like archiving). Target: **1,000 followers by 2026-10-26**. 3 posts/day
-  (08:30, 14:00, 21:00 IST) via the Cloudflare relay (posts with the PC off). Baseline: ~6 followers, ~120 views/reel.
-- **Queue:** the old w2/w3/w4 reels were removed (owner) and their folders deleted. Booked: w6-01 "Hot and cold" (10-16 08:30).
-  Batch **w7** (6 reels, scripts approved, `brain/content/drafts/week7-rebel-scripts.md`) is in the factory and books itself
-  into the next free slots. Factory batches: reels/w6-batch.json, reels/w7-batch.json.
-- **Approved reel format** (owner, 10-16, after many corrections; memory rebel-format.md):
-  - Script shape from the Rebelvids course: hook (her specific behaviour + tension, `brain/research/hooks-2026.md`) → "Listen"
-    → named psychology → numbered moves → why → a natural closing line (a reason to follow/send/save; never begging).
-    English only. No length cap; never rush the voice (memory value-over-length). Ethics: decode/defend/honest attraction,
-    never coach making her insecure or dependent.
-  - Voice: Fish **86ac939163784775a38c14912a8de9d9** (config reels.voice), whole take, 80 ms lead silence.
-  - Look: **colour** clips full-screen with the cinematic grade, black paper as a soft-light **texture**, corners fading out
-    (feathered vignette, `library/rebel-pack/edge-mask-soft.png`), small white serif captions, title card with NO box.
-    reel.json `frame: "lens"`, `colour: true` (new_reels_v3.py sets these when config reels.frame = "lens").
-  - Opening shot: a realistic **AI woman** clip (reel.json `hookClip`; pool `library/hook-pool/ai/`, only pins labelled AI,
-    adult, no nudity, no real/famous faces). Clips from Pinterest with the suffix "dark psychology"; clips with baked-in text
-    are banned (clippick.py).
-  - Sound: ONLY the owner's pack `library/rebel-pack` (config reels.sfxSet). Snaps RARE, only at narration peaks, laughs only
-    after a dark/mocking line (`tools/peak_points.py` → reel.json snaps/laughs). Music: only smooth horror/piano, measured gate
-    in `brain/rules/music-rule.md` (10 approved tracks); bed always ≥ 12 dB under the voice.
-  - Outro (bronze bust) rises during the closing words and ends with the reel; the clip film runs until then.
-- **Board:** pixel studio (boxes = reels, no film-reel icons, no plants/pictures, rugs only), one-sentence summary bar,
-  "In production" progress bars by real pipeline step. Cloud copy: https://decodeher-hq.shajith240.workers.dev
-- **Claude limit:** posting/comment replies never use Claude; the factory pauses a reel 30 min on a limit. Before the owner's
-  limit runs out, write `brain/NEXT-SESSION.md` and schedule `tools/resume_after_limit.sh at "<reset + 5 min>"`.
-- **PC off:** posting continues; production needs the laptop until the GitHub factory is enabled (blocked on the owner
-  setting `gh secret set PINTEREST_COOKIES`).
-- **Growth brain** (`brain/growth/README.md`): daily 05:30 timer measures our stats (tools/growth_analyze.py), reads vetted
-  expert sources (tools/growth_fetch.py, brain/growth/expert-sources.md), then one Sonnet session updates tactics/playbook/
-  experiments and writes `brain/growth/next-batch-plan.md` — the script writer follows it. Running experiment: closing line
-  SEND vs SAVE (w8 batch, read ~10-23).
-- **Batches:** w7 (6, producing/booking), w8 (6, send/save experiment, producing). Telegram pin intake is live
-  (tools/pin_intake.py via manager; AI names each clip). Laptop-offline alert on Telegram after 15 min (campus Wi-Fi login).
-- **Clip Library** (10-18): http://localhost:4317/library (button on the studio; laptop only). Play/add/edit/move/delete clips,
-  7-day undo bin (tools/library.py, tools/library_routes.js). New shelf "visual hooks" (library/hook-pool/visual) = non-AI-woman
-  openers, ≤ 1 reel in 4 (pick_hook.py, reel.json hookType). Keyword SEO: brain/growth/keywords.md + tactics/keyword-seo.md;
-  writer uses one bank phrase in caption line 1 + title card + first sentence; 3 hashtags.
-- Mixer fix 10-18: the 12 dB voice limit muted the music at every sentence end (all reels 10-16→10-18); fixed in reel_mix.py.
-- Open work: see `brain/NEXT-SESSION.md`.
+## Open work (10-27)
+- Trend scan of reels viral in the last 14 days (spare Instagram account via Agent Reach, laptop only for now).
+- Named series instead of "Dark psychology #N"; on-screen hook text above/below her face (needs the owner's OK on a sample).
+- Trial reels through the API (unverified); rclone's shared Drive client id is being retired in 2026 (needs our own id).
 
-## Gotchas learned the hard way
-- Restarting the factory kills running jobs. Wait until no render or queue job is running (a killed queue job double-booked posts on 10-14).
-- On btrfs, `du` of ~/.cache/uv overstates its size (reflinks). Don't run `uv cache prune` in automation, because it blocks on the lock.
-- Claude's usage limit (resets 1 am IST) used to park reels. The factory now pauses them for 30 min instead.
-- Headless screenshots: `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome --headless=new --timeout=9000` for the
-  live board (it never goes idle), and `--virtual-time-budget=9000` for static pages that need web fonts.
-- Low RAM (15 GB): Chrome screenshots during a render can be OOM-killed (exit 137). Retry one at a time.
+## Gotchas
+- A killed queue job double-books posts: never cancel a factory run mid-render/queue.
+- `pkill -f <pattern>` can match its own shell command; use exact process names.
+- Drive has no hard links: `sync.sh` keeps them as `reels/.hardlinks.tsv`; deleting reel folders on Drive means filtering it.
+- Old reels/renders were archived to `gdrive:decodeher-archive/2026-10-27/` (not deleted).
+- Instagram rate-limits fast: one slow attempt, then wait; never loop.

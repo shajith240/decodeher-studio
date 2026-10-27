@@ -1,4 +1,4 @@
-"""Render a PREVIEW of one reel after an owner change request (cloud, manager-request.yml). Never queues anything.
+"""Render a PREVIEW of one reel after an owner change request (cloud, claude.yml). Never queues anything.
   python3 tools/cloud/preview.py <slug>
 reel.json "revoice": true → the voice is re-recorded (old timing + mix moved to <reel>/prev/), then mixed;
 reel.json "remix": true   → re-mixed; otherwise the page is refilled (fill_page.py) and the reel re-rendered.

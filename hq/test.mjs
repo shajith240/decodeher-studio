@@ -116,15 +116,15 @@ test("/queue, /help, /make and /pause work", async () => {
   await w.say("/stats"); assert.match(lastText(w), /How it's going/);
 });
 
-test("free text becomes a change request → GitHub manager-request with the text", async () => {
+test("free text becomes a change request → GitHub claude-task with the text", async () => {
   const w = world();
   await w.say("make the captions <bigger> & white");
   const gh = w.ghCalls(); assert.equal(gh.length, 1);
   assert.equal(gh[0].url, "https://api.github.com/repos/owner/decodeher/dispatches");
   assert.equal(gh[0].headers.Authorization, `Bearer ${SECRETS.GH_TOKEN}`); assert.ok(gh[0].headers["User-Agent"]);
-  assert.equal(gh[0].body.event_type, "manager-request");
+  assert.equal(gh[0].body.event_type, "claude-task");
   assert.equal(gh[0].body.client_payload.text, "make the captions <bigger> & white"); assert.ok(gh[0].body.client_payload.request_id);
-  assert.match(lastText(w), /On it, I'll send a preview/);
+  assert.match(lastText(w), /On it\. Claude is working in the cloud/);
   const reqs = await w.st.get("requests"); assert.equal(reqs.length, 1); assert.equal(reqs[0].state, "working");
 });
 
@@ -152,6 +152,15 @@ test("preview event → message with Approve / Reject buttons", async () => {
   const kb = m[0].body.reply_markup.inline_keyboard.flat();
   assert.deepEqual(kb.map((b) => b.callback_data), [`approve:${j.id}`, `reject:${j.id}`]);
   assert.match(kb[0].text, /Approve/); assert.match(kb[1].text, /Reject/);
+});
+
+test("code-change preview → Approve dispatches code-merge with the request id (not the reel approve)", async () => {
+  const w = world();
+  const { id } = await (await w.req("/api/event", { method: "POST", headers: w.auth, body: { type: "preview", text: "Bigger captions", request_id: "r9", code: true } })).json();
+  assert.match(w.tgCalls("sendMessage")[0].body.text, /Code change waiting/);
+  await w.tg({ callback_query: { id: "cb9", data: `approve:${id}`, from: { id: 4242 }, message: { message_id: 7, chat: { id: 4242 } } } });
+  const gh = w.ghCalls(); assert.equal(gh.length, 1);
+  assert.equal(gh[0].body.event_type, "code-merge"); assert.equal(gh[0].body.client_payload.request_id, "r9");
 });
 
 test("preview with a video URL is sent as a video (by URL) with the buttons", async () => {

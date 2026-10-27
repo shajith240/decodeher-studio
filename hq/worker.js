@@ -159,7 +159,7 @@ const HELP = `Here's what I can do:
 📌 Pinterest links: I ask if it's an AI-girl hook, a dark-psychology clip or a carousel cover, and add it to that library.
 🖼 Pictures: I ask if it's a carousel cover or a design reference.
 
-Or just type what you want changed (for example "make the captions bigger") and I'll get to work and send you a preview to approve.`;
+💬 Or just type anything, like you'd talk to Claude on the laptop ("why are views low?", "make the captions bigger", "fix the factory"). Claude works on the whole project in the cloud and replies here, with a preview video first for anything visual.`;
 
 // ---------- the Durable Object: all state lives here ----------
 export class HQ extends DurableObject {
@@ -213,9 +213,11 @@ export class HQ extends DurableObject {
     // preview: ask the owner to approve, with two buttons
     const id = /^[\w-]{1,40}$/.test(String(ev.id || "")) ? String(ev.id) : newId("p");
     const p = { id, reel, text, slot: ev.slot ?? null, request_id: ev.request_id ? String(ev.request_id).slice(0, 60) : null,
-      preview_url: ev.preview_url ? String(ev.preview_url).slice(0, 1000) : null, at: Date.now(), state: "waiting" };
+      preview_url: ev.preview_url ? String(ev.preview_url).slice(0, 1000) : null, at: Date.now(), state: "waiting",
+      code: ev.code === true && !!ev.request_id };   // 10-27: a cloud-Claude code change on branch claude/<request_id>; Approve merges it
     const buttons = { inline_keyboard: [[{ text: "✅ Approve", callback_data: `approve:${id}` }, { text: "❌ Reject", callback_data: `reject:${id}` }]] };
-    const body = `🎬 <b>New preview${reel ? `: ${esc(reel)}` : ""}</b>\n${esc(text || "Have a look.")}${p.slot ? `\nSlot: ${esc(p.slot)}` : ""}\n\nShall I use it?`;
+    const body = p.code ? `🛠 <b>Code change waiting for you</b>\n${esc(text || "Have a look.")}\n\nShall I put it live?`
+      : `🎬 <b>New preview${reel ? `: ${esc(reel)}` : ""}</b>\n${esc(text || "Have a look.")}${p.slot ? `\nSlot: ${esc(p.slot)}` : ""}\n\nShall I use it?`;
     let sent = null;
     if (p.preview_url && /^https:\/\//.test(p.preview_url)) {   // video by URL only (Telegram fetches it); falls back to a plain message
       const v = await tg(this.env, "sendVideo", { chat_id: this.env.OWNER_CHAT_ID, video: p.preview_url, caption: body.slice(0, 1000), parse_mode: "HTML", reply_markup: buttons });
@@ -393,14 +395,14 @@ export class HQ extends DurableObject {
     return { ok: true };
   }
 
-  async onRequest(text) {   // free text = a change request for the manager agent on GitHub Actions
+  async onRequest(text) {   // free text = a task for Claude in the cloud (owner 10-27: run everything from the phone; .github/workflows/claude.yml)
     const id = newId("r"), reqs = await this.get("requests", []);
-    const r = await dispatch(this.env, "manager-request", { request_id: id, text: text.slice(0, 4000) });
+    const r = await dispatch(this.env, "claude-task", { request_id: id, text: text.slice(0, 4000), kind: "owner" });
     reqs.push({ id, text: text.slice(0, 4000), at: Date.now(), state: r.ok ? "working" : "not-started", ...(r.ok ? {} : { error: r.error }) });
     await this.put("requests", reqs.slice(-100));
     await this.note("activity", r.ok ? `Owner request ${id}: working on it` : `Owner request ${id}: could not start (GitHub)`);
     await this.bump("requests");
-    return say(this.env, r.ok ? "On it, I'll send a preview." :
+    return say(this.env, r.ok ? "🧠 On it. Claude is working in the cloud (a few minutes, longer for big jobs). I'll reply here when it's done." :
       "⚠️ I saved your request, but I couldn't start the work just now (GitHub didn't answer). Please send it again in a few minutes.");
   }
 
@@ -424,7 +426,8 @@ export class HQ extends DurableObject {
     const pending = await this.get("pending", {}), p = pending[id];
     if (!p) return answer("I can't find that preview any more.");
     if (p.state !== "waiting") return answer(`Already ${p.state}.`);
-    const r = await dispatch(this.env, action, { id, request_id: p.request_id, reel: p.reel, slot: p.slot });
+    const r = p.code ? await dispatch(this.env, action === "approve" ? "code-merge" : "code-close", { id, request_id: p.request_id })
+      : await dispatch(this.env, action, { id, request_id: p.request_id, reel: p.reel, slot: p.slot });
     if (!r.ok) return answer("Couldn't reach GitHub. Please tap again in a minute.");
     p.state = action === "approve" ? "approved" : "rejected"; p.decidedAt = Date.now();
     await this.put("pending", pending);
@@ -433,6 +436,7 @@ export class HQ extends DurableObject {
     await answer(action === "approve" ? "Approved ✅" : "Rejected");
     const chat = cq.message && cq.message.chat && cq.message.chat.id, mid = cq.message && cq.message.message_id;
     if (chat && mid) await tg(this.env, "editMessageReplyMarkup", { chat_id: chat, message_id: mid, reply_markup: { inline_keyboard: [] } });
+    if (p.code) return say(this.env, action === "approve" ? "✅ Approved. The change goes live in about a minute." : "Okay, dropped. Nothing changed.");
     return say(this.env, action === "approve" ? `✅ Approved${p.reel ? ` <b>${esc(p.reel)}</b>` : ""}. I'll swap it into its slot.`
       : `Okay, rejected${p.reel ? ` <b>${esc(p.reel)}</b>` : ""}. Nothing changes. Tell me what you'd like different and I'll try again.`);
   }

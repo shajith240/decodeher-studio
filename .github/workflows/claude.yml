@@ -1,0 +1,147 @@
+# Claude in the cloud (owner 10-27: "connect you to my Telegram so you can work completely from the cloud"):
+# the owner types anything on Telegram → HQ dispatches "claude-task" {request_id, text} → a full Claude Code session runs on the
+# whole project (code, reels, brain, Drive files) → its reply (and any preview videos) go back to Telegram.
+# The factory also starts one with kind=repair when a run fails or parks reels (self-repair).
+# Safer by design (owner 10-27): the agent job has NO push rights. The land job then commits brain/-only changes to main and puts
+# any code change on branch claude/<request_id>, sent to the owner with Approve / Reject (code.yml merges or drops it).
+name: claude
+
+on:
+  repository_dispatch:
+    types: [claude-task]
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "What Claude should do"
+        required: true
+      kind:
+        description: "owner | repair"
+        default: "owner"
+
+# one run per request; two requests at once both run (the land job rebases, Drive pushes only copy newer files)
+concurrency:
+  group: claude-${{ github.event.client_payload.request_id || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  TZ: Asia/Kolkata
+  # payload values only ever travel as env (never pasted into a shell line)
+  REQUEST_ID: ${{ github.event.client_payload.request_id || github.run_id }}
+  REQUEST_TEXT: ${{ github.event.client_payload.text || github.event.inputs.text }}
+  REQUEST_KIND: ${{ github.event.client_payload.kind || github.event.inputs.kind || 'owner' }}
+
+jobs:
+  agent:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      actions: write   # gh workflow run factory / planner
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check the request
+        run: |
+          [[ "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad request_id"; exit 1; }
+          [[ "$REQUEST_KIND" =~ ^(owner|repair)$ ]] || { echo "bad kind"; exit 1; }
+          [ -n "$REQUEST_TEXT" ] || { echo "empty request"; exit 1; }
+
+      - uses: ./.github/actions/prepare
+
+      - name: Pull from Drive
+        id: pull
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh pull
+
+      - name: Claude works on it
+        id: agent
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+        run: bash tools/cloud/claude_task.sh
+
+      - name: Collect the git changes (a patch for the land job)
+        if: always() && steps.agent.outcome == 'success'
+        run: |
+          out="$RUNNER_TEMP/claude-$REQUEST_ID"; mkdir -p "$out/land"
+          git add -A && git diff --cached --binary > "$out/land/change.patch" || true
+          git diff --cached --name-only > "$out/land/files.txt" || true
+          cp "$out/reply.txt" "$out/land/" 2>/dev/null || true; cp "$out/commit.txt" "$out/land/" 2>/dev/null || true
+          echo "changed in git: $(wc -l < "$out/land/files.txt") file(s)"
+
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.agent.outcome == 'success'
+        with:
+          name: land-${{ github.run_id }}
+          path: ${{ runner.temp }}/claude-${{ env.REQUEST_ID }}/land/
+          retention-days: 3
+          if-no-files-found: ignore
+
+      - name: Send previews and the reply on Telegram
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OWNER_CHAT_ID: ${{ secrets.OWNER_CHAT_ID }}
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          AGENT: ${{ steps.agent.outcome }}
+        run: |
+          out="$RUNNER_TEMP/claude-$REQUEST_ID"
+          if [ "$AGENT" = success ] && [ -s "$out/reply.txt" ]; then
+            bash tools/cloud/tg_send.sh - "$(cat "$out/reply.txt")"
+            # reel previews: the video, then HQ's Approve / Reject (Approve → approve.yml swaps it into its slot)
+            grep -oE '^[A-Za-z0-9_-]{1,80}$' "$out/previews.txt" 2>/dev/null | head -3 | while read -r slug; do
+              v="deliverables/preview/$slug-tg.mp4"; [ -f "$v" ] || continue
+              bash tools/cloud/tg_send.sh "$v" "Preview · $slug" && python3 tools/cloud/report.py event preview "Preview of $slug (video above)" --reel "$slug" --request-id "$REQUEST_ID" || true
+            done
+          else
+            bash tools/cloud/tg_send.sh - "⚠️ I couldn't finish that one (the cloud job stopped). Send it again or say 'try again'. Details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+
+      - name: Push to Drive
+        if: always() && steps.pull.outcome == 'success'
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: bash tools/cloud/sync.sh push
+
+  land:
+    needs: agent
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        id: dl
+        continue-on-error: true
+        with:
+          name: land-${{ github.run_id }}
+          path: ${{ runner.temp }}/land
+      - name: brain/ changes → main; code changes → branch claude/<id> + Approve on Telegram
+        if: steps.dl.outcome == 'success'
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+        run: |
+          L="$RUNNER_TEMP/land"; [ -s "$L/change.patch" ] || { echo "no git changes"; exit 0; }
+          git config user.name "decodeher-cloud"; git config user.email "cloud@users.noreply.github.com"
+          msg="$(head -c 200 "$L/commit.txt" 2>/dev/null || true)"; msg="${msg:-Cloud Claude: request $REQUEST_ID}"
+          if grep -qv '^brain/' "$L/files.txt"; then
+            git checkout -q -b "claude/$REQUEST_ID"
+            git apply --index "$L/change.patch" && git commit -q -m "$msg" && git push -q origin "claude/$REQUEST_ID"
+            files=$(grep -v '^brain/' "$L/files.txt" | head -8 | tr '\n' ' ')
+            python3 tools/cloud/report.py event preview "$msg — files: $files" --request-id "$REQUEST_ID" --code
+          else
+            git apply --index "$L/change.patch" && git commit -q -m "$msg"
+            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
+          fi

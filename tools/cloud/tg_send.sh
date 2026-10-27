@@ -3,7 +3,8 @@
 # Usage: tools/cloud/tg_send.sh <video.mp4|-> "<caption>"      Env: TELEGRAM_BOT_TOKEN, OWNER_CHAT_ID (TELEGRAM_API: tests only)
 set -euo pipefail
 f="$1"; cap="${2:-}"; : "${TELEGRAM_BOT_TOKEN:?}" "${OWNER_CHAT_ID:?}"
-API="${TELEGRAM_API:-https://api.telegram.org}"; cap="${cap:0:1000}"; resp=$(mktemp); trap 'rm -f "$resp"' EXIT
+API="${TELEGRAM_API:-https://api.telegram.org}"; resp=$(mktemp); trap 'rm -f "$resp"' EXIT
+if [ "$f" = - ]; then cap="${cap:0:4000}"; else cap="${cap:0:1000}"; fi   # Telegram: 4096 for a message, 1024 for a caption
 if [ "$f" = - ]; then
   code=$(curl -sS -o "$resp" -w '%{http_code}' --form-string chat_id="$OWNER_CHAT_ID" --form-string text="$cap" \
     "$API/bot${TELEGRAM_BOT_TOKEN}/sendMessage") || code=000

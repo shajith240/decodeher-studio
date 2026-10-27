@@ -1,0 +1,48 @@
+# The owner tapped Approve / Reject on a cloud-Claude code change (HQ dispatches "code-merge" / "code-close" with {request_id}).
+# Approve: branch claude/<request_id> is rebased onto main and pushed; Reject: the branch is deleted. Either way the owner hears
+# back on Telegram. (GitHub never lets this token change .github/workflows; such a change has to be made on the laptop.)
+name: code
+
+on:
+  repository_dispatch:
+    types: [code-merge, code-close]
+
+concurrency:
+  group: code
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  decide:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      REQUEST_ID: ${{ github.event.client_payload.request_id }}
+      ACTION: ${{ github.event.action }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Merge or drop the branch
+        id: go
+        run: |
+          [[ "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad request_id"; exit 1; }
+          b="claude/$REQUEST_ID"; git fetch -q origin "$b" || { echo "no branch $b"; exit 1; }
+          git config user.name "decodeher-cloud"; git config user.email "cloud@users.noreply.github.com"
+          if [ "$ACTION" = code-merge ]; then
+            git checkout -q -B work "origin/$b" && git rebase -q origin/main && git push -q origin HEAD:main
+          fi
+          git push -q origin --delete "$b" || true
+      - name: Tell the owner
+        if: always()
+        continue-on-error: true
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+          OUTCOME: ${{ steps.go.outcome }}
+        run: |
+          if [ "$OUTCOME" = success ] && [ "$ACTION" = code-merge ]; then python3 tools/cloud/report.py event done "The code change is live (request $REQUEST_ID)." --request-id "$REQUEST_ID"
+          elif [ "$OUTCOME" = success ]; then python3 tools/cloud/report.py event activity "Dropped code change $REQUEST_ID" --request-id "$REQUEST_ID"
+          else python3 tools/cloud/report.py event error "Couldn't put code change $REQUEST_ID live (it clashes with a newer change). Ask me to redo it." --request-id "$REQUEST_ID"; fi

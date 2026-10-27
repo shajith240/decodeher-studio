@@ -39,6 +39,13 @@ jobs:
           HQ_KEY: ${{ secrets.HQ_KEY }}
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
         run: timeout 3000 bash tools/growth_daily.sh
+      - name: "Viral bank — collect new viral reels/shorts (10-27, the bank had stopped refilling; anonymous, stops cleanly on a rate limit)"
+        continue-on-error: true
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          timeout 1500 python3 tools/viral_bank_yt.py --max-new 15 --transcribe || true
+          timeout 1500 uv run -q --with curl_cffi python tools/viral_bank_ig.py --max-new 20 --transcribe || true
       - name: Reels — write the next 95/5 batch when fewer than 4 days are booked or in production (tools/auto_planner.py)
         continue-on-error: true
         env:

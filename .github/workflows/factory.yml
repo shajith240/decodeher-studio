@@ -19,6 +19,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: write   # 10-27: self-repair starts the claude workflow
 
 jobs:
   factory:
@@ -84,6 +85,7 @@ jobs:
         run: |
           [[ "$MAX_MINUTES" =~ ^[0-9]{1,3}$ ]] || MAX_MINUTES=160
           echo "BOOKED_BEFORE=$(grep -c '  Queued · ' logs/activity.log 2>/dev/null || true)" >> "$GITHUB_ENV"
+          echo "PARKED_BEFORE=$(grep -c 'PARKED · ' logs/activity.log 2>/dev/null || true)" >> "$GITHUB_ENV"
           python3 tools/factory.py --once --max-minutes "$MAX_MINUTES"
 
       - name: Pinterest links from Telegram (tools/pin_intake.py)
@@ -97,6 +99,22 @@ jobs:
         run: |
           ( umask 077; printf '%s\n' "$RCLONE_CONF" > "$RUNNER_TEMP/rclone.conf" ); export RCLONE_CONFIG="$RUNNER_TEMP/rclone.conf"
           timeout 1500 python3 tools/pin_intake.py
+
+      - name: Self-repair (10-27) — a failed run or newly parked reels start Claude in the cloud, at most once every 6 h
+        id: repair
+        if: always() && steps.pull.outcome == 'success' && steps.gate.outputs.work == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_OUTCOME: ${{ steps.run.outcome }}
+        run: |
+          parked=$(grep -c 'PARKED · ' logs/activity.log 2>/dev/null || true); new=$(( ${parked:-0} - ${PARKED_BEFORE:-0} ))
+          [ "$RUN_OUTCOME" = success ] && [ "$new" -le 0 ] && exit 0
+          last=$(cat logs/repair-last 2>/dev/null || echo 0); now=$(date +%s)
+          [ $(( now - last )) -ge 21600 ] || { echo "repair ran less than 6 h ago; skipping"; exit 0; }
+          echo "$now" > logs/repair-last
+          why="Factory run $GITHUB_RUN_ID: outcome $RUN_OUTCOME, $new reel(s) newly parked. Last lines: $(grep -h 'PARKED · \|failed\|Error' logs/activity.log | tail -6 | cut -c1-200 | tr '\n' ' ')"
+          gh workflow run claude.yml -R "$GITHUB_REPOSITORY" -f kind=repair -f text="$why" && echo "repair started"
 
       - name: Push to Drive
         if: always() && steps.pull.outcome == 'success'

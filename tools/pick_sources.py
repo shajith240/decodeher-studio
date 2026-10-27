@@ -9,13 +9,14 @@ Usage:
   python3 tools/pick_sources.py 6            # print the next 6 sources as JSON lines (does not mark anything)
   python3 tools/pick_sources.py --mark <url>=<reel-prefix> ...   # record use (bank: used_by; Dark Needle: darkneedle-used.json)
   python3 tools/pick_sources.py --left       # how many unused sources are left in each pool"""
-import glob, json, os, re, sys
+import datetime, glob, json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")); os.chdir(ROOT)
 BANK = ["brain/research/viral-bank/yt-tiktok.jsonl", "brain/research/viral-bank/ig.jsonl", "brain/research/viral-bank/owner.jsonl"]
 DN = os.path.expanduser("~/Documents/YouTube Brains/The Dark Needle/Videos")
 DN_USED = "brain/research/viral-bank/darkneedle-used.json"
 MIN_VIEWS = 1_000_000
+FACE_RE = re.compile(r"to camera|talking head|talking|coach|therapist|podcast|skit|interview|stage|hosts|in a car|selfie", re.I)
 
 
 def rows(p):
@@ -39,9 +40,14 @@ def bank_pool():
             own = bool(r.get("owner_pick"))   # 10-19: videos the owner sent on Telegram — no view minimum, and they go first
             if r.get("used_by") or r.get("fits_us") is False or len(text.split()) < (15 if own else 60) or (views(r) < MIN_VIEWS and not own): continue
             if r.get("type") == "carousel": continue
+            # 10-27: our copies of old (2023-24) face-to-camera hits all died at ~120 views. Rank FRESH (posted in the last 60 days) and
+            # FACELESS (same format as ours, so what made it viral carries over) first; face-to-camera / skits / podcasts go last.
+            d = re.sub(r"\D", "", str(r.get("date") or ""))[:8]
+            fresh = len(d) == 8 and d >= (datetime.date.today() - datetime.timedelta(days=60)).strftime("%Y%m%d")
+            face = bool(FACE_RE.search(str(r.get("visual") or "")))
             out.append({"source": "owner" if own else "bank", "url": r["url"], "views": 10**12 if own else views(r), "title": r.get("title") or r.get("hook"),
-                        "by": r.get("channel") or r.get("account"), "text": text})
-    return sorted(out, key=lambda x: -x["views"])
+                        "by": r.get("channel") or r.get("account"), "text": text, "date": d, "fresh": fresh, "faceless": not face})
+    return sorted(out, key=lambda x: (x["source"] != "owner", x["faceless"] is False, not x["fresh"], -x["views"]))
 
 
 def dn_used():
