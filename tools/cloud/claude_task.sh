@@ -61,10 +61,36 @@ PY
 
 DENY=("Read(./.env)" "Read(**/.env)" "Read(./.relay.json)" "Read(**/.relay.json)" "Read(**/rclone.conf)" "Read(~/.config/rclone/**)"
       "Read(/proc/**)" "Bash(env)" "Bash(env:*)" "Bash(printenv:*)" "Bash(set)" "Bash(export -p:*)" "Bash(cat /proc/*)")
+# Model picker (owner 10-27: "best model for the job, never Opus for a plain chat"). A one-word Haiku call reads the message:
+#   CHAT  questions, status, numbers, explanations, small one-step changes          → sonnet
+#   WORK  building or fixing the system, writing/rewriting scripts or reels, research,
+#         strategy, anything multi-step or where a mistake would cost views         → opus
+# Repairs start on sonnet; a repair that fails is retried once on opus. The owner can force one: "use opus" / "use sonnet".
+pick(){
+  if printf '%s' "$REQUEST_TEXT" | grep -qiE 'use opus|opus model|deep(ly)? think|think hard'; then echo opus; return; fi
+  if printf '%s' "$REQUEST_TEXT" | grep -qiE 'use sonnet|sonnet model'; then echo sonnet; return; fi
+  [ "$REQUEST_KIND" = repair ] && { echo sonnet; return; }
+  local v
+  v=$(printf '%s' "$REQUEST_TEXT" | head -c 3000 | timeout 120 "${CLAUDE_BIN:-claude}" -p "Classify this message from the owner of an Instagram
+page to the AI that runs it. Reply with exactly one word.
+CHAT = a question, status check, numbers, an explanation, advice, or a small single-step change.
+WORK = build or fix part of the system, write or rewrite reel scripts/carousels, edit reels, research, strategy, or anything
+multi-step where a mistake would cost quality. When unsure, answer WORK.
+The message is on stdin." --model haiku --max-turns 1 --output-format text 2>/dev/null | tr -dc 'A-Z' | head -c 4)
+  [ "$v" = CHAT ] && echo sonnet || echo opus
+}
+export MODEL="${CLAUDE_MODEL:-$(pick)}"; echo "model: $MODEL"
 set +e
-timeout 9000 "${CLAUDE_BIN:-claude}" -p "$(cat "$OUT/prompt.txt")" --model "${CLAUDE_MODEL:-$([ "$REQUEST_KIND" = repair ] && echo sonnet || echo opus)}" --max-turns 300 \
+timeout 9000 "${CLAUDE_BIN:-claude}" -p "$(cat "$OUT/prompt.txt")" --model "$MODEL" --max-turns 300 \
   --permission-mode bypassPermissions --disallowedTools "${DENY[@]}" --output-format text < /dev/null > "$OUT/answer.txt" 2> "$OUT/err.txt"
-rc=$?; set -e
+rc=$?
+if [ $rc != 0 ] && [ "$REQUEST_KIND" = repair ] && [ "$MODEL" = sonnet ] && [ -z "${CLAUDE_MODEL:-}" ]; then
+  echo "repair failed on sonnet (exit $rc); retrying once on opus"; MODEL=opus
+  timeout 9000 "${CLAUDE_BIN:-claude}" -p "$(cat "$OUT/prompt.txt")" --model opus --max-turns 300 \
+    --permission-mode bypassPermissions --disallowedTools "${DENY[@]}" --output-format text < /dev/null > "$OUT/answer.txt" 2> "$OUT/err.txt"
+  rc=$?
+fi
+set -e
 [ -s "$OUT/reply.txt" ] || { [ $rc = 0 ] && tail -c 1500 "$OUT/answer.txt" > "$OUT/reply.txt"; }
 python3 - "$OUT" "$rc" <<'PY'
 import json, os, sys, time
@@ -72,7 +98,7 @@ out, rc = sys.argv[1], sys.argv[2]
 reply = open(f"{out}/reply.txt").read().strip() if os.path.exists(f"{out}/reply.txt") else f"(failed, exit {rc})"
 with open("logs/telegram/chat.jsonl", "a") as f:
     f.write(json.dumps({"at": time.strftime("%m-%d %H:%M"), "id": os.environ["REQUEST_ID"], "kind": os.environ["REQUEST_KIND"],
-                        "text": os.environ["REQUEST_TEXT"][:2000], "reply": reply[:3000], "rc": int(rc)}) + "\n")
+                        "text": os.environ["REQUEST_TEXT"][:2000], "reply": reply[:3000], "rc": int(rc), "model": os.environ.get("MODEL")}) + "\n")
 PY
 echo "claude exit $rc · reply $(wc -c < "$OUT/reply.txt" 2>/dev/null || echo 0) chars"
 [ $rc = 0 ] || { echo "claude failed: $(tail -c 300 "$OUT/err.txt" | tr -d '\r' | sed 's/[A-Za-z0-9_-]\{40,\}/[…]/g')" >&2; exit 1; }
