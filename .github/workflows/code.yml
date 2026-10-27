@@ -29,7 +29,8 @@ jobs:
         id: go
         run: |
           [[ "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad request_id"; exit 1; }
-          b="claude/$REQUEST_ID"; git fetch -q origin "$b" || { echo "no branch $b"; exit 1; }
+          b="claude/$REQUEST_ID"
+          git fetch -q origin "$b" || { echo "no branch $b"; [ "$ACTION" = code-close ] && exit 0; exit 1; }
           git config user.name "decodeher-cloud"; git config user.email "cloud@users.noreply.github.com"
           if [ "$ACTION" = code-merge ]; then
             git checkout -q -B work "origin/$b" && git rebase -q origin/main && git push -q origin HEAD:main
