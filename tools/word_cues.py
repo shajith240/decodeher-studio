@@ -26,5 +26,6 @@ for c in [c for c in plan if "every_cut" in c and not SFXSET]:   # 10-16 owner: 
     for sh in json.load(open(f"{R}/shots.json"))[1:]:
         if not any(abs(x["t"] - sh["t"]) < 0.3 for x in cues): cues.append({"type": CUT or c["every_cut"], "t": round(sh["t"] - 0.02, 3), "gain": c.get("gain", 0), "at": "cut"})
 cues.sort(key=lambda c: c["t"])
+import os; os.makedirs(f"{R}/assets/audio", exist_ok=True)   # 10-27: Drive does not sync empty folders, so the cloud runner starts without it
 json.dump(cues, open(f"{R}/assets/audio/cues.json", "w"), indent=1)
 print(f"{len(cues)} cues: " + ", ".join(f"{c['type']}@{c['t']}({c['at']})" for c in cues))

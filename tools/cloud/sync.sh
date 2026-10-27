@@ -64,6 +64,19 @@ if [ "$MODE" = pull ]; then
     done < reels/.hardlinks.tsv
     echo "hard links re-created: $n${NOTE}$([ $miss = 0 ] || echo " · $miss skipped (pool clip missing)")"
   fi
+  # 10-26: the pool fingerprints (reels/_pool/emb.json) store absolute paths from whichever machine wrote them ("/home/shajith/...");
+  # re-base them onto THIS checkout so libfill / clipsheet find the clips (the first cloud run saw an "empty" pool)
+  if [ "${DRY:-}" != 1 ] && [ -f reels/_pool/emb.json ]; then
+    python3 - "$PWD" <<'PY'
+import json, re, sys
+root = sys.argv[1]; p = "reels/_pool/emb.json"; d = json.load(open(p)); n = 0
+for v in d.values():
+    if v and v.get("file") and "/reels/_pool/" in v["file"]:
+        new = root + "/reels/_pool/" + v["file"].split("/reels/_pool/", 1)[1]
+        if new != v["file"]: v["file"] = new; n += 1
+if n: json.dump(d, open(p, "w")); print(f"pool fingerprints re-based: {n} paths")
+PY
+  fi
   if [ "${DRY:-}" != 1 ]; then
     mkdir -p "$STATE"; find "${PATHS[@]}" -type f 2>/dev/null | LC_ALL=C sort > "$MANIFEST"
     echo "manifest: $(wc -l < "$MANIFEST") files"
