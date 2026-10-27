@@ -1,11 +1,11 @@
-# Next batch plan: the next 6 scripts (rewritten 2026-10-19; checked 2026-10-26, no new data, plan unchanged)
-Sources: run `python3 tools/pick_sources.py 8` before scripting (owner picks first, then viral bank); it was not runnable in the 10-26 session. Skip skits/street interviews. Apply content-rules.md.
+# Next batch plan: the next 6 scripts (topics from 2026-10-19; rules refreshed 2026-10-27)
+Sources: run `python3 tools/pick_sources.py 8` before scripting (owner picks first, then viral bank); it needs approval and was not run in the 10-26 or 10-27 sessions, so no new sources are listed. Skip skits/street interviews. Apply content-rules.md: hold people (avg watch 16 s or more passed the audition 7 of 9 times), second beat ("Listen" + named idea) before 15 s, reword every line, add one original example.
 Follows brain/rules/spoken-script-rules.md, brain/rules/script-writing-system.md and the owner's ethics line. No texting words (haha, lol, omg, idk, tbh…) in scripts or as topics.
 Experiment unchanged: closing line A = SEND, B = SAVE (experiments/2026-10-16-closing-line-send-vs-save.md); each arm gets one reel per slot.
 Owner order 10-19: all 6 hooks are viewer-action (the first sentence names the viewer's move or mistake + tension; her behaviour comes second). That holds hook type constant, so only the closing line differs between arms.
 Skip any topic already scripted in w8-w11; pick the nearest unused one from brain/growth/keywords.md.
 
-Slots (relay): 08:30, 18:30, 22:00 IST. No slot is proven better; arms are balanced across slots.
+Slots (relay): 08:30, 18:30, 22:00 IST. 08:30 reached 1,000+ in 5 of 8 reels (18:30: 3 of 9, 22:00: 2 of 8; tiny n), so put the strongest scripts at 08:30 but keep arms balanced across slots. Opening-sound-hit is NOT in this batch (idea only, needs owner OK).
 
 | # | Template | Pillar | Topic | Hook line (viewer move first) | Hook format | Opening AI-woman clip | Slot | Arm |
 |---|---|---|---|---|---|---|---|---|

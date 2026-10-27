@@ -31,3 +31,10 @@
 - Flag: the daily measure step looks stalled since 10-19 (or later posts are missing from the data). Check tools/growth_analyze.py output. pick_sources.py could not be run in this session, so the plan keeps its six topics and lists no new sources.
 - Changes: content-rules.md records what our data does and does not show; experiment left running, no invented result; next-batch-plan header flagged. No new tactic.
 - Why: with no new numbers any change would be a guess; one experiment at a time.
+
+## 2026-10-27
+- Numbers: 74 followers (36 on 10-19, 6 on 10-16; about 5 a day). 25 reels posted, reach 113-1,303: 10 at 1,000-1,300, 15 at 110-270, none between. 5 carousels reached 6-25 each. About 0.4% of views become follows. No post on 10-24 and 10-25.
+- Learned: Buffer's algorithm guide (citing Mosseri) says Instagram "auditions" small accounts' posts on a few non-followers, then pushes winners; that fits our two-level reach. Avg watch of 16 s or more passed 7 of 9 times, under 16 s only 3 of 16 (three reels at 13.4-13.8 s stayed at 115-132, so the old 13 s line was too low). Reels reach new people, carousels don't. Other inbox items (TikTok songs, Buffer analytics, sponsored rates) were off topic. Owner sound tip: an opening sound hit is weak and optional; risers skipped.
+- Changes: playbook rule 3 now 16 s; new tactics audition-first-batch, original-content-check, carousel-reach-check, opening-sound-hit (idea, needs owner OK); carousel-rules.md created; content-rules and the plan's rules refreshed. Send-vs-save stays running: no w8 reel is identifiable in the data.
+- Why: one experiment at a time; it cannot be read until w8 posts. pick_sources.py could not be run here, so the plan keeps its six topics.
+- Flags for the factory side: why posting paused 10-24/25; why performance.md labels every reel W2 and has no hook detail after 10-18.
