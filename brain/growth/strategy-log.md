@@ -38,3 +38,9 @@
 - Changes: playbook rule 3 now 16 s; new tactics audition-first-batch, original-content-check, carousel-reach-check, opening-sound-hit (idea, needs owner OK); carousel-rules.md created; content-rules and the plan's rules refreshed. Send-vs-save stays running: no w8 reel is identifiable in the data.
 - Why: one experiment at a time; it cannot be read until w8 posts. pick_sources.py could not be run here, so the plan keeps its six topics.
 - Flags for the factory side: why posting paused 10-24/25; why performance.md labels every reel W2 and has no hook detail after 10-18.
+
+## 2026-10-27 (evening run)
+- Numbers: 73-74 followers; 25 reels (10 at reach 1,000-1,300, 15 at 110-270), 5 carousels at 6-25. Reels 37-42 (10-22 18:47 to 10-26): 1 of 6 passed 1,000; earlier 9 of 19. Reel 43 (first short script) is only hours old (55 reach).
+- Learned: Hootsuite's Reels guide repeats Meta's ranking (watch time, completion, shares, saves) and says drop slow intros and title cards; Trial Reels and the retention curve are official tools (find the first big dip). The X analytics post was off topic. No new owner shares since 10-26.
+- Changes: closed send-vs-save as "no signal" (no w8 reel identifiable, closing line now fixed). Started experiment short-script-85 (next 6 reels, pass rate vs a 1-of-6 baseline). New tactics short-script-85 and first-frame-hook-text (idea, needs owner OK); plan rewritten with all 6 as the short arm.
+- Why: the length growth to 45-60 s matches the slump and the owner already set 85 words, so we measure it instead of assuming. pick_sources.py could not run here; the planner supplies sources.

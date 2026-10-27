@@ -1,8 +1,8 @@
 {
  "account": {
   "username": "thedecodeher",
-  "followers_count": 74,
-  "media_count": 30,
+  "followers_count": 73,
+  "media_count": 31,
   "id": "39815642344686105"
  },
  "reels": [
@@ -152,13 +152,13 @@
    "permalink": "https://www.instagram.com/reel/DeqPlppmNEL/",
    "postedAt": 1792378914923,
    "reach": 1303,
-   "views": 1728,
+   "views": 1729,
    "likes": 37,
    "comments": 1,
    "shares": 20,
    "saved": 39,
-   "ig_reels_avg_watch_time": 18420,
-   "ig_reels_video_view_total_time": 24499480
+   "ig_reels_avg_watch_time": 18407,
+   "ig_reels_video_view_total_time": 24500689
   },
   {
    "title": "27-W2-biggest-turn-off",
@@ -376,7 +376,7 @@
    "title": "C-c5-4-conversations-that-lead-to",
    "permalink": "https://www.instagram.com/p/De9SIsojHzf/",
    "postedAt": 1793017859066,
-   "reach": 7,
+   "reach": 9,
    "likes": 2,
    "comments": 0,
    "shares": 0,
@@ -386,24 +386,37 @@
    "title": "42-W2-friend-zone-texts",
    "permalink": "https://www.instagram.com/reel/De9V2anEVt7/",
    "postedAt": 1793020269795,
-   "reach": 113,
-   "views": 141,
+   "reach": 114,
+   "views": 144,
    "likes": 3,
    "comments": 0,
    "shares": 2,
    "saved": 4,
-   "ig_reels_avg_watch_time": 9824,
-   "ig_reels_video_view_total_time": 1188753
+   "ig_reels_avg_watch_time": 9631,
+   "ig_reels_video_view_total_time": 1194281
   },
   {
    "title": "C-c6-for-some-people-kissing-can",
    "permalink": "https://www.instagram.com/p/De-amXAjK2g/",
    "postedAt": 1793056319101,
-   "reach": 6,
-   "likes": 1,
+   "reach": 11,
+   "likes": 2,
    "comments": 0,
    "shares": 0,
    "saved": 1
+  },
+  {
+   "title": "43-W2-three-questions",
+   "permalink": "https://www.instagram.com/reel/De_6ydXAX1G/",
+   "postedAt": 1793106744433,
+   "reach": 35,
+   "views": 55,
+   "likes": 1,
+   "comments": 0,
+   "shares": 0,
+   "saved": 2,
+   "ig_reels_avg_watch_time": 12877,
+   "ig_reels_video_view_total_time": 489344
   }
  ]
 }

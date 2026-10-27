@@ -13,7 +13,7 @@ Updated 2026-10-27. Evidence: owner rules, our 25 posted reels (performance.md 1
 - Reach is two-level: 15 reels at 110-270, 10 at 1,000-1,300, none between ([[audition-first-batch]]). So the goal of every reel is to pass the first audition.
 - Hold: avg watch of 16 s or more passed 7 of 9; below 16 s only 3 of 16. Second beat ("Listen" + named idea) before 15 s, no dead lead-in, first move stated before 35 s. Length 39-55 s shows no pattern.
 - Hooks: first sentence names the viewer's move or mistake + tension. Winning first lines: "Want her to like you more? Don't do her a favour. Let her do one for you." (1,150), "The more you chase her, the faster she pulls away. It's not bad luck." (1,117), "She teases you, just a little, to see what you'll do." (1,277). Hook-type data stops at 10-18 (small).
-- Shares: best 76/1k on "why chasing fails". Closing-line test (send vs save) has no readable w8 reel yet, so no closing-line rule.
+- Shares: best 76/1k on "why chasing fails". Closing-line test (send vs save) closed 10-27 as "no signal", so no closing-line rule beyond our fixed line. Running now: [[short-script-85]] (reels 37-42: 1 of 6 passed 1,000; Hootsuite also says drop slow intros and title cards, idea [[first-frame-hook-text]]).
 - Sources: no reel is tied to a source with views in performance.md, so no per-source ranking. Do not invent one.
 - Owner shares so far: hook > build-up > pay-off (robertmckeaveney); sound hit at second 0-1 is an optional test only ([[opening-sound-hit]]).
 
