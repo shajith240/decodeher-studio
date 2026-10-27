@@ -16,17 +16,19 @@ Read {os.path.join(ROOT, 'brain/rules/spoken-script-rules.md')} (how our narrati
 Rewrite ONLY the spoken lines of each reel (the lines between a "## NN · …" heading and its first <!-- comment). Keep everything else
 byte for byte: headings, <!-- --> comments, "## NN meta" blocks, captions.
 Hard rules:
-1. Keep the content: same points, same order, same examples and quoted texts (95/5). Do not add or remove points.
+1. Keep the content: same points, same order, same examples and quoted texts (95/5). Do not add points; drop some only for rule 6.
 2. It must sound like a friend talking, not like text on a screen. Every quoted text or example sits inside a full sentence that
    frames it: who says it, when, and what happens. E.g. NOT: "Yeah, we should hang out some time." Friend zone.
    BUT: If you text her "yeah, we should hang out some time", she'll put you in the friend zone. Instead, ask her
    "do you want to hang out later this week?"
 3. Complete sentences with a subject and a verb. Link each idea to the last with so, because, but, that's why, now, instead.
    No stacked one-word or two-word sentences (one deliberate short punch per reel at most).
-4. Keep the "[pause] Listen." beat right after the first (hook) sentence, keep the delivery tags ([pause], [confident],
+4. Keep the "Listen." beat right after the first (hook) sentence, keep the delivery tags ([pause], [confident],
    [lower voice]) and the closing line. One spoken line per row, like the draft.
 5. Plain words a 16-year-old who speaks English as a second language gets on first listen. No texting words (lol, haha, omg).
-6. Keep each reel at about the same length (do not pad).
+6. HARD LIMIT 85 spoken words per reel (about 30 s; 10-27 data: reels over 40 s lose viewers before the end and die at ~120 views).
+   If a reel is longer, cut its weakest points or examples (keep the hook, at most 3 points, the closing line). Never pad.
+7. Write the hook beat as "Listen." with NO [pause] before it: the first 3 seconds decide the reel, so no dead air.
 After rewriting, read each reel aloud in your head. Score it 0/1 on: framed examples, complete sentences, connectors, first-listen
 clear, same content as before. If any score is 0, rewrite again. Add a line <!-- narration: framed 1, sentences 1, connectors 1,
 clear 1, content 1 --> right after each reel's spoken lines.

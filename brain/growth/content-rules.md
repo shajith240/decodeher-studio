@@ -19,3 +19,8 @@ Updated 2026-10-27. Evidence: owner rules, our 25 posted reels (performance.md 1
 
 ## Stop doing
 - Topics built on texting words; hooks that only describe her with no viewer move; moves that make her insecure; carousels as a growth tool ([[carousel-reach-check]]); risers and trending audio.
+
+## 10-27 rule: short and no dead air (from our own numbers)
+Reels that hold ~17 s average watch reach ~1,100–1,300; reels at 10–13 s die at ~120. Since 10-22 every reel died at ~120, and the
+scripts had grown to 45–60 s. Rule: max 85 spoken words (~30 s), max 3 points, "Listen." with no pause, the hook line on screen from
+the first frame (above or below her face, never on it).

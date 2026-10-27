@@ -40,9 +40,9 @@ Read {os.path.join(ROOT, last)} (the exact format to copy) and {os.path.join(ROO
 From the sources below, pick the best {a.n} that are a single narratable message for men (SKIP skits, street interviews, dialogues,
 advice for creators, off-niche topics, and broken / garbled / cut-off transcripts). Owner sources (source = owner) come first if usable.
 For each, write a reel at 95/5: same hook, same points in the same order, same examples, similar length — reworded sentence by
-sentence, never word for word, translated to plain English if needed. Ours: "[pause] Listen." right after the hook sentence, and our
-closing line ("[lower voice] Save this …" or "[lower voice] Send this to the friend who …"). Aim for 20–35 seconds of speech
-(about 60–100 words); if a source is longer, keep its strongest points in order and drop the rest. No texting slang (lol, haha).
+sentence, never word for word, translated to plain English if needed. Ours: "Listen." right after the hook sentence (no pause),
+and our closing line ("[lower voice] Save this …" or "[lower voice] Send this to the friend who …"). HARD LIMIT 85 spoken words
+(about 30 s; 10-27 data: longer reels die at ~120 views); if a source is longer, keep its hook and strongest 3 points in order. No texting slang (lol, haha).
 Number the sections 01..{a.n:02d}, series "Dark psychology #{series}" upward, each with the <!-- source: … --> line (creator, views, url),
 a <!-- keyword: … --> line and the "## NN meta" block exactly like the example.
 Write the file {os.path.join(ROOT, out)}. Then reply with one line per reel: "<url>" only.
