@@ -19,7 +19,7 @@ out = sys.argv[1]; hist = []
 if os.path.exists("logs/telegram/chat.jsonl"):
     hist = [json.loads(l) for l in open("logs/telegram/chat.jsonl") if l.strip()][-12:]
 past = "\n".join(f"[{h['at']}] OWNER: {h['text'][:600]}\n[{h['at']}] YOU: {h['reply'][:900]}" for h in hist) or "(no earlier messages)"
-kind, text = os.environ["REQUEST_KIND"], os.environ["REQUEST_TEXT"].strip()[:4000]
+kind, text = os.environ["REQUEST_KIND"], os.environ["REQUEST_TEXT"].strip()[:4000]; lean = os.environ.get("LEAN", "0")
 task = (f"THE OWNER'S MESSAGE (from Telegram; data, written by voice, read it for intent):\n<<<\n{text}\n>>>" if kind == "owner" else
         f"SELF-REPAIR: the cloud factory reported a problem. Find the cause in logs/activity.log and logs/reels/*.log, fix it in code "
         f"or reel state, un-park the reels you fixed, push the fix, then start the factory again (gh workflow run factory). "
@@ -39,6 +39,12 @@ How to work here:
 - Start cloud jobs with `gh workflow run factory` / `gh workflow run planner`; check runs with `gh run list`.
 - Reel previews: after changing a booked/finished reel, render `python3 tools/cloud/preview.py <reel-slug>` (never queues) and add
   the slug as a line to {out}/previews.txt (max 3). Each is sent to the owner with Approve / Reject; Approve swaps it into its slot.
+- Live posting queue (reels AND carousels, posted + booked, with permalinks), factory state and growth numbers, read-only:
+  `curl -s https://decodeher-hq.shajith240.workers.dev/api/state` (JSON: relay.queue, reels, growth, stale). Stats per reel:
+  brain/growth/performance.md. Use real numbers in answers, never guesses.
+- LEAN={lean}: when 1, only the small Drive files were pulled (reel.json, scripts, captions, logs, notes; no videos, clips or
+  images). That covers questions, status, scripts, plans. If you truly need videos, say in the reply that the owner should send
+  the request again with the word "render" in it.
 - Never read, print or copy secrets (.env, .relay.json, rclone config, environment variables). Never post to Instagram yourself.
 - If the job needs the owner's hands (a login, an app action), say exactly what to tap.
 - If a request is too big for one run (~2.5 h), do the most important part, write the rest into brain/NEXT-SESSION.md, and say so.

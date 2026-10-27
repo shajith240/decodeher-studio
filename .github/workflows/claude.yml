@@ -53,11 +53,15 @@ jobs:
 
       - uses: ./.github/actions/prepare
 
-      - name: Pull from Drive
+      - name: Pull from Drive (small files only, unless the job needs videos)
         id: pull
         env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-        run: bash tools/cloud/sync.sh pull
+        run: |
+          # 10-27: the full pull took 21 min for a 37 s question. Videos/clips only for repairs and reel/video work.
+          if [ "$REQUEST_KIND" = repair ] || printf '%s' "$REQUEST_TEXT" | grep -qiE 'preview|render|video|reel|clip|caption|cover|music|sound|voice|frame|edit|hook|intro|outro|carousel'; then
+            echo "LEAN=0" >> "$GITHUB_ENV"; bash tools/cloud/sync.sh pull
+          else echo "LEAN=1" >> "$GITHUB_ENV"; LEAN=1 bash tools/cloud/sync.sh pull; fi
 
       - name: Claude works on it
         id: agent
@@ -71,7 +75,9 @@ jobs:
         if: always() && steps.agent.outcome == 'success'
         run: |
           out="$RUNNER_TEMP/claude-$REQUEST_ID"; mkdir -p "$out/land"
-          git add -A && git diff --cached --binary > "$out/land/change.patch" || true
+          # only real project files count (10-27: the runner's node_modules link was once sent to the owner as a "code change")
+          for p in brain tools hq relay site docs .github src config.json CLAUDE.md package.json; do [ -e "$p" ] && git add -A -- "$p"; done
+          git diff --cached --binary > "$out/land/change.patch" || true
           git diff --cached --name-only > "$out/land/files.txt" || true
           cp "$out/reply.txt" "$out/land/" 2>/dev/null || true; cp "$out/commit.txt" "$out/land/" 2>/dev/null || true
           echo "changed in git: $(wc -l < "$out/land/files.txt") file(s)"
@@ -135,12 +141,13 @@ jobs:
         run: |
           L="$RUNNER_TEMP/land"; [ -s "$L/change.patch" ] || { echo "no git changes"; exit 0; }
           git config user.name "decodeher-cloud"; git config user.email "cloud@users.noreply.github.com"
-          msg="$(head -c 200 "$L/commit.txt" 2>/dev/null || true)"; msg="${msg:-Cloud Claude: request $REQUEST_ID}"
+          msg="$(head -1 "$L/commit.txt" 2>/dev/null | head -c 200 || true)"
+          [ -n "$msg" ] || msg="$(grep -m1 . "$L/reply.txt" 2>/dev/null | head -c 200 || true)"; msg="${msg:-A change to how the system works}"
           if grep -qv '^brain/' "$L/files.txt"; then
             git checkout -q -b "claude/$REQUEST_ID"
             git apply --index "$L/change.patch" && git commit -q -m "$msg" && git push -q origin "claude/$REQUEST_ID"
-            files=$(grep -v '^brain/' "$L/files.txt" | head -8 | tr '\n' ' ')
-            python3 tools/cloud/report.py event preview "$msg — files: $files" --request-id "$REQUEST_ID" --code
+            n=$(grep -vc '^brain/' "$L/files.txt" || true)
+            python3 tools/cloud/report.py event preview "$msg ($n file$([ "$n" = 1 ] || echo s) of the system's code)" --request-id "$REQUEST_ID" --code
           else
             git apply --index "$L/change.patch" && git commit -q -m "$msg"
             for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done

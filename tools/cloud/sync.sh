@@ -41,6 +41,10 @@ cat > "$TMP/exclude.txt" <<'EOF'
 **/__pycache__/**
 **/node_modules/**
 EOF
+# LEAN=1 (10-27, claude.yml chat jobs): only the small files (reel.json, scripts, captions, logs, notes). The full pull took
+# 21 min for a 37 s question. Media stays on Drive untouched: never pulled, so never pushed back or deleted.
+if [ "${LEAN:-}" = 1 ]; then printf '%s\n' '*.mp4' '*.mov' '*.webm' '*.mkv' '*.wav' '*.mp3' '*.m4a' '*.flac' '*.png' '*.jpg' \
+  '*.jpeg' '*.webp' '*.gif' '*.pdf' '*.zip' '/_pool/**' '**/clips/**' '**/renders/**' >> "$TMP/exclude.txt"; fi
 skip(){ case "$1" in */renders/raw.mp4|*/assets/bg.mp4|*.part|*.part.mp4|*/.env|*/.relay.json|*.lock|*/__pycache__/*|*/node_modules/*) return 0;; esac; return 1; }
 FLAGS=(--exclude-from "$TMP/exclude.txt" --transfers 8 --checkers 16 --drive-chunk-size 64M --stats 2m --stats-one-line --stats-log-level NOTICE)
 FLAGS+=("${DRYRUN[@]}")
