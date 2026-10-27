@@ -46,7 +46,7 @@ jobs:
         run: |
           timeout 1500 python3 tools/viral_bank_yt.py --max-new 15 --transcribe || true
           timeout 1500 uv run -q --with curl_cffi python tools/viral_bank_ig.py --max-new 20 --transcribe || true
-      - name: Reels — write the next 95/5 batch when fewer than 4 days are booked or in production (tools/auto_planner.py)
+      - name: "Reels — trend-first, just in time (10-27), 3 fresh reels when under 1.5 days are booked or in production (tools/auto_planner.py)"
         continue-on-error: true
         env:
           RELAY_URL: ${{ secrets.RELAY_URL }}
@@ -54,7 +54,7 @@ jobs:
           HQ_URL: ${{ secrets.HQ_URL }}
           HQ_KEY: ${{ secrets.HQ_KEY }}
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-        run: timeout 3000 python3 tools/auto_planner.py --min-days 4 --n 6
+        run: timeout 3000 python3 tools/auto_planner.py --min-days 1.5 --n 3
       - name: Carousels — keep 2 days (4) booked (tools/carousel_daily.py)
         continue-on-error: true
         env:

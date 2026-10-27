@@ -152,6 +152,8 @@ def handle(item):
     mid, text = item["id"], item["text"]
     if re.fullmatch(r"\s*(new chat|reset chat|start over)\s*[.!]*", text, re.I):
         open(f"{SESS}/current", "w").write(""); return reply("🆕 Fresh conversation started.", mid, done=True)
+    # the latest plan / notes / code from main before every answer (10-27: the chat didn't know a plan written after it started)
+    subprocess.run(["git", "pull", "-q", "--rebase", "origin", "main"], capture_output=True)
     previews = os.path.join(os.environ.get("RUNNER_TEMP", "/tmp"), f"previews-{mid}.txt")
     model = pick_model(text); log(f"{mid}: {model}")
     stop = threading.Event()
