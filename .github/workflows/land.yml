@@ -1,0 +1,43 @@
+# Land a change the always-on chat runner made (chat.yml has no push rights; owner 10-27 chose "safer").
+# The runner uploads logs/telegram/land/<id>/ (change.patch, files.txt, commit.txt) to Drive, then starts this with {id}.
+# tools/cloud/land.sh: brain/-only → main; anything else → branch claude/<id> + Approve / Reject on Telegram (code.yml).
+name: land
+
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "chat message id (folder under logs/telegram/land/ on Drive)"
+        required: true
+
+concurrency:
+  group: land
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  land:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      REQUEST_ID: ${{ github.event.inputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch the change from Drive
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+        run: |
+          [[ "$REQUEST_ID" =~ ^[A-Za-z0-9_-]{1,64}$ ]] || { echo "bad id"; exit 1; }
+          command -v rclone >/dev/null || { curl -fsSL https://rclone.org/install.sh | sudo bash >/dev/null; }
+          ( umask 077; printf '%s\n' "$RCLONE_CONF" > "$RUNNER_TEMP/rclone.conf" )
+          RCLONE_CONFIG="$RUNNER_TEMP/rclone.conf" rclone copy "gdrive:decodeher/logs/telegram/land/$REQUEST_ID" "$RUNNER_TEMP/land"
+          rm -f "$RUNNER_TEMP/rclone.conf"
+      - name: Land it (tools/cloud/land.sh)
+        env:
+          HQ_URL: ${{ secrets.HQ_URL }}
+          HQ_KEY: ${{ secrets.HQ_KEY }}
+        run: bash tools/cloud/land.sh "$RUNNER_TEMP/land"

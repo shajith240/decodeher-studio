@@ -163,6 +163,24 @@ test("'hi' / 'thanks' get an instant reply and start no cloud job; a real questi
   assert.equal(w.ghCalls().length, 1);
 });
 
+test("chat runner alive: message is queued for it (typing, no cloud job), poll hands it over once, reply reaches the owner", async () => {
+  const w = world();
+  const poll = async () => (await w.req("/api/chat", { headers: w.auth })).json();
+  assert.deepEqual((await poll()).items, []);   // heartbeat
+  await w.say("hi, how did today's reel do?");
+  assert.equal(w.ghCalls().length, 0); assert.equal(w.tgCalls("sendChatAction").length, 1);
+  const got = (await poll()).items; assert.equal(got.length, 1); assert.equal(got[0].text, "hi, how did today's reel do?");
+  assert.equal((await poll()).items.length, 0, "handed over once");
+  await w.req("/api/chat", { method: "POST", headers: w.auth, body: { id: got[0].id, text: "It got **1,204** views <3", done: true } });
+  assert.match(lastText(w), /It got <b>1,204<\/b> views &lt;3/);
+  assert.equal((await w.st.get("chatInbox"))[0].state, "done");
+});
+
+test("chat API needs the key", async () => {
+  const w = world();
+  assert.equal((await w.req("/api/chat")).status, 401);
+});
+
 test("code-change preview → Approve dispatches code-merge with the request id (not the reel approve)", async () => {
   const w = world();
   const { id } = await (await w.req("/api/event", { method: "POST", headers: w.auth, body: { type: "preview", text: "Bigger captions", request_id: "r9", code: true } })).json();

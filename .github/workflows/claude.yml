@@ -133,22 +133,9 @@ jobs:
         with:
           name: land-${{ github.run_id }}
           path: ${{ runner.temp }}/land
-      - name: brain/ changes → main; code changes → branch claude/<id> + Approve on Telegram
+      - name: brain/ changes → main; code changes → branch claude/<id> + Approve on Telegram (tools/cloud/land.sh)
         if: steps.dl.outcome == 'success'
         env:
           HQ_URL: ${{ secrets.HQ_URL }}
           HQ_KEY: ${{ secrets.HQ_KEY }}
-        run: |
-          L="$RUNNER_TEMP/land"; [ -s "$L/change.patch" ] || { echo "no git changes"; exit 0; }
-          git config user.name "decodeher-cloud"; git config user.email "cloud@users.noreply.github.com"
-          msg="$(head -1 "$L/commit.txt" 2>/dev/null | head -c 200 || true)"
-          [ -n "$msg" ] || msg="$(grep -m1 . "$L/reply.txt" 2>/dev/null | head -c 200 || true)"; msg="${msg:-A change to how the system works}"
-          if grep -qv '^brain/' "$L/files.txt"; then
-            git checkout -q -b "claude/$REQUEST_ID"
-            git apply --index "$L/change.patch" && git commit -q -m "$msg" && git push -q origin "claude/$REQUEST_ID"
-            n=$(grep -vc '^brain/' "$L/files.txt" || true)
-            python3 tools/cloud/report.py event preview "$msg ($n file$([ "$n" = 1 ] || echo s) of the system's code)" --request-id "$REQUEST_ID" --code
-          else
-            git apply --index "$L/change.patch" && git commit -q -m "$msg"
-            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
-          fi
+        run: bash tools/cloud/land.sh "$RUNNER_TEMP/land"

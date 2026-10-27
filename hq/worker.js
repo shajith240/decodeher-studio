@@ -147,6 +147,8 @@ async function tgPhoto(env, b64, caption) {   // a preview frame from the laptop
   try { const r = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendPhoto`, { method: "POST", body: f }); return { ok: r.ok }; } catch { return { ok: false }; }
 }
 
+const CHAT_ALIVE_MS = 3 * 60e3, CHAT_GONE_MS = 40 * 60e3;   // chat runner heartbeat: answering now / restarting / gone
+
 // a whole message that is only a greeting / thanks / "ok" (no question, no request) — answered instantly, no cloud job
 const SMALL_TALK = /^(hi+|hii+|hello+|hey+|heya|yo|sup|hola|namaste|good (morning|afternoon|evening|night)|gm|gn|ok(ay)?|k|kk|cool|nice|great|thanks?|thank you|thx|ty|good job|👍|🙏|👋)[\s!.,🙂😊👍🙏👋]*$/i;
 
@@ -254,6 +256,7 @@ export class HQ extends DurableObject {
       stale: { factory: age === null ? true : age > STALE_MS, factoryAgeMin: age === null ? null : Math.round(age / 60e3), relay: !rs.ok, unfinished: unfinished(snap).length },
       growth: growth ? { ...growth, at: new Date(growth.at).toISOString(), goal: 1000, goalDate: "2026-10-26" } : null,
       hqNow: new Date().toISOString(),
+      chatBeatAge: (await this.get("chatBeat", 0)) ? Math.round((Date.now() - (await this.get("chatBeat", 0))) / 1000) : null,   // chat.yml watchdog
     };
   }
 
@@ -399,7 +402,19 @@ export class HQ extends DurableObject {
   }
 
   async onRequest(text) {   // free text = a task for Claude in the cloud (owner 10-27: run everything from the phone; .github/workflows/claude.yml)
-    // owner 10-27: "hi" started a whole cloud job and got the generic "On it" — greetings / small talk are answered here, instantly
+    // 10-27: the always-on chat runner (chat.yml) answers in seconds and remembers the conversation. Alive (polled in the last
+    // 3 min) → queue for it and show "typing"; restarting (seen in the last 40 min) → queue + say so once; gone → the old one-shot job.
+    const beat = await this.get("chatBeat", 0), age = Date.now() - beat;
+    if (beat && age < CHAT_GONE_MS) {
+      const box = await this.get("chatInbox", []);
+      box.push({ id: newId("c"), text: text.slice(0, 4000), at: Date.now(), state: "queued" });
+      await this.put("chatInbox", box.slice(-50));
+      if (age < CHAT_ALIVE_MS) return tg(this.env, "sendChatAction", { chat_id: this.env.OWNER_CHAT_ID, action: "typing" });
+      const told = await this.get("chatToldAt", 0);
+      if (Date.now() - told > 10 * 60e3) { await this.put("chatToldAt", Date.now()); return say(this.env, "⏳ I'm restarting (a few minutes). Your message is saved and I'll answer as soon as I'm back."); }
+      return { ok: true };
+    }
+    // owner 10-27: "hi" started a whole cloud job — with no chat runner up, greetings / small talk are answered here, instantly
     if (SMALL_TALK.test(text.trim())) {
       const thanks = /thank|thx|great|nice|cool|ok|okay|good job/i.test(text);
       return say(this.env, thanks ? "👍 Anytime. I'm keeping the page running. Message me whenever you want something changed or checked."
@@ -414,6 +429,35 @@ export class HQ extends DurableObject {
     const gist = text.replace(/\s+/g, " ").trim(), short = gist.length > 70 ? `${gist.slice(0, 67)}…` : gist;
     return say(this.env, r.ok ? `🧠 Got it: “${esc(short)}”\nI'm on it. Answers take about 5 minutes, bigger jobs longer. I'll reply right here.` :
       "⚠️ I saved your request, but I couldn't start the work just now (GitHub didn't answer). Please send it again in a few minutes.");
+  }
+
+  // ----- the always-on chat runner (tools/cloud/chat_runner.py in chat.yml) -----
+  async chatPoll() {   // the runner asks for new owner messages (every few seconds); doubles as its heartbeat
+    const prev = await this.get("chatBeat", 0); await this.put("chatBeat", Date.now());
+    const box = await this.get("chatInbox", []);
+    // a runner that died mid-answer (new runner after a silence): its unfinished messages go back in the queue
+    if (Date.now() - prev > CHAT_ALIVE_MS) for (const x of box) if (x.state === "working") x.state = "queued";
+    const items = box.filter((x) => x.state === "queued");
+    if (!items.length) return { ok: true, items: [] };
+    for (const x of items) { x.state = "working"; x.takenAt = Date.now(); }
+    await this.put("chatInbox", box);
+    return { ok: true, items: items.map(({ id, text, at }) => ({ id, text, at })) };
+  }
+  async chatReply(b) {   // {id?, text?, typing?, done?, bye?} — text is Claude's plain reply (light markdown: **bold**)
+    // bye: the runner is handing over — "restarting" (messages wait for the next runner; the watchdog may start one)
+    await this.put("chatBeat", b.bye ? Date.now() - CHAT_ALIVE_MS - 1000 : Date.now());
+    if (b.bye) return { ok: true };
+    if (b.typing) await tg(this.env, "sendChatAction", { chat_id: this.env.OWNER_CHAT_ID, action: "typing" });
+    const t = String(b.text || "").trim();
+    if (t) {
+      const html = esc(t).replace(/\*\*([^*\n]{1,200})\*\*/g, "<b>$1</b>");
+      for (let i = 0; i < html.length; i += 3900) await say(this.env, html.slice(i, i + 3900));
+    }
+    if (b.done && b.id) {
+      const box = await this.get("chatInbox", []), x = box.find((y) => y.id === b.id);
+      if (x) { x.state = "done"; await this.put("chatInbox", box); }
+    }
+    return { ok: true };
   }
 
   async onButton(cq) {
@@ -718,6 +762,11 @@ async function handle(req, env) {
     if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
     if (req.method === "GET") return json(await hq(env).pinInbox());
     if (req.method === "POST") { const b = await body(req); if (!b || !b.id) return json({ ok: false, error: "send {id, state, text}" }, 400); const r = await hq(env).pinResult(b); return json(r, r.ok ? 200 : 400); }
+  }
+  if (p === "/api/chat") {   // 10-27: the always-on chat runner: GET = new owner messages (+ heartbeat), POST = reply / typing / done
+    if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+    if (req.method === "GET") return json(await hq(env).chatPoll());
+    if (req.method === "POST") { const b = await body(req); if (!b) return json({ ok: false, error: "send {id, text, typing, done}" }, 400); return json(await hq(env).chatReply(b)); }
   }
   if (p === "/api/tgfile" && req.method === "GET") {   // 10-18: the laptop downloads a video the owner sent (the bot token never leaves HQ)
     if (!bearer(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
