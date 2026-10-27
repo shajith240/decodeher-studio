@@ -14,7 +14,8 @@ The owner gave Claude full control of content and growth: **decide, don't ask**;
 | Posting relay | Cloudflare `relay/worker.js` | posts booked reels (08:30, 18:30, 22:00 IST) and carousels (04:30, 20:00) |
 | Factory | GitHub `.github/workflows/factory.yml` (every 3 h) → `tools/factory.py` | voice → plan → clips → mix → sheets → judge → render → book |
 | Planner | GitHub `planner.yml` (05:30 + 17:30 IST) | growth stats + notes, viral bank collectors, next reel batch (`tools/auto_planner.py`), carousels |
-| Claude in the cloud | GitHub `claude.yml` → `tools/cloud/claude_task.sh` | any Telegram message from the owner = a full Claude session; replies on Telegram |
+| Telegram chat with Claude | GitHub `chat.yml` → `tools/cloud/chat_runner.py` (always on, hands over every ~5.5 h; watchdog every 20 min) | the owner's plain Telegram messages → one ongoing Claude session, replies in seconds; changes land via `land.yml` (brain → main, code → owner's Approve) |
+| One-shot Claude (fallback) | GitHub `claude.yml` → `tools/cloud/claude_task.sh` | used when the chat runner is down > 40 min, and for factory self-repair |
 | Self-repair | last steps of `factory.yml` | failed run / newly parked reels → starts `claude.yml` (kind=repair), max once per 6 h |
 | HQ + Telegram bot | Cloudflare `hq/worker.js` | the owner's phone interface, /status /queue /stats, board at https://decodeher-hq.shajith240.workers.dev |
 | Files | Google Drive `gdrive:decodeher/` via `tools/cloud/sync.sh` | reels, library, deliverables, logs (code is in git; the repo is PUBLIC, so no secrets or private notes in git) |
