@@ -50,3 +50,9 @@
 - Learned: no new inbox items (both files already noted 10-19 and 10-26) and no new owner shares. The first short reels did not pass (0 of 2; 6 needed). The "16 s average watch" bar cannot fit a 30 s reel, so for short reels read watch % or retention. Followers fell by 2 (tiny n, could be noise).
 - Changes: short-script-85 keeps running with an interim note (no early call). Success rule now uses watch %. Plan topics refreshed (reel 43 already used "three questions"). Ask the factory side to log word count, source, hook line and watch % per reel in performance.md.
 - Why: one experiment at a time; 2 reels cannot call a result. pick_sources.py could not run here.
+
+## 2026-10-28 (night run)
+- Numbers: 79 followers (72 this morning, 6 on 10-16). Reel 43 reach 126; reel 44 reach 408 (15.7 s, 76 saves/1k), up from 210; reels 45-47 hours old (0 recorded). Carousels c8-c9 under 10.
+- Learned: the only new inbox item is a Sprout B2B segmentation guide, mostly off topic (note written; only "generic AI content loses trust" is useful, vendor data). Reel 44 shows short reels can land between 270 and 1,000. The +7 follower jump has no clear cause yet.
+- Changes: short-script-85 keeps running, interim logged, no call (0 of 2 passed, 6 needed). Plan and playbook headers refreshed; no new tactic or experiment.
+- Why: 5 short reels still lack 48 h data; one experiment at a time. pick_sources.py was not run (needs approval here).

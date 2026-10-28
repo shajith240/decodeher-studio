@@ -13,3 +13,9 @@
 - Short reels so far: 43-W2-three-questions (reach 123, avg watch 10.7 s), 44-W2-six-compliments (210, 13.8 s; word count not logged). 0 of 2 passed. 45-W2-soulmates is hours old.
 - Fix to the success rule: "avg watch 16 s or more" came from 45-60 s reels. For ~30 s reels use watch % (34% or more, the old pass line) once the data has it. Still need 6 short reels with 48 h data.
 - Confound: 43-45 are list-style topics ("three questions", "soulmates"), not hooks that name her behaviour or the viewer's move, and hook lines were not logged.
+
+## Interim 2026-10-28 night (not a result)
+- Reel 43: reach 126, 10.8 s. Reel 44: reach 408 (210 earlier today), 15.7 s, saves 76/1k, shares 29/1k: best short reel, short of 1,000. Reels 45-47 posted 10-28, no data yet (lag ~24 h). 0 of 2 passed; 6 needed.
+- Followers 79 at 23:57 (72 at 10:49). Do not credit the short test: no reel passed.
+- Still missing per reel: word count, source, hook line, watch %.
+- Result: pending.
