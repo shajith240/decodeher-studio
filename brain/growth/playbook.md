@@ -1,4 +1,4 @@
-# Playbook (updated 2026-10-27 evening; numbers from performance.md: 25 reels, 5 carousels, 73-74 followers)
+# Playbook (updated 2026-10-28; numbers from performance.md: 29 reels, 8 carousels, 72 followers)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)
@@ -20,7 +20,7 @@ Only official guidance, our own proven numbers, and the owner's fixed rules are 
 - Show before you ship: anything new and visual goes to the owner as a preview first.
 
 ## C. Testing now
-- [[short-script-85]]: experiments/2026-10-27-short-script-85.md. Next 6 reels, pass rate and avg watch vs the 1-of-6 baseline. The send-vs-save test was closed as "no signal".
+- [[short-script-85]]: experiments/2026-10-27-short-script-85.md. Next 6 reels, pass rate vs the 1-of-6 baseline. Interim 10-28: 0 of 2 passed (reach 123, 210); judge on watch %, since 16 s average watch is too high a bar for a 30 s reel. The send-vs-save test was closed as "no signal".
 
 ## D. Signals to watch (our data, small, not rules)
 - Slot pass rate (reach 1,000+): 08:30 5 of 8, 18:30 3 of 9, 22:00 2 of 8. Tiny n; balance arms across slots anyway.

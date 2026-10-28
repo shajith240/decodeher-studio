@@ -8,3 +8,8 @@
 - End: when 6 short reels have 48 h of data (about 2026-11-01 to 11-03). Call "works" if 3+ of 6 pass AND avg watch is 16 s or more on those; "failed" if 0-1 of 6 pass; otherwise "no signal".
 - Warning: baseline is historic, topic and source also change (trend-first, 95/5), so a pass is a hint, not proof. Reel 43 (three questions, 10-27) is the first short one; its 48 h data is not in yet.
 - Result: pending.
+
+## Interim 2026-10-28 (not a result)
+- Short reels so far: 43-W2-three-questions (reach 123, avg watch 10.7 s), 44-W2-six-compliments (210, 13.8 s; word count not logged). 0 of 2 passed. 45-W2-soulmates is hours old.
+- Fix to the success rule: "avg watch 16 s or more" came from 45-60 s reels. For ~30 s reels use watch % (34% or more, the old pass line) once the data has it. Still need 6 short reels with 48 h data.
+- Confound: 43-45 are list-style topics ("three questions", "soulmates"), not hooks that name her behaviour or the viewer's move, and hook lines were not logged.

@@ -1,4 +1,5 @@
-# Next batch plan: the next 6 scripts (rewritten 2026-10-27 evening)
+# Next batch plan: the next 6 scripts (refreshed 2026-10-28)
+10-28: reels 43-45 (three questions, six compliments, soulmates) were list-style and none passed. Every hook below names her behaviour or the viewer's move in sentence one. Row 4 changed (three questions already posted as 43). Live sources come from the planner's pick_sources run (could not run here); no owner shares since 10-26.
 Experiment: [[short-script-85]]. Every one of these 6 is the SHORT arm: max 85 spoken words (~30 s), max 3 points, "Listen." with no pause, second beat before 15 s. Log the word count in each draft.
 Sources: `python3 tools/pick_sources.py 8` needs approval and could not run in this session; the factory's planner runs it (owner picks first, then viral bank, last 60 days, faceless format, skip skits/street interviews). The topics below are fallbacks if the source picker returns nothing; the live plan is NEXT-SESSION.md.
 Follows brain/rules/spoken-script-rules.md, brain/rules/script-writing-system.md, content-rules.md and the owner's ethics line. No texting words (haha, lol, omg, idk, tbh) in scripts or as topics. 95/5: same hook, points, order, examples as the source; reword every line; add one original example.
@@ -10,7 +11,7 @@ Slots (relay): 08:30, 18:30, 22:00 IST; two reels per slot across the batch. 08:
 | 1 | T5 myth, mechanism, move | attraction myths | Playing it cool | Stop acting like you don't care. It doesn't make her chase you. Listen. | wrong-belief flip | close-up, unimpressed half smile | d1 08:30 | short |
 | 2 | T2 scene, freeze, rewrite | communication | "We'll see" | When you ask her out and she says "we'll see", don't answer the way most guys do. | mistake callout | half-turned, thinking | d1 18:30 | short |
 | 3 | T8 decision tree | manipulation literacy | She cancels, then wants to reschedule | If she cancels last minute and offers another day, don't reply right away. Listen. | mistake callout | looks at phone, sighs | d1 22:00 | short |
-| 4 | T6 three-question audit | self-command | Before the follow-up | Before you text her again, ask yourself three questions. | mid-scene | eyes reading a message, no smile | d2 08:30 | short |
+| 4 | T6 three-question audit | self-command | Before the angry reply | Before you answer her cold message, ask yourself one thing first. | mid-scene | eyes reading a message, no smile | d2 08:30 | short |
 | 5 | T9 red flag vs green flag | standards | Plans that never get set | If she says "let's hang out soon" and never picks a day, you have two choices. | behaviour + verdict | scrolls, phone lit on her face | d2 18:30 | short |
 | 6 | T0 decode + three moves | communication | Double text, then silence | If she goes quiet after your double text, don't send a third. Listen. | mistake callout | starts typing, stops | d2 22:00 | short |
 

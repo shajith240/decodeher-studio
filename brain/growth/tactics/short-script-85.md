@@ -4,4 +4,5 @@ Status: testing (experiment 2026-10-27-short-script-85)
 - Why: Reels rank on watch time and completion; replays of short dense reels count too. In our data avg watch of 16 s or more passed the audition 7 of 9, under 16 s only 3 of 16. Since 10-22 scripts grew to 45-60 s and 6 of 7 reels stopped at 35-147 reach.
 - Pipeline: `tools/script_polish.py` enforces words and pause; narration stays complete framed sentences.
 - Evidence: [[2026-10-27-hootsuite-instagram-reels-2026]] (vendor), [[2026-10-27-buffer-instagram-algorithm-2026-guide]], our performance.md (small n; topic and slot also differ).
+- Interim 10-28: first 2 short reels 0 of 2 passed (reach 123 and 210; avg watch 10.7 and 13.8 s). Too early to call.
 - Risk: a 30 s reel can cap avg watch below 16 s in seconds terms. Judge by watch % too.

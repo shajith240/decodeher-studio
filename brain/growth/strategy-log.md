@@ -44,3 +44,9 @@
 - Learned: Hootsuite's Reels guide repeats Meta's ranking (watch time, completion, shares, saves) and says drop slow intros and title cards; Trial Reels and the retention curve are official tools (find the first big dip). The X analytics post was off topic. No new owner shares since 10-26.
 - Changes: closed send-vs-save as "no signal" (no w8 reel identifiable, closing line now fixed). Started experiment short-script-85 (next 6 reels, pass rate vs a 1-of-6 baseline). New tactics short-script-85 and first-frame-hook-text (idea, needs owner OK); plan rewritten with all 6 as the short arm.
 - Why: the length growth to 45-60 s matches the slump and the owner already set 85 words, so we measure it instead of assuming. pick_sources.py could not run here; the planner supplies sources.
+
+## 2026-10-28
+- Numbers: 72 followers (74 on 10-27 morning, 6 on 10-16). Reel 43 (first short script): reach 123, avg watch 10.7 s. Reel 44 (six compliments): reach 210, 13.8 s. Reel 45 (soulmates) is hours old, reach 0. Carousels c6-c8 reached 2-15.
+- Learned: no new inbox items (both files already noted 10-19 and 10-26) and no new owner shares. The first short reels did not pass (0 of 2; 6 needed). The "16 s average watch" bar cannot fit a 30 s reel, so for short reels read watch % or retention. Followers fell by 2 (tiny n, could be noise).
+- Changes: short-script-85 keeps running with an interim note (no early call). Success rule now uses watch %. Plan topics refreshed (reel 43 already used "three questions"). Ask the factory side to log word count, source, hook line and watch % per reel in performance.md.
+- Why: one experiment at a time; 2 reels cannot call a result. pick_sources.py could not run here.

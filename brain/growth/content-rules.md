@@ -1,5 +1,5 @@
 # Content rules (living rulebook, rewritten daily by the growth session; every script writer follows it)
-Updated 2026-10-27. Evidence: owner rules, our 25 posted reels (performance.md 10-27), viral bank (81 YouTube Shorts, 202 Instagram posts, all ≥1M).
+Updated 2026-10-28. Evidence: owner rules, our 29 posted reels (performance.md 10-28), viral bank (81 YouTube Shorts, 202 Instagram posts, all ≥1M).
 
 ## Fixed (owner)
 1. Every reel remixes a proven post at 95/5: same hook, same points in the same order, same examples, similar length. Ours: "Listen." after the hook + our closing line. Reword every sentence, never copy word for word. Add one original example or named idea ([[original-content-check]]).
@@ -19,6 +19,11 @@ Updated 2026-10-27. Evidence: owner rules, our 25 posted reels (performance.md 1
 
 ## Stop doing
 - Topics built on texting words; hooks that only describe her with no viewer move; moves that make her insecure; carousels as a growth tool ([[carousel-reach-check]]); risers and trending audio.
+
+## 10-28 update
+- First short reels: 43 (reach 123) and 44 (210), 0 of 2 passed; the test needs 6. Let the hook carry the weight: sentence one names her behaviour or the viewer's move (the three 1,100+ first lines above). List-style titles ("three questions", "soulmates") did not pass.
+- For 30 s reels judge watch % (34%+), not "16 s average watch". Followers 74 → 72 (tiny n).
+- No new owner shares or advice today.
 
 ## 10-27 rule: short and no dead air (from our own numbers)
 Reels that hold ~17 s average watch reach ~1,100–1,300; reels at 10–13 s die at ~120. Since 10-22 every reel died at ~120, and the
