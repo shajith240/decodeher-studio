@@ -23,6 +23,13 @@ died at ~120. Our copies were of OLD (2023–24) face-to-camera hits, 45–60 s 
 
 Posting stays 3 reels a day (08:30, 18:30, 22:00 IST) + 2 carousels (04:30, 20:00). Judge results from ~10-31.
 
+# 10-28 11:35 IST
+- Parked the 5 old long reels (v8-03, v8-04, v8-05, v9-01, v9-02: 95–145 words, made before the 85-word rule). They made
+  auto_planner think 1.5 days were "in production", so it wrote no new reels. With them parked it makes 3 new short trend
+  reels at the 17:30 planner run. Tonight's two (v7-03 18:30, v8-02 22:00) are old method too but already booked; the
+  cloud session has no relay access to unbook them.
+- Bug to fix in code: auto_planner should count only reels that pass the current rules (≤85 words), not every unbooked one.
+
 # Open items
 - Owner: approve a hook-text sample (item 5); spare IG account warm-up (scroll on phone).
 - Build item 4 into the factory; pick the series name (item 6).
