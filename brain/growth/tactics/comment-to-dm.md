@@ -2,6 +2,8 @@
 Status: candidate (researched 2026-10-18). Do not put it on a live reel until the owner has seen the free page, the DM text and one sample reel ending.
 Links: [[send-or-save-closing-line]] (running test, do not disturb), [[comment-prompt]], [[keyword-seo]], [[reply-to-comments]], [[profile-conversion]].
 
+10-30: [[2026-10-30-buffer-social-media-engagement-tools]] (vendor) repeats keyword-comment auto-DM (Manychat) and Meta Business Suite as the free inbox; no new data, status unchanged.
+
 ## The short answer
 - **Path: Meta's own free "Comment to Message" automation in Meta Business Suite (desktop).** No app review, no third-party login, no cost, no limit on contacts. Fallback if it proves too limited: ManyChat Essential (about $14-17 a month, 250 contacts). Building it ourselves in the relay is blocked for now (needs Meta App Review + Business Verification, see 2).
 - **What it does for us:** turns viewers into DM conversations, site visits and sales. It is a conversion tool more than a reach tool. Comments are not one of Mosseri's three main Reels signals (watch time, sends per reach, likes per reach), and one-word comments carry little information.

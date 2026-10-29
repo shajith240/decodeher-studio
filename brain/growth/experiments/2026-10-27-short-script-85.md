@@ -19,3 +19,8 @@
 - Followers 79 at 23:57 (72 at 10:49). Do not credit the short test: no reel passed.
 - Still missing per reel: word count, source, hook line, watch %.
 - Result: pending.
+
+## Interim 2026-10-30 (not a result)
+- Only reels 43 (reach 126) and 44 (reach 423, 520 views, 15.5 s, saves 71/1k, shares 28/1k) have data. Reels 45, 46, 47 (posted 10-28, 48 h+ ago) still show reach 0 and no views. Almost surely a stats-fetch gap, not real zero reach: followers went 79, 90, 102 in 24 h. They cannot be counted until the fetch is fixed. 0 of 2 measurable passed.
+- The test continues; new end date about 11-03 (real data on 45-47 plus the next 3 short reels). Ask the factory side to check why insights return 0 for reels 45-47 and carousels c9-c11.
+- Result: pending.

@@ -1,4 +1,4 @@
-# Playbook (updated 2026-10-28 night; performance.md: 34 reels, 9 carousels, 79 followers)
+# Playbook (updated 2026-10-30; performance.md: 35 reels, 11 carousels, 102 followers; reels 45-47 show 0 stats = fetch gap)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)
@@ -21,6 +21,8 @@ Only official guidance, our own proven numbers, and the owner's fixed rules are 
 
 ## C. Testing now
 - [[short-script-85]]: experiments/2026-10-27-short-script-85.md. Next 6 reels, pass rate vs the 1-of-6 baseline. Interim 10-28 night: 0 of 2 passed (reach 126, 408 and rising; reels 45-47 too new); judge on watch %, since 16 s average watch is too high a bar for a 30 s reel. The send-vs-save test was closed as "no signal".
+
+- Update 10-30: still 0 of 2 measurable short reels passed (43: 126; 44: 423 reach, 15.5 s, 71 saves/1k). Reels 45-47 read 0 because the stats fetch returned nothing, not because nobody saw them (followers 79, 90, 102 in a day). No call until that is fixed and 6 short reels have data (~11-03).
 
 ## D. Signals to watch (our data, small, not rules)
 - Slot pass rate (reach 1,000+): 08:30 5 of 8, 18:30 3 of 9, 22:00 2 of 8. Tiny n; balance arms across slots anyway.

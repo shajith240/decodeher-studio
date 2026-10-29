@@ -56,3 +56,9 @@
 - Learned: the only new inbox item is a Sprout B2B segmentation guide, mostly off topic (note written; only "generic AI content loses trust" is useful, vendor data). Reel 44 shows short reels can land between 270 and 1,000. The +7 follower jump has no clear cause yet.
 - Changes: short-script-85 keeps running, interim logged, no call (0 of 2 passed, 6 needed). Plan and playbook headers refreshed; no new tactic or experiment.
 - Why: 5 short reels still lack 48 h data; one experiment at a time. pick_sources.py was not run (needs approval here).
+
+## 2026-10-30
+- Numbers: 102 followers (79 on 10-28 night, 90 on 10-29, 6 on 10-16). Reel 43 reach 126; reel 44 reach 423 (15.5 s, 71 saves/1k). Reels 45-47 (10-28) and carousels c9-c11 show 0 reach: very likely a stats-fetch gap, since followers rose 23 in 24 h.
+- Learned: the two inbox items (Buffer engagement tools, Sprout link in bio) are vendor filler; only "first bio link shows, put the key one first" is usable, and only once we have a product. No owner shares. We cannot judge the short-script test because 3 of its 6 reels have no readable data.
+- Changes: short-script-85 continues, end date moved to ~11-03, interim logged, no result. Plan, playbook and content-rules headers refreshed; two notes written; no new tactic or experiment.
+- Why: one experiment at a time and 2 measurable reels cannot call it. Factory side: please check the insights fetch for reels 45-47 and carousels c9-c11, and log word count, source, hook line, watch % per reel. pick_sources.py was not run (needs approval here).

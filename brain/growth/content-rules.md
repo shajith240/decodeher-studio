@@ -30,5 +30,8 @@ Reels that hold ~17 s average watch reach ~1,100–1,300; reels at 10–13 s die
 scripts had grown to 45–60 s. Rule: max 85 spoken words (~30 s), max 3 points, "Listen." with no pause, the hook line on screen from
 the first frame (above or below her face, never on it).
 
+## 10-30
+- No rule changes. Short reels so far: 43 reach 126, 44 reach 423 (15.5 s, 71 saves/1k); 45-47 unmeasured (stats gap). Followers 102 (+23 in 24 h, cause unknown, tiny n). Today's vendor posts (engagement tools, link in bio) add no script rule; nothing new from the owner.
+
 ## 10-28 night
 - Reel 44 (six compliments, short) climbed to reach 408, 15.7 s avg watch, 76 saves/1k: short reels can land between the two reach levels. Followers 79 (+7 since morning, tiny n). Reels 45-47 have no data. No new owner shares; the Sprout B2B guide only repeats "generic AI content loses" (keep one original example per reel).
