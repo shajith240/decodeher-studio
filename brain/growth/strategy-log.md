@@ -62,3 +62,9 @@
 - Learned: the two inbox items (Buffer engagement tools, Sprout link in bio) are vendor filler; only "first bio link shows, put the key one first" is usable, and only once we have a product. No owner shares. We cannot judge the short-script test because 3 of its 6 reels have no readable data.
 - Changes: short-script-85 continues, end date moved to ~11-03, interim logged, no result. Plan, playbook and content-rules headers refreshed; two notes written; no new tactic or experiment.
 - Why: one experiment at a time and 2 measurable reels cannot call it. Factory side: please check the insights fetch for reels 45-47 and carousels c9-c11, and log word count, source, hook line, watch % per reel. pick_sources.py was not run (needs approval here).
+
+## 2026-10-30 (night run)
+- Numbers: 103 followers (102 at 00:24, 101 at 11:01, 6 on 10-16). Reel 43 reach 126; reel 44 reach 423. Reels 45-47 and carousels c9-c12 still read 0 reach: the stats gap is 48 h+ old while followers keep rising.
+- Learned: the inbox holds the same two owner tips already noted (Damini 10-19, itsruiz 10-26), so no new notes. No new owner shares (owner.jsonl still 1 row). pick_sources.py not run (needs approval here).
+- Changes: none to rules or tactics. short-script-85 continues (end ~11-03). Adopted tips unchanged: viewer-move hook + reason to send (Damini); opening sound hit stays an idea needing owner OK (itsruiz).
+- Why: only 2 of 6 short reels are readable, so no call. Factory side: fix the insights fetch for reels 45-47 and carousels c9-c12, or the test cannot end.

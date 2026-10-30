@@ -24,3 +24,7 @@
 - Only reels 43 (reach 126) and 44 (reach 423, 520 views, 15.5 s, saves 71/1k, shares 28/1k) have data. Reels 45, 46, 47 (posted 10-28, 48 h+ ago) still show reach 0 and no views. Almost surely a stats-fetch gap, not real zero reach: followers went 79, 90, 102 in 24 h. They cannot be counted until the fetch is fixed. 0 of 2 measurable passed.
 - The test continues; new end date about 11-03 (real data on 45-47 plus the next 3 short reels). Ask the factory side to check why insights return 0 for reels 45-47 and carousels c9-c11.
 - Result: pending.
+
+## Interim 2026-10-30 night (not a result)
+- No change: reels 45-47 still read 0 reach after 48 h+. Still 0 of 2 measurable passed. Followers 103. End date stays ~11-03; if the fetch is not fixed by then, read reach by hand in the app.
+- Result: pending.
