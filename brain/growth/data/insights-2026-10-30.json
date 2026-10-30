@@ -1,8 +1,8 @@
 {
  "account": {
   "username": "thedecodeher",
-  "followers_count": 102,
-  "media_count": 40,
+  "followers_count": 101,
+  "media_count": 41,
   "id": "39815642344686105"
  },
  "reels": [
@@ -126,13 +126,13 @@
    "permalink": "https://www.instagram.com/reel/DeovfS9m9FU/",
    "postedAt": 1792329070211,
    "reach": 1063,
-   "views": 1302,
+   "views": 1303,
    "likes": 17,
    "comments": 0,
    "shares": 4,
    "saved": 16,
-   "ig_reels_avg_watch_time": 13339,
-   "ig_reels_video_view_total_time": 14713772
+   "ig_reels_avg_watch_time": 13330,
+   "ig_reels_video_view_total_time": 14716389
   },
   {
    "title": "25-W2-double-text-then-silence",
@@ -350,14 +350,14 @@
    "title": "40-W2-three-rules-of-thomas-sh",
    "permalink": "https://www.instagram.com/reel/De1oXUXjNWZ/",
    "postedAt": 1792761529907,
-   "reach": 134,
+   "reach": 135,
    "views": 166,
    "likes": 2,
    "comments": 0,
    "shares": 1,
    "saved": 1,
-   "ig_reels_avg_watch_time": 13412,
-   "ig_reels_video_view_total_time": 1877716
+   "ig_reels_avg_watch_time": 13335,
+   "ig_reels_video_view_total_time": 1880242
   },
   {
    "title": "41-W2-she-s-testing-your-tempe",
@@ -386,14 +386,14 @@
    "title": "42-W2-friend-zone-texts",
    "permalink": "https://www.instagram.com/reel/De9V2anEVt7/",
    "postedAt": 1793020269795,
-   "reach": 118,
-   "views": 150,
+   "reach": 119,
+   "views": 151,
    "likes": 3,
    "comments": 0,
    "shares": 2,
    "saved": 4,
-   "ig_reels_avg_watch_time": 9623,
-   "ig_reels_video_view_total_time": 1251118
+   "ig_reels_avg_watch_time": 9564,
+   "ig_reels_video_view_total_time": 1252895
   },
   {
    "title": "C-c6-for-some-people-kissing-can",
@@ -410,19 +410,19 @@
    "permalink": "https://www.instagram.com/reel/De_6ydXAX1G/",
    "postedAt": 1793106744433,
    "reach": 133,
-   "views": 175,
+   "views": 177,
    "likes": 5,
    "comments": 0,
    "shares": 2,
    "saved": 6,
-   "ig_reels_avg_watch_time": 10923,
-   "ig_reels_video_view_total_time": 1583929
+   "ig_reels_avg_watch_time": 10786,
+   "ig_reels_video_view_total_time": 1585647
   },
   {
    "title": "C-c7-don-t-judge-a-woman-simply-b",
    "permalink": "https://www.instagram.com/p/DfAFJ4vDHb7/",
    "postedAt": 1793112187183,
-   "reach": 10,
+   "reach": 11,
    "likes": 2,
    "comments": 0,
    "shares": 0,
@@ -432,14 +432,14 @@
    "title": "44-W2-six-compliments",
    "permalink": "https://www.instagram.com/reel/DfAS7WCktLe/",
    "postedAt": 1793119400508,
-   "reach": 423,
-   "views": 520,
+   "reach": 424,
+   "views": 527,
    "likes": 9,
    "comments": 0,
    "shares": 12,
    "saved": 30,
-   "ig_reels_avg_watch_time": 15538,
-   "ig_reels_video_view_total_time": 6603691
+   "ig_reels_avg_watch_time": 15463,
+   "ig_reels_video_view_total_time": 6618581
   },
   {
    "title": "C-c8-a-95-year-old-man-who-was-wi",
@@ -485,6 +485,12 @@
    "title": "C-c11-the-honeymoon-period-can-fee",
    "permalink": "https://www.instagram.com/p/DfFPV7DDoJ2/",
    "postedAt": 1793285299909,
+   "error": "Too many subrequests by single Worker invocation. To configure this limit, refer to https://developers.cloudflare.com/workers/wrangler/configuration/#limits"
+  },
+  {
+   "title": "C-c12-not-because-attractiveness-i",
+   "permalink": "https://www.instagram.com/p/DfGJ1-JCKZe/",
+   "postedAt": 1793315974215,
    "error": "Too many subrequests by single Worker invocation. To configure this limit, refer to https://developers.cloudflare.com/workers/wrangler/configuration/#limits"
   }
  ]
