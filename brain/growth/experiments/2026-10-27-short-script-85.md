@@ -25,6 +25,10 @@
 - The test continues; new end date about 11-03 (real data on 45-47 plus the next 3 short reels). Ask the factory side to check why insights return 0 for reels 45-47 and carousels c9-c11.
 - Result: pending.
 
+## Interim 2026-10-31 (not a result)
+- No change: only reels 43 (reach 126) and 44 (reach 423) are readable; 45-47 (posted 10-28, 72 h+) still read 0 reach, a fetch gap. Followers 103, flat. 0 of 2 measurable passed; 6 needed.
+- If the fetch is still empty on 11-03: the owner reads reach for 45-47 by hand in the app, or we close as "no signal".
+
 ## Interim 2026-10-30 night (not a result)
 - No change: reels 45-47 still read 0 reach after 48 h+. Still 0 of 2 measurable passed. Followers 103. End date stays ~11-03; if the fetch is not fixed by then, read reach by hand in the app.
 - Result: pending.

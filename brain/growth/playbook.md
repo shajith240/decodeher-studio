@@ -1,4 +1,4 @@
-# Playbook (updated 2026-10-30; performance.md: 35 reels, 11 carousels, 102 followers; reels 45-47 show 0 stats = fetch gap)
+# Playbook (updated 2026-10-31; performance.md: 103 followers; reels 45-47 still show 0 stats = fetch gap)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)

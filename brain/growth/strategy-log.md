@@ -68,3 +68,9 @@
 - Learned: the inbox holds the same two owner tips already noted (Damini 10-19, itsruiz 10-26), so no new notes. No new owner shares (owner.jsonl still 1 row). pick_sources.py not run (needs approval here).
 - Changes: none to rules or tactics. short-script-85 continues (end ~11-03). Adopted tips unchanged: viewer-move hook + reason to send (Damini); opening sound hit stays an idea needing owner OK (itsruiz).
 - Why: only 2 of 6 short reels are readable, so no call. Factory side: fix the insights fetch for reels 45-47 and carousels c9-c12, or the test cannot end.
+
+## 2026-10-31
+- Numbers: 103 followers (flat vs 10-30 night; 6 on 10-16). Reel 43 reach 126; reel 44 reach 423. Reels 45-47 and carousels c9-c12 still read 0 reach (72 h+): stats gap.
+- Learned: inbox repeats the two owner tips already noted, so no new notes or tactics. No new owner shares (owner.jsonl 1 row). Follower growth paused at about 103 for a day.
+- Changes: none to rules. short-script-85 continues, interim logged, no call (0 of 2 measurable, 6 needed). Plan and playbook headers refreshed.
+- Why: one experiment at a time and too few readable reels. Fallback if the fetch stays empty on 11-03: owner reads reach for reels 45-47 by hand, or the test closes as "no signal". Factory side: fix the insights fetch.
