@@ -1,8 +1,8 @@
 {
  "account": {
   "username": "thedecodeher",
-  "followers_count": 103,
-  "media_count": 41,
+  "followers_count": 104,
+  "media_count": 43,
   "id": "39815642344686105"
  },
  "reels": [
@@ -113,13 +113,13 @@
    "permalink": "https://www.instagram.com/reel/DenqxhRgPU1/",
    "postedAt": 1792292508264,
    "reach": 1282,
-   "views": 1588,
+   "views": 1591,
    "likes": 33,
    "comments": 1,
    "shares": 19,
    "saved": 33,
-   "ig_reels_avg_watch_time": 16713,
-   "ig_reels_video_view_total_time": 22144873
+   "ig_reels_avg_watch_time": 16702,
+   "ig_reels_video_view_total_time": 22180433
   },
   {
    "title": "24-W2-three-hours",
@@ -433,13 +433,13 @@
    "permalink": "https://www.instagram.com/reel/DfAS7WCktLe/",
    "postedAt": 1793119400508,
    "reach": 425,
-   "views": 528,
+   "views": 531,
    "likes": 9,
    "comments": 0,
    "shares": 12,
    "saved": 30,
-   "ig_reels_avg_watch_time": 15463,
-   "ig_reels_video_view_total_time": 6618581
+   "ig_reels_avg_watch_time": 15357,
+   "ig_reels_video_view_total_time": 6634393
   },
   {
    "title": "C-c8-a-95-year-old-man-who-was-wi",
@@ -491,6 +491,18 @@
    "title": "C-c12-not-because-attractiveness-i",
    "permalink": "https://www.instagram.com/p/DfGJ1-JCKZe/",
    "postedAt": 1793315974215,
+   "error": "Too many subrequests by single Worker invocation. To configure this limit, refer to https://developers.cloudflare.com/workers/wrangler/configuration/#limits"
+  },
+  {
+   "title": "53-W2-men-who-don-t-chase",
+   "permalink": "https://www.instagram.com/reel/DfKN3ZUlK4Q/",
+   "postedAt": 1793452231271,
+   "error": "Too many subrequests by single Worker invocation. To configure this limit, refer to https://developers.cloudflare.com/workers/wrangler/configuration/#limits"
+  },
+  {
+   "title": "54-W2-three-signs-she-can-t-hi",
+   "permalink": "https://www.instagram.com/reel/DfKlzwOIxfi/",
+   "postedAt": 1793464845501,
    "error": "Too many subrequests by single Worker invocation. To configure this limit, refer to https://developers.cloudflare.com/workers/wrangler/configuration/#limits"
   }
  ]

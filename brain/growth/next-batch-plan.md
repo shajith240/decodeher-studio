@@ -1,4 +1,5 @@
 # Next batch plan: the next 6 scripts (refreshed 2026-10-31)
+10-31 night: plan unchanged; no new inbox items or owner shares. Reels 53-54 (posted today) are short-arm reels: read them after 48 h.
 10-31: plan unchanged. Inbox held only the two owner tips already noted; no new owner shares; reels 45-47 still read 0 (fetch gap). pick_sources.py not run here; the planner's live list wins.
 10-30 night: plan unchanged. No new inbox items or owner shares; reels 45-47 still read 0 (stats gap, not failure).
 10-30: plan unchanged. Today's inbox (Buffer engagement tools, Sprout link in bio) is vendor filler with no script impact; no new owner shares (owner.jsonl has 1 old row); pick_sources.py needs approval here and was not run, so the planner's live list wins over the fallback topics. Reels 45-47 read 0 (stats gap): do not read them as failures. Log word count, source and hook line per draft so the test can be read.

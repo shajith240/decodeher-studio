@@ -74,3 +74,9 @@
 - Learned: inbox repeats the two owner tips already noted, so no new notes or tactics. No new owner shares (owner.jsonl 1 row). Follower growth paused at about 103 for a day.
 - Changes: none to rules. short-script-85 continues, interim logged, no call (0 of 2 measurable, 6 needed). Plan and playbook headers refreshed.
 - Why: one experiment at a time and too few readable reels. Fallback if the fetch stays empty on 11-03: owner reads reach for reels 45-47 by hand, or the test closes as "no signal". Factory side: fix the insights fetch.
+
+## 2026-10-31 (night run)
+- Numbers: 104 followers (103 this morning; 6 on 10-16). Reel 43 reach 126; reel 44 reach 423. Reels 45-47 and carousels c9-c12 still read 0 (fetch gap, 72 h+). Reels 53 and 54 went out today (too new).
+- Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); no new owner shares (owner.jsonl 1 row). Nothing new to write.
+- Changes: none to rules or tactics. short-script-85 continues, end ~11-03; reels 53-54 count as short-arm reels once they have 48 h of data.
+- Why: still only 2 readable short reels, so no call. Factory side: fix the insights fetch for 45-47 and c9-c12.
