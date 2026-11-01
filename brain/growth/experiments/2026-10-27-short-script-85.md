@@ -40,3 +40,8 @@
 - Short arm: 43-47 and 53-55 (8 reels; 55 posted today). Readable: 43 (reach 126), 44 (423). The other six read 0 (fetch gap). 0 of 2 measurable passed. Followers 105.
 - Rule for 11-03: if the owner reads reach for 45-47 and 53-54 by hand, call it on those; otherwise close as "no signal" and start the next test from the idea queue ([[hook-ab-same-body]] needs no owner OK; [[first-frame-hook-text]] does).
 - Result: pending.
+
+## Interim 2026-11-01 night (not a result)
+- No change in readable data: 43 (reach 126), 44 (423); 45-47 and 53-55 read 0 (fetch gap). Followers 110 (105 at 11:32), the best day in a week, but no reel can be credited.
+- Call date stays 11-03: owner reads reach for 45-47 and 53-55 in the app, else close as "no signal".
+- Result: pending.
