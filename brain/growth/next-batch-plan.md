@@ -1,4 +1,5 @@
-# Next batch plan: the next 6 scripts (refreshed 2026-10-31)
+# Next batch plan: the next 6 scripts (refreshed 2026-11-01)
+11-01: plan unchanged. Inbox = the two owner tips already noted; no new owner shares; reels 45-47, 53-55 read 0 (fetch gap). Reel 55 (11-01) is a short-arm reel. pick_sources.py not run here; the planner's live list wins.
 10-31 night: plan unchanged; no new inbox items or owner shares. Reels 53-54 (posted today) are short-arm reels: read them after 48 h.
 10-31: plan unchanged. Inbox held only the two owner tips already noted; no new owner shares; reels 45-47 still read 0 (fetch gap). pick_sources.py not run here; the planner's live list wins.
 10-30 night: plan unchanged. No new inbox items or owner shares; reels 45-47 still read 0 (stats gap, not failure).

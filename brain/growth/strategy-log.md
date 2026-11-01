@@ -80,3 +80,9 @@
 - Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); no new owner shares (owner.jsonl 1 row). Nothing new to write.
 - Changes: none to rules or tactics. short-script-85 continues, end ~11-03; reels 53-54 count as short-arm reels once they have 48 h of data.
 - Why: still only 2 readable short reels, so no call. Factory side: fix the insights fetch for 45-47 and c9-c12.
+
+## 2026-11-01
+- Numbers: 105 followers (104 last night; 6 on 10-16). Reel 43 reach 126; reel 44 reach 423. Reels 45-47, 53-55 and carousels c9-c12 read 0 reach: the gap is 4 days old for 45-47 while followers kept rising, so it is a fetch gap, not zero reach.
+- Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); no new owner shares (owner.jsonl 1 row). Nothing on hooks, length or sources can be compared yet: the data does not exist.
+- Changes: none to rules or tactics. short-script-85 continues; reel 55 (11-01) joins the short arm. Headers refreshed.
+- Why: only 2 of 8 short reels are readable, so no call. On 11-03 the owner reads reach for 45-47 and 53-55 by hand in the app, or we close as "no signal". Factory side: fix the insights fetch. pick_sources.py not run (needs approval here).
