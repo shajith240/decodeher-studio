@@ -1,5 +1,6 @@
 # short-script-85
-Status: testing (experiment 2026-10-27-short-script-85)
+Status: no signal (experiment closed 2026-11-03; kept as the working format, not proven)
+- Closed 11-03: 2 of 2 readable short reels did not pass (43: 126; 44: 423); 45-47 and 53-55 unreadable (fetch gap). Kept because it is an owner rule and 44 (423 reach, 71 saves/1k) is our best recent reel, but it is not a proven rule.
 - What: max 85 spoken words (~30 s), max 3 points, "Listen." with no pause, second beat before 15 s.
 - Why: Reels rank on watch time and completion; replays of short dense reels count too. In our data avg watch of 16 s or more passed the audition 7 of 9, under 16 s only 3 of 16. Since 10-22 scripts grew to 45-60 s and 6 of 7 reels stopped at 35-147 reach.
 - Pipeline: `tools/script_polish.py` enforces words and pause; narration stays complete framed sentences.

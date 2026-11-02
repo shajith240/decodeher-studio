@@ -98,3 +98,9 @@
 - Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); owner.jsonl still 1 row, no new owner shares. Nothing new to write, so no new notes or tactics. No reel can be tied to the follower rise.
 - Changes: none to rules or tactics. short-script-85 continues; call date 11-03. Headers refreshed.
 - Why: 2 of 8 short reels readable, so no call. 11-03: owner reads reach for 45-47 and 53-55 by hand in the app, else close as "no signal" and start hook-ab-same-body. Factory side: fix the insights fetch. pick_sources.py not run (needs approval here).
+
+## 2026-11-03
+- Numbers: 111 followers (111 on 11-02; 74 on 10-27; 6 on 10-16). Readable short reels: 43 (reach 126), 44 (423). Reels 45-47, 53-55 and carousels c9-c12 read 0 (fetch gap, 6 days for 45-47). Small sample: 2 readable.
+- Learned: inbox = one Hootsuite Facebook analytics listicle (no Instagram value, note written) plus two owner tips already noted; owner.jsonl still 1 row. About 5 followers a day with no reel above 530 reach; cause unknown.
+- Changes: short-script-85 closed as "no signal" (kept as owner format, not proven). New test hook-ab-same-body: viewer-move hooks (3 reels) vs type-of-man hooks (3 reels), same short format. Plan, playbook, rules header updated.
+- Why: the call date arrived with only 2 readable reels, so no honest verdict; the next queued test needs no owner OK. Factory side: fix the insights fetch or the new test also ends as no signal. pick_sources.py not run (needs approval here).

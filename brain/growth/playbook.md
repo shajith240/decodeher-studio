@@ -1,4 +1,4 @@
-# Playbook (updated 2026-11-02; performance.md: 111 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
+# Playbook (updated 2026-11-03; performance.md: 111 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)
@@ -20,6 +20,8 @@ Only official guidance, our own proven numbers, and the owner's fixed rules are 
 - Show before you ship: anything new and visual goes to the owner as a preview first.
 
 ## C. Testing now
+- NEW 11-03: [[hook-ab-same-body]], experiments/2026-11-03-hook-viewer-move-vs-type-of-man.md. Next 6 reels: 3 hooks name the viewer's move, 3 name a type of man, all short format. Needs readable stats (fetch gap) or owner hand-read reach.
+- CLOSED 11-03: [[short-script-85]] = no signal (2 readable reels, none passed; 6 unreadable). Format stays as owner rule, not proven. Older interim notes below are history.
 - [[short-script-85]]: experiments/2026-10-27-short-script-85.md. Next 6 reels, pass rate vs the 1-of-6 baseline. Interim 10-28 night: 0 of 2 passed (reach 126, 408 and rising; reels 45-47 too new); judge on watch %, since 16 s average watch is too high a bar for a 30 s reel. The send-vs-save test was closed as "no signal".
 
 - Update 10-30: still 0 of 2 measurable short reels passed (43: 126; 44: 423 reach, 15.5 s, 71 saves/1k). Reels 45-47 read 0 because the stats fetch returned nothing, not because nobody saw them (followers 79, 90, 102 in a day). No call until that is fixed and 6 short reels have data (~11-03).

@@ -7,7 +7,10 @@
 - Size: the next 6 reels, balanced across slots (2 each). Log word count per draft. Note each reel's source and topic so confounds are visible.
 - End: when 6 short reels have 48 h of data (about 2026-11-01 to 11-03). Call "works" if 3+ of 6 pass AND avg watch is 16 s or more on those; "failed" if 0-1 of 6 pass; otherwise "no signal".
 - Warning: baseline is historic, topic and source also change (trend-first, 95/5), so a pass is a hint, not proof. Reel 43 (three questions, 10-27) is the first short one; its 48 h data is not in yet.
-- Result: pending.
+- Result: closed 11-03, NO SIGNAL (see Final).
+
+## Final 2026-11-03: NO SIGNAL
+- Readable: 43 (reach 126), 44 (423). 45-47 and 53-55 still read 0 after 6 days (fetch gap; followers kept rising, 74 to 111). 0 of 2 readable passed; 6 needed. Not enough to call works or failed. Next: [[hook-ab-same-body]] (experiments/2026-11-03-hook-viewer-move-vs-type-of-man.md).
 
 ## Interim 2026-11-02 (not a result)
 - No change in readable data: 43 (reach 126), 44 (423); 45-47 and 53-55 read 0 (fetch gap). Followers 111. Call date stays 11-03: owner hand-reads reach, else close as "no signal".

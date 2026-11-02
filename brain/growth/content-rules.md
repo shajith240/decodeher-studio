@@ -1,5 +1,5 @@
 # Content rules (living rulebook, rewritten daily by the growth session; every script writer follows it)
-Updated 2026-11-01 (no rule changes: inbox repeats known owner tips; only 2 of 8 short reels readable). Evidence: owner rules, our 29 posted reels (performance.md 10-28), viral bank (81 YouTube Shorts, 202 Instagram posts, all ≥1M).
+Updated 2026-11-03: short-script test closed as no signal; new test = viewer-move vs type-of-man hook ([[hook-ab-same-body]]); no other rule change. Earlier 2026-11-01 (no rule changes: inbox repeats known owner tips; only 2 of 8 short reels readable). Evidence: owner rules, our 29 posted reels (performance.md 10-28), viral bank (81 YouTube Shorts, 202 Instagram posts, all ≥1M).
 
 ## Fixed (owner)
 1. Every reel remixes a proven post at 95/5: same hook, same points in the same order, same examples, similar length. Ours: "Listen." after the hook + our closing line. Reword every sentence, never copy word for word. Add one original example or named idea ([[original-content-check]]).

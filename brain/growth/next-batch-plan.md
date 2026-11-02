@@ -1,4 +1,5 @@
-# Next batch plan: the next 6 scripts (refreshed 2026-11-02)
+# Next batch plan: the next 6 scripts (refreshed 2026-11-03)
+11-03: NEW experiment [[hook-ab-same-body]]: rows 1-3 = arm A (hook names the viewer's move), rows 4-6 = arm B (hook names a type of man). Short-script test closed as no signal. Inbox = Facebook analytics listicle (no change) + two owner tips already noted; owner.jsonl still 1 row; pick_sources.py not run here (needs approval), planner's live list wins. 45-47, 53-55 still read 0. Log hook line, word count and source per draft.
 11-02: plan unchanged. Inbox = the two owner tips already noted; no new owner shares; 45-47 and 53-55 still read 0 (fetch gap); followers 111. pick_sources.py not run here.
 11-01 night: plan unchanged. Same two owner tips in the inbox (already noted), owner.jsonl still 1 row; followers 110 (+5 in 12 h) while 45-47 and 53-55 still read 0 (fetch gap). pick_sources.py needs approval here, not run.
 11-01: plan unchanged. Inbox = the two owner tips already noted; no new owner shares; reels 45-47, 53-55 read 0 (fetch gap). Reel 55 (11-01) is a short-arm reel. pick_sources.py not run here; the planner's live list wins.
@@ -15,12 +16,12 @@ Slots (relay): 08:30, 18:30, 22:00 IST; two reels per slot across the batch. 08:
 
 | # | Template | Pillar | Topic | Hook line (viewer move first) | Hook format | Opening AI-woman clip | Slot | Arm |
 |---|---|---|---|---|---|---|---|---|
-| 1 | T5 myth, mechanism, move | attraction myths | Playing it cool | Stop acting like you don't care. It doesn't make her chase you. Listen. | wrong-belief flip | close-up, unimpressed half smile | d1 08:30 | short |
-| 2 | T2 scene, freeze, rewrite | communication | "We'll see" | When you ask her out and she says "we'll see", don't answer the way most guys do. | mistake callout | half-turned, thinking | d1 18:30 | short |
-| 3 | T8 decision tree | manipulation literacy | She cancels, then wants to reschedule | If she cancels last minute and offers another day, don't reply right away. Listen. | mistake callout | looks at phone, sighs | d1 22:00 | short |
-| 4 | T6 three-question audit | self-command | Before the angry reply | Before you answer her cold message, ask yourself one thing first. | mid-scene | eyes reading a message, no smile | d2 08:30 | short |
-| 5 | T9 red flag vs green flag | standards | Plans that never get set | If she says "let's hang out soon" and never picks a day, you have two choices. | behaviour + verdict | scrolls, phone lit on her face | d2 18:30 | short |
-| 6 | T0 decode + three moves | communication | Double text, then silence | If she goes quiet after your double text, don't send a third. Listen. | mistake callout | starts typing, stops | d2 22:00 | short |
+| 1 | T5 myth, mechanism, move | attraction myths | Playing it cool | Stop acting like you don't care. It doesn't make her chase you. Listen. | wrong-belief flip | close-up, unimpressed half smile | d1 08:30 | A move |
+| 2 | T2 scene, freeze, rewrite | communication | "We'll see" | When you ask her out and she says "we'll see", don't answer the way most guys do. | mistake callout | half-turned, thinking | d1 18:30 | A move |
+| 3 | T8 decision tree | manipulation literacy | She cancels, then wants to reschedule | If she cancels last minute and offers another day, don't reply right away. Listen. | mistake callout | looks at phone, sighs | d1 22:00 | A move |
+| 4 | T6 three-question audit | self-command | Before the angry reply | The man who fires back an angry reply to her cold message loses her in one text. Listen. | mid-scene | eyes reading a message, no smile | d2 08:30 | B type |
+| 5 | T9 red flag vs green flag | standards | Plans that never get set | Some men hear "let's hang out soon" as a yes and wait for months. Listen. | behaviour + verdict | scrolls, phone lit on her face | d2 18:30 | B type |
+| 6 | T0 decode + three moves | communication | Double text, then silence | The guy who sends a third text after she goes quiet is teaching her one thing. Listen. | mistake callout | starts typing, stops | d2 22:00 | B type |
 
 Templates: T5, T2, T8, T6, T9, T0 (6 different, T0 once). Pillars: myths, communication x2, manipulation literacy, self-command, standards. Hook type: viewer move first (our best first lines: the favour, chasing, teasing).
 Caption: line 1 = keyword phrase from keywords.md + the hook; last line repeats the spoken closing ask (send or save, our own line). 3 hashtags. No "follow for more". No comment question yet ([[comment-prompt]] waits).
