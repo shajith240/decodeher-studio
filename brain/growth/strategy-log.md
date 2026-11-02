@@ -92,3 +92,9 @@
 - Learned: inbox holds only the two owner tips already noted; no new owner shares. The +5 follower day cannot be tied to a reel because stats are missing. Small sample: 2 readable reels.
 - Changes: none to rules or tactics; headers refreshed. short-script-85 continues.
 - Why: 2 of 8 short reels readable, so no call. 11-03: owner reads reach by hand, or we close as "no signal" and start hook-ab-same-body. Factory side: fix the insights fetch. pick_sources.py not run (needs approval here).
+
+## 2026-11-02
+- Numbers: 111 followers (110 last night; 6 on 10-16). Readable short reels: 43 (reach 126), 44 (423). Reels 45-47, 53-55 and carousels c9-c12 still read 0 (fetch gap, 5 days for 45-47). Small sample: 2 readable reels.
+- Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); owner.jsonl still 1 row, no new owner shares. Nothing new to write, so no new notes or tactics. No reel can be tied to the follower rise.
+- Changes: none to rules or tactics. short-script-85 continues; call date 11-03. Headers refreshed.
+- Why: 2 of 8 short reels readable, so no call. 11-03: owner reads reach for 45-47 and 53-55 by hand in the app, else close as "no signal" and start hook-ab-same-body. Factory side: fix the insights fetch. pick_sources.py not run (needs approval here).

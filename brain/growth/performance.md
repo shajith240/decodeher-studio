@@ -1,6 +1,6 @@
-# Performance — updated 2026-11-01 23:57 IST
+# Performance — updated 2026-11-02 11:25 IST
 
-Followers: **110** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
+Followers: **111** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
 | Posted (IST) | Reel | Format | Len s | Reach | Views | Avg watch s | Watch % | Likes/1k | Comments/1k | Shares/1k | Saves/1k |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -10,13 +10,13 @@ Followers: **110** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-17 08:31 | [19-W2-why-chasing-fails](https://www.instagram.com/reel/DelF_ojChpH/) | old | ? | 1117 | 1449 | 15.4 | ? | 26.0 | 0.0 | 76.1 | 33.1 |
 | 10-17 18:40 | [20-W2-sometime](https://www.instagram.com/reel/DemKm9OEQpL/) | old | ? | 138 | 176 | 14.4 | ? | 43.5 | 0.0 | 7.2 | 43.5 |
 | 10-17 22:01 | [21-W2-she-stopped-asking](https://www.instagram.com/reel/Demiom8AX9D/) | old | ? | 277 | 362 | 16.8 | ? | 36.1 | 0.0 | 14.4 | 21.7 |
-| 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1282 | 1591 | 16.7 | ? | 25.7 | 0.8 | 14.8 | 25.7 |
+| 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1282 | 1592 | 16.7 | ? | 25.7 | 0.8 | 14.8 | 25.7 |
 | 10-18 18:41 | [24-W2-three-hours](https://www.instagram.com/reel/DeovfS9m9FU/) | old | ? | 1063 | 1303 | 13.3 | ? | 16.0 | 0.0 | 3.8 | 15.1 |
 | 10-18 22:01 | [25-W2-double-text-then-silence](https://www.instagram.com/reel/DepHcvKCKzt/) | old | ? | 139 | 171 | 8.5 | ? | 43.2 | 0.0 | 0.0 | 14.4 |
 | 10-19 08:31 | [26-W2-six-words](https://www.instagram.com/reel/DeqPlppmNEL/) | old | ? | 1305 | 1735 | 18.4 | ? | 28.4 | 0.8 | 15.3 | 29.9 |
 | 10-19 18:42 | [27-W2-biggest-turn-off](https://www.instagram.com/reel/DerUaYxEk5K/) | old | ? | 135 | 171 | 11.9 | ? | 44.4 | 0.0 | 7.4 | 7.4 |
 | 10-19 20:12 | [C-c1-green-flags](https://www.instagram.com/p/DerexSzDjyz/) | old | ? | 26 | None | 0.0 | ? | 192.3 | 0.0 | 76.9 | 76.9 |
-| 10-19 22:13 | [31-W2-stop-chasing-her](https://www.instagram.com/reel/DersiYMDUqi/) | old | ? | 177 | 214 | 8.2 | ? | 39.5 | 0.0 | 16.9 | 39.5 |
+| 10-19 22:13 | [31-W2-stop-chasing-her](https://www.instagram.com/reel/DersiYMDUqi/) | old | ? | 177 | 215 | 8.2 | ? | 39.5 | 0.0 | 16.9 | 39.5 |
 | 10-20 04:43 | [C-c2-girls-to-avoid](https://www.instagram.com/p/DesZPfSjAbK/) | old | ? | 16 | None | 0.0 | ? | 250.0 | 0.0 | 0.0 | 125.0 |
 | 10-20 08:44 | [29-W2-likes-you-but-hides-it](https://www.instagram.com/reel/Des01_iCBpu/) | old | ? | 122 | 155 | 10.7 | ? | 16.4 | 0.0 | 8.2 | 16.4 |
 | 10-20 18:44 | [30-W2-what-women-wish-men-knew](https://www.instagram.com/reel/Det5dboDRB4/) | old | ? | 1071 | 1417 | 17.3 | ? | 28.9 | 0.0 | 14.9 | 42.0 |

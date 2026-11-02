@@ -9,6 +9,9 @@
 - Warning: baseline is historic, topic and source also change (trend-first, 95/5), so a pass is a hint, not proof. Reel 43 (three questions, 10-27) is the first short one; its 48 h data is not in yet.
 - Result: pending.
 
+## Interim 2026-11-02 (not a result)
+- No change in readable data: 43 (reach 126), 44 (423); 45-47 and 53-55 read 0 (fetch gap). Followers 111. Call date stays 11-03: owner hand-reads reach, else close as "no signal".
+
 ## Interim 2026-10-28 (not a result)
 - Short reels so far: 43-W2-three-questions (reach 123, avg watch 10.7 s), 44-W2-six-compliments (210, 13.8 s; word count not logged). 0 of 2 passed. 45-W2-soulmates is hours old.
 - Fix to the success rule: "avg watch 16 s or more" came from 45-60 s reels. For ~30 s reels use watch % (34% or more, the old pass line) once the data has it. Still need 6 short reels with 48 h data.
