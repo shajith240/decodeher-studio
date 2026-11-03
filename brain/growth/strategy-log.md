@@ -104,3 +104,9 @@
 - Learned: inbox = one Hootsuite Facebook analytics listicle (no Instagram value, note written) plus two owner tips already noted; owner.jsonl still 1 row. About 5 followers a day with no reel above 530 reach; cause unknown.
 - Changes: short-script-85 closed as "no signal" (kept as owner format, not proven). New test hook-ab-same-body: viewer-move hooks (3 reels) vs type-of-man hooks (3 reels), same short format. Plan, playbook, rules header updated.
 - Why: the call date arrived with only 2 readable reels, so no honest verdict; the next queued test needs no owner OK. Factory side: fix the insights fetch or the new test also ends as no signal. pick_sources.py not run (needs approval here).
+
+## 2026-11-03 (12:02 run)
+- Numbers: 111 followers (111 at 03:37; 74 on 10-27; 6 on 10-16). Readable short reels: 43 (reach 134), 44 (428). Reels 45-47, 53-55 and carousels c9-c12 still read 0 (fetch gap). Small sample: 2 readable.
+- Learned: inbox is unchanged (the two owner tips already noted: Damini 10-19, itsruiz 10-26); no new owner shares (owner.jsonl 1 row). Nothing new to write. Followers flat for 24 h.
+- Changes: none. Experiment hook-ab-same-body (started this morning) continues, end about 11-08. No rule or tactic changed.
+- Why: nothing new to learn and the new test has 0 reels out. Factory side: fix the insights fetch, or this test also ends as "no signal".
