@@ -110,3 +110,9 @@
 - Learned: inbox is unchanged (the two owner tips already noted: Damini 10-19, itsruiz 10-26); no new owner shares (owner.jsonl 1 row). Nothing new to write. Followers flat for 24 h.
 - Changes: none. Experiment hook-ab-same-body (started this morning) continues, end about 11-08. No rule or tactic changed.
 - Why: nothing new to learn and the new test has 0 reels out. Factory side: fix the insights fetch, or this test also ends as "no signal".
+
+## 2026-11-04
+- Numbers: followers 114 (111 → 114 overnight); reels 45-47 and 53-55 still read 0 (fetch gap, not failure); last readable reel is 44 (reach 428). owner.jsonl still 1 row.
+- Learned: inbox = Hootsuite GA4 guide (no website, no use) and TikTok AI-label policy (our realistic AI-woman opener may need a label; Instagram rule unverified). New tactic idea [[ai-label-check]].
+- Changes: no script or plan change; experiment [[hook-ab-same-body]] keeps running (ends about 11-08, result pending).
+- Why: nothing new moves a rule; the real blocker is still the stats fetch.

@@ -6,4 +6,4 @@
 - Size: 3 reels per arm, one per slot per arm (08:30, 18:30, 22:00). Log hook line, word count and source per draft.
 - End: 48 h after the 6th reel posts (about 2026-11-08). Call "works" only if one arm passes 2+ more reels than the other AND stats are readable.
 - Blocker: the insights fetch returns 0 for reels from 10-28 on. Without a fix or hand-read reach from the owner, the result will be "no signal" again.
-- Result: pending.
+- 11-04 check: still running; none of the 6 batch reels is posted or readable yet (reels 53-55 are the old short-arm batch and still read 0). Result: pending.

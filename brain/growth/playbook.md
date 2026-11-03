@@ -1,4 +1,4 @@
-# Playbook (updated 2026-11-03; performance.md: 111 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
+# Playbook (updated 2026-11-04; performance.md: 114 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)
@@ -33,4 +33,4 @@ Only official guidance, our own proven numbers, and the owner's fixed rules are 
 
 ## E. Ideas queued (after the current test)
 1. [[first-frame-hook-text]] (needs owner OK on a sample)  2. [[hook-ab-same-body]]  3. [[opening-sound-hit]] (owner OK)  4. [[comment-prompt]]  5. [[feeling-first-hook]]  6. [[open-loop-body]]  7. [[trial-reels]] (API unchecked)  8. [[send-or-save-closing-line]]
-- Watching: [[original-content-check]], [[carousel-reach-check]]. Parked: [[meta-verified]]. Rejected: [[trending-audio]], risers.
+- Watching: [[original-content-check]], [[carousel-reach-check]], [[ai-label-check]] (new 11-04, Instagram rule unverified). Parked: [[meta-verified]]. Rejected: [[trending-audio]], risers.
