@@ -116,3 +116,9 @@
 - Learned: inbox = Hootsuite GA4 guide (no website, no use) and TikTok AI-label policy (our realistic AI-woman opener may need a label; Instagram rule unverified). New tactic idea [[ai-label-check]].
 - Changes: no script or plan change; experiment [[hook-ab-same-body]] keeps running (ends about 11-08, result pending).
 - Why: nothing new moves a rule; the real blocker is still the stats fetch.
+
+## 2026-11-04 (11:42 run)
+- Numbers: 114 followers (114 at 01:27; 111 on 11-03; 74 on 10-27; 6 on 10-16). Last readable short reels: 43 (reach 134), 44 (428). Reels 45-47, 53-55 and carousels c9-c12 still read 0 (fetch gap). Small sample: 2 readable.
+- Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); owner.jsonl still 1 row, no new owner shares, no new channel playbooks. Nothing new to write.
+- Changes: none to rules, tactics or plan. Experiment [[hook-ab-same-body]] continues (ends about 11-08).
+- Why: no new input and no new readable stats. Without the insights fetch fixed or hand-read reach from the owner, the test ends as "no signal" again.
