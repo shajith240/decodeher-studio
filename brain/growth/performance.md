@@ -1,4 +1,4 @@
-# Performance — updated 2026-11-05 11:59 IST
+# Performance — updated 2026-11-06 01:50 IST
 
 Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
@@ -23,7 +23,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-20 20:15 | [C-c4-choosing-a-partner-takes-pat](https://www.instagram.com/p/DeuD1OgDhwP/) | old | ? | 17 | None | 0.0 | ? | 235.3 | 0.0 | 117.6 | 117.6 |
 | 10-20 22:15 | [32-W2-small-things-she-notices](https://www.instagram.com/reel/DeuRmXGkbu9/) | old | ? | 1107 | 1475 | 17.1 | ? | 39.7 | 0.0 | 37.9 | 58.7 |
 | 10-21 08:45 | [33-W2-habits-women-find-attrac](https://www.instagram.com/reel/DevZve5ipdp/) | old | ? | 1209 | 1474 | 17.7 | ? | 27.3 | 0.0 | 13.2 | 29.8 |
-| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 356 | 16.6 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
+| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 357 | 16.6 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
 | 10-21 22:16 | [35-W2-the-slow-look](https://www.instagram.com/reel/Dew2gXMjnIZ/) | old | ? | 131 | 162 | 12.6 | ? | 38.2 | 0.0 | 0.0 | 38.2 |
 | 10-22 08:47 | [36-W2-what-you-lead-with](https://www.instagram.com/reel/Dex-pu1EbCS/) | old | ? | 1184 | 1530 | 13.0 | ? | 19.4 | 0.0 | 5.9 | 32.9 |
 | 10-22 18:47 | [37-W2-make-her-miss-you](https://www.instagram.com/reel/DezDYWjjUfG/) | old | ? | 1191 | 1528 | 16.2 | ? | 16.8 | 0.0 | 6.7 | 26.9 |
@@ -34,8 +34,8 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-26 18:00 | [C-c5-4-conversations-that-lead-to](https://www.instagram.com/p/De9SIsojHzf/) | old | ? | 11 | None | 0.0 | ? | 181.8 | 0.0 | 0.0 | 90.9 |
 | 10-26 18:41 | [42-W2-friend-zone-texts](https://www.instagram.com/reel/De9V2anEVt7/) | old | ? | 121 | 156 | 9.6 | ? | 24.8 | 0.0 | 16.5 | 41.3 |
 | 10-27 04:41 | [C-c6-for-some-people-kissing-can](https://www.instagram.com/p/De-amXAjK2g/) | old | ? | 20 | None | 0.0 | ? | 100.0 | 0.0 | 100.0 | 50.0 |
-| 10-27 18:42 | [43-W2-three-questions](https://www.instagram.com/reel/De_6ydXAX1G/) | old | ? | 136 | 181 | 11.2 | ? | 44.1 | 0.0 | 14.7 | 51.5 |
-| 10-27 20:13 | [C-c7-don-t-judge-a-woman-simply-b](https://www.instagram.com/p/DfAFJ4vDHb7/) | old | ? | 12 | None | 0.0 | ? | 166.7 | 0.0 | 0.0 | 83.3 |
+| 10-27 18:42 | [43-W2-three-questions](https://www.instagram.com/reel/De_6ydXAX1G/) | old | ? | 136 | 182 | 11.2 | ? | 44.1 | 0.0 | 14.7 | 51.5 |
+| 10-27 20:13 | [C-c7-don-t-judge-a-woman-simply-b](https://www.instagram.com/p/DfAFJ4vDHb7/) | old | ? | 13 | None | 0.0 | ? | 153.8 | 0.0 | 0.0 | 76.9 |
 | 10-27 22:13 | [44-W2-six-compliments](https://www.instagram.com/reel/DfAS7WCktLe/) | old | ? | 429 | 539 | 15.7 | ? | 18.6 | 0.0 | 28.0 | 72.3 |
 | 10-28 04:44 | [C-c8-a-95-year-old-man-who-was-wi](https://www.instagram.com/p/DfA_sl9iM_t/) | old | ? | 11 | None | 0.0 | ? | 363.6 | 0.0 | 0.0 | 90.9 |
 | 10-28 08:45 | [45-W2-soulmates](https://www.instagram.com/reel/DfBbU7mDTHz/) | old | ? | 0 | None | 0.0 | ? | 0 | 0 | 0 | 0 |
@@ -52,5 +52,5 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 ## What stands out
 - Best reach: 26-W2-six-words (1307 reach, 18.3 s average watch).
 - Weakest: 45-W2-soulmates (0 reach, 0.0 s).
-- Shares + saves across all reels: 671.5 + 1463.2 per 1k — see table.
+- Shares + saves across all reels: 671.5 + 1456.8 per 1k — see table.
 - Hook details per reel (for the strategist):
