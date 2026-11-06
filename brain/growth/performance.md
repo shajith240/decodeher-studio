@@ -1,6 +1,6 @@
-# Performance — updated 2026-11-06 12:10 IST
+# Performance — updated 2026-11-07 01:01 IST
 
-Followers: **113** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
+Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
 | Posted (IST) | Reel | Format | Len s | Reach | Views | Avg watch s | Watch % | Likes/1k | Comments/1k | Shares/1k | Saves/1k |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -23,7 +23,7 @@ Followers: **113** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-20 20:15 | [C-c4-choosing-a-partner-takes-pat](https://www.instagram.com/p/DeuD1OgDhwP/) | old | ? | 17 | None | 0.0 | ? | 235.3 | 0.0 | 117.6 | 117.6 |
 | 10-20 22:15 | [32-W2-small-things-she-notices](https://www.instagram.com/reel/DeuRmXGkbu9/) | old | ? | 1107 | 1475 | 17.1 | ? | 39.7 | 0.0 | 37.9 | 58.7 |
 | 10-21 08:45 | [33-W2-habits-women-find-attrac](https://www.instagram.com/reel/DevZve5ipdp/) | old | ? | 1209 | 1474 | 17.7 | ? | 27.3 | 0.0 | 13.2 | 29.8 |
-| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 359 | 16.6 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
+| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 360 | 16.5 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
 | 10-21 22:16 | [35-W2-the-slow-look](https://www.instagram.com/reel/Dew2gXMjnIZ/) | old | ? | 131 | 162 | 12.6 | ? | 38.2 | 0.0 | 0.0 | 38.2 |
 | 10-22 08:47 | [36-W2-what-you-lead-with](https://www.instagram.com/reel/Dex-pu1EbCS/) | old | ? | 1184 | 1530 | 13.0 | ? | 19.4 | 0.0 | 5.9 | 32.9 |
 | 10-22 18:47 | [37-W2-make-her-miss-you](https://www.instagram.com/reel/DezDYWjjUfG/) | old | ? | 1191 | 1528 | 16.2 | ? | 16.8 | 0.0 | 6.7 | 26.9 |
