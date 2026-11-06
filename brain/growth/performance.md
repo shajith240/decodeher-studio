@@ -1,6 +1,6 @@
-# Performance — updated 2026-11-06 01:50 IST
+# Performance — updated 2026-11-06 12:10 IST
 
-Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
+Followers: **113** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
 | Posted (IST) | Reel | Format | Len s | Reach | Views | Avg watch s | Watch % | Likes/1k | Comments/1k | Shares/1k | Saves/1k |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -10,7 +10,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-17 08:31 | [19-W2-why-chasing-fails](https://www.instagram.com/reel/DelF_ojChpH/) | old | ? | 1117 | 1449 | 15.4 | ? | 26.0 | 0.0 | 76.1 | 33.1 |
 | 10-17 18:40 | [20-W2-sometime](https://www.instagram.com/reel/DemKm9OEQpL/) | old | ? | 138 | 176 | 14.4 | ? | 43.5 | 0.0 | 7.2 | 43.5 |
 | 10-17 22:01 | [21-W2-she-stopped-asking](https://www.instagram.com/reel/Demiom8AX9D/) | old | ? | 277 | 362 | 16.8 | ? | 36.1 | 0.0 | 14.4 | 21.7 |
-| 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1286 | 1599 | 16.6 | ? | 25.7 | 0.8 | 16.3 | 25.7 |
+| 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1286 | 1602 | 16.7 | ? | 25.7 | 0.8 | 16.3 | 25.7 |
 | 10-18 18:41 | [24-W2-three-hours](https://www.instagram.com/reel/DeovfS9m9FU/) | old | ? | 1063 | 1303 | 13.3 | ? | 16.0 | 0.0 | 3.8 | 15.1 |
 | 10-18 22:01 | [25-W2-double-text-then-silence](https://www.instagram.com/reel/DepHcvKCKzt/) | old | ? | 139 | 171 | 8.5 | ? | 43.2 | 0.0 | 0.0 | 14.4 |
 | 10-19 08:31 | [26-W2-six-words](https://www.instagram.com/reel/DeqPlppmNEL/) | old | ? | 1307 | 1736 | 18.3 | ? | 28.3 | 0.8 | 15.3 | 29.8 |
@@ -23,7 +23,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-20 20:15 | [C-c4-choosing-a-partner-takes-pat](https://www.instagram.com/p/DeuD1OgDhwP/) | old | ? | 17 | None | 0.0 | ? | 235.3 | 0.0 | 117.6 | 117.6 |
 | 10-20 22:15 | [32-W2-small-things-she-notices](https://www.instagram.com/reel/DeuRmXGkbu9/) | old | ? | 1107 | 1475 | 17.1 | ? | 39.7 | 0.0 | 37.9 | 58.7 |
 | 10-21 08:45 | [33-W2-habits-women-find-attrac](https://www.instagram.com/reel/DevZve5ipdp/) | old | ? | 1209 | 1474 | 17.7 | ? | 27.3 | 0.0 | 13.2 | 29.8 |
-| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 357 | 16.6 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
+| 10-21 18:46 | [34-W2-never-do-this-around-her](https://www.instagram.com/reel/Dewei2LlWCP/) | old | ? | 262 | 359 | 16.6 | ? | 22.9 | 0.0 | 0.0 | 26.7 |
 | 10-21 22:16 | [35-W2-the-slow-look](https://www.instagram.com/reel/Dew2gXMjnIZ/) | old | ? | 131 | 162 | 12.6 | ? | 38.2 | 0.0 | 0.0 | 38.2 |
 | 10-22 08:47 | [36-W2-what-you-lead-with](https://www.instagram.com/reel/Dex-pu1EbCS/) | old | ? | 1184 | 1530 | 13.0 | ? | 19.4 | 0.0 | 5.9 | 32.9 |
 | 10-22 18:47 | [37-W2-make-her-miss-you](https://www.instagram.com/reel/DezDYWjjUfG/) | old | ? | 1191 | 1528 | 16.2 | ? | 16.8 | 0.0 | 6.7 | 26.9 |
@@ -32,7 +32,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-23 18:48 | [40-W2-three-rules-of-thomas-sh](https://www.instagram.com/reel/De1oXUXjNWZ/) | old | ? | 137 | 168 | 13.3 | ? | 14.6 | 0.0 | 7.3 | 7.3 |
 | 10-23 22:19 | [41-W2-she-s-testing-your-tempe](https://www.instagram.com/reel/De2AZ6Fj8ml/) | old | ? | 130 | 154 | 10.6 | ? | 23.1 | 0.0 | 0.0 | 15.4 |
 | 10-26 18:00 | [C-c5-4-conversations-that-lead-to](https://www.instagram.com/p/De9SIsojHzf/) | old | ? | 11 | None | 0.0 | ? | 181.8 | 0.0 | 0.0 | 90.9 |
-| 10-26 18:41 | [42-W2-friend-zone-texts](https://www.instagram.com/reel/De9V2anEVt7/) | old | ? | 121 | 156 | 9.6 | ? | 24.8 | 0.0 | 16.5 | 41.3 |
+| 10-26 18:41 | [42-W2-friend-zone-texts](https://www.instagram.com/reel/De9V2anEVt7/) | old | ? | 121 | 157 | 9.5 | ? | 24.8 | 0.0 | 16.5 | 41.3 |
 | 10-27 04:41 | [C-c6-for-some-people-kissing-can](https://www.instagram.com/p/De-amXAjK2g/) | old | ? | 20 | None | 0.0 | ? | 100.0 | 0.0 | 100.0 | 50.0 |
 | 10-27 18:42 | [43-W2-three-questions](https://www.instagram.com/reel/De_6ydXAX1G/) | old | ? | 136 | 182 | 11.2 | ? | 44.1 | 0.0 | 14.7 | 51.5 |
 | 10-27 20:13 | [C-c7-don-t-judge-a-woman-simply-b](https://www.instagram.com/p/DfAFJ4vDHb7/) | old | ? | 13 | None | 0.0 | ? | 153.8 | 0.0 | 0.0 | 76.9 |
