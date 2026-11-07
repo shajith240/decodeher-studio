@@ -1,4 +1,4 @@
-# Performance — updated 2026-11-07 01:01 IST
+# Performance — updated 2026-11-07 11:28 IST
 
 Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
@@ -7,7 +7,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-16 08:33 | [16-W2-hot-and-cold](https://www.instagram.com/reel/DeihYDykatC/) | old | ? | 269 | 337 | 13.7 | ? | 26.0 | 0.0 | 26.0 | 29.7 |
 | 10-16 18:49 | [17-W2-seen-then-story](https://www.instagram.com/reel/Dejm4BYiABF/) | old | ? | 123 | 155 | 9.3 | ? | 40.7 | 0.0 | 0.0 | 8.1 |
 | 10-16 22:01 | [18-W2-ask-her-a-favour](https://www.instagram.com/reel/Dej93uFlCUw/) | old | ? | 1150 | 1486 | 20.1 | ? | 24.3 | 0.0 | 7.8 | 43.5 |
-| 10-17 08:31 | [19-W2-why-chasing-fails](https://www.instagram.com/reel/DelF_ojChpH/) | old | ? | 1117 | 1449 | 15.4 | ? | 26.0 | 0.0 | 76.1 | 33.1 |
+| 10-17 08:31 | [19-W2-why-chasing-fails](https://www.instagram.com/reel/DelF_ojChpH/) | old | ? | 1117 | 1450 | 15.3 | ? | 26.0 | 0.0 | 76.1 | 33.1 |
 | 10-17 18:40 | [20-W2-sometime](https://www.instagram.com/reel/DemKm9OEQpL/) | old | ? | 138 | 176 | 14.4 | ? | 43.5 | 0.0 | 7.2 | 43.5 |
 | 10-17 22:01 | [21-W2-she-stopped-asking](https://www.instagram.com/reel/Demiom8AX9D/) | old | ? | 277 | 362 | 16.8 | ? | 36.1 | 0.0 | 14.4 | 21.7 |
 | 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1286 | 1602 | 16.7 | ? | 25.7 | 0.8 | 16.3 | 25.7 |
@@ -19,7 +19,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-19 22:13 | [31-W2-stop-chasing-her](https://www.instagram.com/reel/DersiYMDUqi/) | old | ? | 177 | 217 | 8.4 | ? | 39.5 | 0.0 | 16.9 | 39.5 |
 | 10-20 04:43 | [C-c2-girls-to-avoid](https://www.instagram.com/p/DesZPfSjAbK/) | old | ? | 16 | None | 0.0 | ? | 250.0 | 0.0 | 0.0 | 125.0 |
 | 10-20 08:44 | [29-W2-likes-you-but-hides-it](https://www.instagram.com/reel/Des01_iCBpu/) | old | ? | 123 | 156 | 10.6 | ? | 16.3 | 0.0 | 8.1 | 16.3 |
-| 10-20 18:44 | [30-W2-what-women-wish-men-knew](https://www.instagram.com/reel/Det5dboDRB4/) | old | ? | 1071 | 1419 | 17.3 | ? | 28.9 | 0.0 | 14.9 | 42.0 |
+| 10-20 18:44 | [30-W2-what-women-wish-men-knew](https://www.instagram.com/reel/Det5dboDRB4/) | old | ? | 1071 | 1420 | 17.3 | ? | 28.9 | 0.0 | 14.9 | 42.0 |
 | 10-20 20:15 | [C-c4-choosing-a-partner-takes-pat](https://www.instagram.com/p/DeuD1OgDhwP/) | old | ? | 17 | None | 0.0 | ? | 235.3 | 0.0 | 117.6 | 117.6 |
 | 10-20 22:15 | [32-W2-small-things-she-notices](https://www.instagram.com/reel/DeuRmXGkbu9/) | old | ? | 1107 | 1475 | 17.1 | ? | 39.7 | 0.0 | 37.9 | 58.7 |
 | 10-21 08:45 | [33-W2-habits-women-find-attrac](https://www.instagram.com/reel/DevZve5ipdp/) | old | ? | 1209 | 1474 | 17.7 | ? | 27.3 | 0.0 | 13.2 | 29.8 |
