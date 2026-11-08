@@ -1,6 +1,6 @@
-# Performance — updated 2026-11-08 11:25 IST
+# Performance — updated 2026-11-08 23:59 IST
 
-Followers: **115** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
+Followers: **116** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
 | Posted (IST) | Reel | Format | Len s | Reach | Views | Avg watch s | Watch % | Likes/1k | Comments/1k | Shares/1k | Saves/1k |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -36,7 +36,7 @@ Followers: **115** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-27 04:41 | [C-c6-for-some-people-kissing-can](https://www.instagram.com/p/De-amXAjK2g/) | old | ? | 20 | None | 0.0 | ? | 100.0 | 0.0 | 100.0 | 50.0 |
 | 10-27 18:42 | [43-W2-three-questions](https://www.instagram.com/reel/De_6ydXAX1G/) | old | ? | 137 | 183 | 11.1 | ? | 43.8 | 0.0 | 14.6 | 51.1 |
 | 10-27 20:13 | [C-c7-don-t-judge-a-woman-simply-b](https://www.instagram.com/p/DfAFJ4vDHb7/) | old | ? | 13 | None | 0.0 | ? | 153.8 | 0.0 | 0.0 | 76.9 |
-| 10-27 22:13 | [44-W2-six-compliments](https://www.instagram.com/reel/DfAS7WCktLe/) | old | ? | 429 | 539 | 15.7 | ? | 18.6 | 0.0 | 28.0 | 72.3 |
+| 10-27 22:13 | [44-W2-six-compliments](https://www.instagram.com/reel/DfAS7WCktLe/) | old | ? | 430 | 540 | 15.7 | ? | 18.6 | 0.0 | 27.9 | 72.1 |
 | 10-28 04:44 | [C-c8-a-95-year-old-man-who-was-wi](https://www.instagram.com/p/DfA_sl9iM_t/) | old | ? | 11 | None | 0.0 | ? | 363.6 | 0.0 | 0.0 | 90.9 |
 | 10-28 08:45 | [45-W2-soulmates](https://www.instagram.com/reel/DfBbU7mDTHz/) | old | ? | 0 | None | 0.0 | ? | 0 | 0 | 0 | 0 |
 | 10-28 18:45 | [46-W2-when-she-looks-at-you](https://www.instagram.com/reel/DfCf-wYiR6R/) | old | ? | 0 | None | 0.0 | ? | 0 | 0 | 0 | 0 |
@@ -52,5 +52,5 @@ Followers: **115** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 ## What stands out
 - Best reach: 26-W2-six-words (1307 reach, 18.3 s average watch).
 - Weakest: 45-W2-soulmates (0 reach, 0.0 s).
-- Shares + saves across all reels: 671.4 + 1456.4 per 1k — see table.
+- Shares + saves across all reels: 671.3 + 1456.2 per 1k — see table.
 - Hook details per reel (for the strategist):
