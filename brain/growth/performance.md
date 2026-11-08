@@ -1,6 +1,6 @@
-# Performance — updated 2026-11-07 23:36 IST
+# Performance — updated 2026-11-08 11:25 IST
 
-Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
+Followers: **115** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 
 | Posted (IST) | Reel | Format | Len s | Reach | Views | Avg watch s | Watch % | Likes/1k | Comments/1k | Shares/1k | Saves/1k |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -11,7 +11,7 @@ Followers: **114** (first recorded 2026-10-16: 6). Target: 1,000 by 2026-10-26.
 | 10-17 18:40 | [20-W2-sometime](https://www.instagram.com/reel/DemKm9OEQpL/) | old | ? | 138 | 176 | 14.4 | ? | 43.5 | 0.0 | 7.2 | 43.5 |
 | 10-17 22:01 | [21-W2-she-stopped-asking](https://www.instagram.com/reel/Demiom8AX9D/) | old | ? | 277 | 362 | 16.8 | ? | 36.1 | 0.0 | 14.4 | 21.7 |
 | 10-18 08:31 | [23-W2-the-small-test](https://www.instagram.com/reel/DenqxhRgPU1/) | old | ? | 1286 | 1603 | 16.7 | ? | 25.7 | 0.8 | 16.3 | 25.7 |
-| 10-18 18:41 | [24-W2-three-hours](https://www.instagram.com/reel/DeovfS9m9FU/) | old | ? | 1063 | 1303 | 13.3 | ? | 16.0 | 0.0 | 3.8 | 15.1 |
+| 10-18 18:41 | [24-W2-three-hours](https://www.instagram.com/reel/DeovfS9m9FU/) | old | ? | 1063 | 1304 | 13.3 | ? | 16.0 | 0.0 | 3.8 | 15.1 |
 | 10-18 22:01 | [25-W2-double-text-then-silence](https://www.instagram.com/reel/DepHcvKCKzt/) | old | ? | 139 | 171 | 8.5 | ? | 43.2 | 0.0 | 0.0 | 14.4 |
 | 10-19 08:31 | [26-W2-six-words](https://www.instagram.com/reel/DeqPlppmNEL/) | old | ? | 1307 | 1736 | 18.3 | ? | 28.3 | 0.8 | 15.3 | 29.8 |
 | 10-19 18:42 | [27-W2-biggest-turn-off](https://www.instagram.com/reel/DerUaYxEk5K/) | old | ? | 135 | 171 | 11.9 | ? | 44.4 | 0.0 | 7.4 | 7.4 |
