@@ -122,3 +122,9 @@
 - Learned: inbox holds only the two owner tips already noted (Damini 10-19, itsruiz 10-26); owner.jsonl still 1 row, no new owner shares, no new channel playbooks. Nothing new to write.
 - Changes: none to rules, tactics or plan. Experiment [[hook-ab-same-body]] continues (ends about 11-08).
 - Why: no new input and no new readable stats. Without the insights fetch fixed or hand-read reach from the owner, the test ends as "no signal" again.
+
+## 2026-11-09
+- Numbers: followers 116 (114 on 11-04, 74 on 10-27, 6 on 10-16). Last reel in performance.md posted 11-01 (8 days ago); last readable short reels still 43 (reach ~134) and 44 (~430). Reels 45-47, 53-55 read 0 (fetch gap).
+- Learned: inbox = the two owner tips already noted (Damini, itsruiz); owner.jsonl still 1 row; nothing new. Bigger finding: no reel appears after 11-01, so the hook test never started and growth is about 0.4 followers a day.
+- Changes: none to rules or tactics. Experiment end date moved to 48 h after the 6th reel posts. Plan note says posting the batch comes first.
+- Why: no new input. Posting steadily is our rule 4; the gap is the real cost now. Factory side: check why nothing was booked since 11-01 (queue/relay) and the insights fetch.

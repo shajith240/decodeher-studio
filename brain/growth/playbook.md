@@ -1,4 +1,4 @@
-# Playbook (updated 2026-11-04 11:42, no rule change; performance.md: 114 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
+# Playbook (updated 2026-11-09: no rule change; 116 followers; last reel in stats is 11-01, so the hook test has 0 reels out. Before: 11-04 11:42, performance.md: 114 followers; reels 45-47 and 53-55 still show 0 stats = fetch gap)
 Only official guidance, our own proven numbers, and the owner's fixed rules are rules. Everything else is "testing" or "idea".
 
 ## A. Ranked rules (official or proven)

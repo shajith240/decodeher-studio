@@ -1,5 +1,6 @@
 # Experiment: hook names the viewer's move vs a type of man
 - Started: 2026-11-03 (replaces the closed short-script test). Tactic: [[hook-ab-same-body]].
+- 11-09 check: still 0 of 6 batch reels in performance.md (last reel 11-01). The 11-08 end date passed with no data; new end = 48 h after the 6th reel posts. Result: pending, not "no signal" (nothing was tested).
 - Hypothesis: a first sentence naming a type of man ("is that me?") holds the first 3 s better than one naming the viewer's next move.
 - The single change: first sentence only. Arm A (rows 1-3 of next-batch-plan): "If she does X, don't do Y." Arm B (rows 4-6): "The man who does X..." / "Some men...". Everything else is the same short format (max 85 words, 3 points, "Listen.").
 - Metric: pass rate (reach 1,000+ at 48 h), avg watch s and watch %. Second: shares and saves per 1k.
